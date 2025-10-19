@@ -22,23 +22,28 @@ class EspecialidadModel
     public function get($id)
     {
         //Consulta sql
-        $vSql = "SELECT * FROM Especialidad where Id=$id";
+        $vSql = "SELECT e.Id, e.Nombre, e.Descripcion 
+        FROM Tecnico t 
+        JOIN Especialidad e ON t.Id_Especialidad = e.Id 
+        WHERE t.Id_Usuario = '$id';";
 
         //Ejecutar la consulta
         $vResultado = $this->enlace->ExecuteSQL($vSql);
         // Retornar el objeto
-        return $vResultado[0];
+        return $vResultado;
     }
-    public function getRolUser($idUser)
+
+    public function getCategory($id)
     {
         //Consulta sql
-        $vSql = "SELECT r.Id,r.Nombre
-            FROM Rol r, Usuario u
-            where r.Id = u.rol and u.id=$idUser";
+        $vSql = "SELECT e.Id, e.Nombre, e.Descripcion 
+        FROM Categoria_Especialidad c 
+        JOIN Especialidad e ON c.Id_Especialidad = e.Id 
+        WHERE c.Id_Categoria = '$id';";
 
         //Ejecutar la consulta
         $vResultado = $this->enlace->ExecuteSQL($vSql);
         // Retornar el objeto
-        return $vResultado[0];
+        return $vResultado;
     }
 }

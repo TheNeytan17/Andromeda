@@ -23,10 +23,21 @@ require_once "models/UserModel.php";
 require_once "models/RolModel.php";
 require_once "models/TechnicianModel.php";
 require_once "models/EspecialidadModel.php";
+require_once "models/CategoryModel.php";
+require_once "models/EtiquetaModel.php";
+require_once "models/SLAModel.php";
+require_once "models/TicketModel.php";
+require_once "models/TicketHistoryModel.php";
+require_once "models/ImageModel.php";
+require_once "models/ValoracionModel.php";
+require_once "models/AssignmentModel.php";
 
 /***--- Agregar todos los controladores*/
 require_once "controllers/UserController.php";
 require_once "controllers/TechController.php";
+require_once "controllers/CategoryController.php";
+require_once "controllers/TicketController.php";
+require_once "controllers/AssignmentController.php";
 
 
 //Enrutador
