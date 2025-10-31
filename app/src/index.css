@@ -1,68 +1,337 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+@import "tailwindcss";
+@import "tw-animate-css";
+/* Load Shrikhand locally from src/assets/fonts */
+@font-face {
+  font-family: 'Shrikhand';
+  src: url('../src/assets/fonts/Shrikhand-Regular.ttf') format('truetype');
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-style: normal;
+  font-display: swap;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+@custom-variant dark (&:where(.dark, .dark *));
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --primary: #171717;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #171717;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --accent: #f5f5f5;
+  --accent-foreground: #171717;
+  --destructive: #e7000b;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #a1a1a1;
+  --chart-1: #f54900;
+  --chart-2: #009689;
+  --chart-3: #104e64;
+  --chart-4: #ffb900;
+  --chart-5: #fe9a00;
+  --sidebar: #fafafa;
+  --sidebar-foreground: #0a0a0a;
+  --sidebar-primary: #171717;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #171717;
+  --sidebar-border: #e5e5e5;
+  --sidebar-ring: oklch(0.708 0 0);;
+
+  --font-sans: 'Geist', 'Geist Fallback', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-serif: "Geist", "Geist Fallback", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --radius: 0.625rem;
+  
+  --shadow-2xs: 0 1px 3px 0px rgb(0 0 0 / 0.05);
+  --shadow-xs: 0 1px 3px 0px rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0px rgb(0 0 0 / 0.10), 0 1px 2px -1px rgb(0 0 0 / 0.10);
+  --shadow: 0 1px 3px 0px rgb(0 0 0 / 0.10), 0 1px 2px -1px rgb(0 0 0 / 0.10);
+  --shadow-md: 0 1px 3px 0px rgb(0 0 0 / 0.10), 0 2px 4px -1px rgb(0 0 0 / 0.10);
+  --shadow-lg: 0 1px 3px 0px rgb(0 0 0 / 0.10), 0 4px 6px -1px rgb(0 0 0 / 0.10);
+  --shadow-xl: 0 1px 3px 0px rgb(0 0 0 / 0.10), 0 8px 10px -1px rgb(0 0 0 / 0.10);
+  --shadow-2xl: 0 1px 3px 0px rgb(0 0 0 / 0.25);
+  
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+.dark {
+  --background: #241b38;
+  --foreground: #f7f4f3;
+  --card: #352c50;
+  --card-foreground: #f7f4f3;
+  --popover: #171717;
+  --popover-foreground: #f7f4f3;
+  --primary: #f7f4f3;
+  --primary-foreground: #241b38;
+  --secondary: #ff95b5;
+  --secondary-foreground: #f7f4f3;
+  --muted: #ff95b5;
+  --muted-foreground: #f7f4f3;
+  --accent: #352c50;
+  --accent-foreground: #f7f4f3;
+  --destructive: #ff95b5;
+  --border: #fc52af;
+  --input: #f7f4f3;
+  --ring: #352c50;
+  --chart-1: #ff8f57;
+  --chart-2: #fbb25f;
+  --chart-3: #ff8f57;
+  --chart-4: #fbb25f;
+  --chart-5: #ff8f57;
+  --sidebar: #171717;
+  --sidebar-foreground: #f7f4f3;
+  --sidebar-primary: #6f3c82;
+  --sidebar-primary-foreground: #f7f4f3;
+  --sidebar-accent: #7f51bf;
+  --sidebar-accent-foreground: #f7f4f3;
+  --sidebar-border: #7f51bf;
+  --sidebar-ring: #6f3c82;
+  
+  --shadow-2xs: 0 1px 3px 0px rgb(0 0 0 / 0.05);
+  --shadow-xs: 0 1px 3px 0px rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0px rgb(0 0 0 / 0.10), 0 1px 2px -1px rgb(0 0 0 / 0.10);
+  --shadow: 0 1px 3px 0px rgb(0 0 0 / 0.10), 0 1px 2px -1px rgb(0 0 0 / 0.10);
+  --shadow-md: 0 1px 3px 0px rgb(0 0 0 / 0.10), 0 2px 4px -1px rgb(0 0 0 / 0.10);
+  --shadow-lg: 0 1px 3px 0px rgb(0 0 0 / 0.10), 0 4px 6px -1px rgb(0 0 0 / 0.10);
+  --shadow-xl: 0 1px 3px 0px rgb(0 0 0 / 0.10), 0 8px 10px -1px rgb(0 0 0 / 0.10);
+  --shadow-2xl: 0 1px 3px 0px rgb(0 0 0 / 0.25);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-2xs: var(--shadow-2xs);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow: var(--shadow);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Neon hover effect for Home program cards */
+.neon-card {
+  border: 1.5px solid rgba(252, 82, 175, 0.2); /* base tenue */
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  transition:
+    transform 480ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 480ms ease,
+    border-color 480ms ease,
+    background-color 480ms ease;
+  will-change: transform, box-shadow, border-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.neon-card:hover {
+  border-color: rgba(252, 82, 175, 0.85); /* pink suave */
+  box-shadow:
+    0 0 8px rgba(252, 82, 175, 0.35),
+    0 0 16px rgba(252, 82, 175, 0.25),
+    0 0 28px rgba(251, 178, 95, 0.20);
+}
+
+/* Ghost button with gradient neon glow on hover */
+.btn-ghost-neon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  border-radius: 9999px; /* full */
+  border: 2px solid #f7f4f3;
+  color: #f7f4f3;
+  background: #241b38; /* mismo color del fondo del hero */
+  transition: border-color 420ms ease, color 420ms ease, transform 420ms ease;
+  will-change: transform, border-color;
+  isolation: isolate; /* ensure pseudo-element is below */
+}
+
+.btn-ghost-neon:hover {
+  transform: translateY(-1px) scale(1.02);
+  /* Mantener mismo color de fondo y borde; el neón lo hace el pseudo-elemento */
+}
+
+/* Borde con degradado (anillo) */
+.btn-ghost-neon::before {
+  content: "";
+  position: absolute;
+  inset: 0; /* anillo exacto del borde */
+  border-radius: inherit;
+  padding: 2px; /* grosor del anillo */
+  background: linear-gradient(90deg, #6f3c82 0%, #fc52af 50%, #ff8f57 100%);
+  background-size: 200% 100%;
+  /* Crear hueco interior para que no tape el contenido */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 420ms ease;
+}
+
+.btn-ghost-neon:hover::before {
+  opacity: 1; /* muestra el anillo degradado */
+  animation: neonShift 3s linear infinite;
+}
+
+/* Glow exterior suave */
+.btn-ghost-neon::after {
+  content: "";
+  position: absolute;
+  inset: -8px; /* solo fuera del botón */
+  border-radius: inherit;
+  background: linear-gradient(90deg, #fc52af 0%, #fbb25f 50%, #fc52af 100%);
+  background-size: 200% 100%;
+  filter: blur(16px);
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 420ms ease;
+  pointer-events: none;
+}
+
+.btn-ghost-neon:hover::after {
+  opacity: 1; /* enciende el halo exterior */
+  animation: neonShift 3s linear infinite;
+}
+
+@keyframes neonShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Styled select for Kanban state menu */
+.styled-select {
+  /* Glass look with brand purple */
+  background: rgba(111, 60, 130, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #f7f4f3;
+  border: 2px solid #6f3c82;
+  border-radius: 0.75rem;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+  accent-color: #6f3c82; /* replace default blue for supported UAs */
+}
+
+.styled-select:focus,
+.styled-select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(111, 60, 130, 0.35);
+  border-color: #6f3c82;
+}
+
+.styled-select option {
+  background: #2a2141; /* dark menu for contrast */
+  color: #f7f4f3;
+}
+
+/* Many browsers ignore :hover on option; applies in Chromium/Edge */
+.styled-select option:hover,
+.styled-select option:checked,
+.styled-select option:focus {
+  background: #6f3c82;
+  color: #f7f4f3;
+}
+
+/* Animación para los polígonos del Home */
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
   }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
 }
+
+/* Borde degradado animado para cuadros informativos */
+.neon-card-gradient {
+  position: relative;
+  border: 1.5px solid transparent;
+  background-clip: padding-box;
+  transition: all 480ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.neon-card-gradient::before {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(90deg, #fc52af 0%, #fbb25f 25%, #6f3c82 50%, #fc52af 75%, #fbb25f 100%);
+  background-size: 200% 100%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 480ms cubic-bezier(0.23, 1, 0.32, 1);
+  pointer-events: none;
+}
+
+.neon-card-gradient:hover::before {
+  opacity: 1;
+  animation: gradientMove 3s linear infinite;
+}
+
+.neon-card-gradient:hover {
+  box-shadow: 
+    0 0 20px rgba(252, 82, 175, 0.3),
+    0 0 40px rgba(252, 82, 175, 0.2),
+    0 0 60px rgba(252, 82, 175, 0.1);
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Eliminado: animación de eventos al hacer scroll */

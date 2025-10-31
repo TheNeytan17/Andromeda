@@ -107,7 +107,7 @@ CREATE TABLE Historial_Estado (
 
 CREATE TABLE Imagen (
     Id INT AUTO_INCREMENT PRIMARY KEY,
-    Imagen MEDIUMBLOB NOT NULL, -- Array de Bits para guardar la imagen
+    Imagen varchar(100) NOT NULL, -- Array de Bits para guardar la imagen
     Id_Historial INT NOT NULL,
     FOREIGN KEY (Id_Historial) REFERENCES Historial_Estado(Id)
 );
@@ -669,37 +669,37 @@ INSERT INTO Tipo_Notificacion (Id, Nombre) VALUES
 INSERT INTO Ticket (Id_Usuario, Titulo, Descripcion, Fecha_Creacion, Prioridad, Estado, Id_Categoria, Fecha_Cierre, cumplimiento_respuesta, cumplimiento_resolucion) VALUES
 (14, 'Consola de audio no responde en escenario principal', 
 'La consola digital Behringer X32 del escenario principal dejó de responder. No hay salida de audio y el evento comienza en 30 minutos. Pantalla táctil congelada.', 
-'2025-01-18 20:30:00', 5, 5, 1, '2025-01-19 00:15:00', TRUE, TRUE);
+'2025-10-18 20:30:00', 5, 5, 1, '2025-01-19 00:15:00', TRUE, TRUE);
 
 -- Ticket 2: CRÍTICO - Falla en Lámparas LED - RESUELTO
 INSERT INTO Ticket (Id_Usuario, Titulo, Descripcion, Fecha_Creacion, Prioridad, Estado, Id_Categoria, Fecha_Cierre, cumplimiento_respuesta, cumplimiento_resolucion) VALUES
 (15, 'Falla masiva en lámparas LED del escenario', 
 '15 de las 20 lámparas LED del escenario principal no encienden. El show comienza en 45 minutos. Posible problema en el dimmer.', 
-'2025-01-18 21:00:00', 5, 4, 7, NULL, TRUE, FALSE);
+'2025-10-18 21:00:00', 5, 4, 7, NULL, TRUE, FALSE);
 
 -- Ticket 3: CRÍTICO - Desmayo - EN PROCESO
 INSERT INTO Ticket (Id_Usuario, Titulo, Descripcion, Fecha_Creacion, Prioridad, Estado, Id_Categoria, Fecha_Cierre, cumplimiento_respuesta, cumplimiento_resolucion) VALUES
 (16, 'Desmayo en zona de pit - posible golpe de calor', 
 'Mujer de aproximadamente 25 años se desmayó en el pit. Está consciente pero desorientada. Temperatura corporal elevada. Coordenadas: sector A, fila 5.', 
-'2025-01-19 01:05:00', 5, 3, 19, NULL, TRUE, FALSE);
+'2025-10-19 01:05:00', 5, 3, 19, NULL, TRUE, FALSE);
 
 -- Ticket 4: ALTO - Pelea entre asistentes - CERRADO
 INSERT INTO Ticket (Id_Usuario, Titulo, Descripcion, Fecha_Creacion, Prioridad, Estado, Id_Categoria, Fecha_Cierre, cumplimiento_respuesta, cumplimiento_resolucion) VALUES
 (17, 'Pelea entre asistentes en zona de tarima', 
 'Pelea entre 4 personas cerca del escenario. Situación escalando. Requiero equipo de seguridad inmediatamente.', 
-'2025-01-18 22:50:00', 5, 5, 16, '2025-01-18 23:10:00', TRUE, TRUE);
+'2025-10-18 22:50:00', 5, 5, 16, '2025-01-18 23:10:00', TRUE, TRUE);
 
 -- Ticket 5: MEDIO - Programación de luces - ASIGNADO
 INSERT INTO Ticket (Id_Usuario, Titulo, Descripcion, Fecha_Creacion, Prioridad, Estado, Id_Categoria, Fecha_Cierre, cumplimiento_respuesta, cumplimiento_resolucion) VALUES
 (18, 'Ajuste de programación de luces para banda de rock', 
 'Necesito que se ajuste la programación de luces según el rider técnico de la banda que se presenta mañana. Adjunto archivo con especificaciones.', 
-'2025-01-18 10:30:00', 3, 2, 11, NULL, TRUE, FALSE);
+'2025-10-18 10:30:00', 3, 2, 11, NULL, TRUE, FALSE);
 
 -- Ticket 6: BAJO - Revisión de extintores - PENDIENTE
 INSERT INTO Ticket (Id_Usuario, Titulo, Descripcion, Fecha_Creacion, Prioridad, Estado, Id_Categoria, Fecha_Cierre, cumplimiento_respuesta, cumplimiento_resolucion) VALUES
 (14, 'Revisión de extintores en backstage', 
 'Solicito revisión de los extintores del área de backstage. Algunos tienen el precinto roto y no sé si están en buen estado.', 
-'2025-01-19 01:30:00', 2, 1, 13, NULL, FALSE, FALSE);
+'2025-10-19 01:30:00', 2, 1, 13, NULL, FALSE, FALSE);
 
 -- =============================================
 -- HISTORIAL DE ESTADOS
@@ -707,41 +707,41 @@ INSERT INTO Ticket (Id_Usuario, Titulo, Descripcion, Fecha_Creacion, Prioridad, 
 
 -- Ticket 1: Consola de audio (Pendiente → Asignado → En Proceso → Resuelto → Cerrado)
 INSERT INTO Historial_Estado (Id_Ticket, Fecha_Cambio, Estado_Anterior, Estado_Nuevo, Observaciones, Id_Usuario_Responsable) VALUES
-(1, '2025-01-18 20:30:00', 1, 1, 'Ticket creado por usuario', 14),
-(1, '2025-01-18 20:32:00', 1, 2, 'Asignado automáticamente a técnico de audio con menor carga', 1),
-(1, '2025-01-18 20:35:00', 2, 3, 'Técnico en camino al escenario principal', 3),
-(1, '2025-01-18 23:45:00', 3, 4, 'Consola reiniciada. Problema de firmware resuelto. Audio funcionando correctamente.', 3),
-(1, '2025-01-19 00:15:00', 4, 5, 'Usuario confirma que todo está funcionando. Evento culminó exitosamente.', 14);
+(1, '2025-10-18 20:30:00', 1, 1, 'Ticket creado por usuario', 14),
+(1, '2025-10-18 20:32:00', 1, 2, 'Asignado automáticamente a técnico de audio con menor carga', 1),
+(1, '2025-10-18 20:35:00', 2, 3, 'Técnico en camino al escenario principal', 3),
+(1, '2025-10-18 23:45:00', 3, 4, 'Consola reiniciada. Problema de firmware resuelto. Audio funcionando correctamente.', 3),
+(1, '2025-10-19 00:15:00', 4, 5, 'Usuario confirma que todo está funcionando. Evento culminó exitosamente.', 14);
 
 -- Ticket 2: Lámparas LED (Pendiente → Asignado → En Proceso → Resuelto)
 INSERT INTO Historial_Estado (Id_Ticket, Fecha_Cambio, Estado_Anterior, Estado_Nuevo, Observaciones, Id_Usuario_Responsable) VALUES
-(2, '2025-01-18 21:00:00', 1, 1, 'Ticket creado por usuario', 15),
-(2, '2025-01-18 21:02:00', 1, 2, 'Asignado a técnico de iluminación', 1),
-(2, '2025-01-18 21:05:00', 2, 3, 'Verificando dimmer principal. Fusible quemado detectado.', 5),
-(2, '2025-01-18 23:50:00', 3, 4, 'Fusible reemplazado. 18 de 20 luces funcionando. 2 LED requieren cambio de módulo.', 5);
+(2, '2025-10-18 21:00:00', 1, 1, 'Ticket creado por usuario', 15),
+(2, '2025-10-18 21:02:00', 1, 2, 'Asignado a técnico de iluminación', 1),
+(2, '2025-10-18 21:05:00', 2, 3, 'Verificando dimmer principal. Fusible quemado detectado.', 5),
+(2, '2025-10-18 23:50:00', 3, 4, 'Fusible reemplazado. 18 de 20 luces funcionando. 2 LED requieren cambio de módulo.', 5);
 
 -- Ticket 3: Desmayo (Pendiente → Asignado → En Proceso)
 INSERT INTO Historial_Estado (Id_Ticket, Fecha_Cambio, Estado_Anterior, Estado_Nuevo, Observaciones, Id_Usuario_Responsable) VALUES
-(3, '2025-01-19 01:05:00', 1, 1, 'Ticket creado - EMERGENCIA MÉDICA', 16),
-(3, '2025-01-19 01:06:00', 1, 2, 'Paramédico despachado inmediatamente', 1),
-(3, '2025-01-19 01:08:00', 2, 3, 'Paciente atendida. Signos vitales estables. Hidratando y enfriando.', 11);
+(3, '2025-10-19 01:05:00', 1, 1, 'Ticket creado - EMERGENCIA MÉDICA', 16),
+(3, '2025-10-19 01:06:00', 1, 2, 'Paramédico despachado inmediatamente', 1),
+(3, '2025-10-19 01:08:00', 2, 3, 'Paciente atendida. Signos vitales estables. Hidratando y enfriando.', 11);
 
 -- Ticket 4: Pelea (Pendiente → Asignado → En Proceso → Resuelto → Cerrado)
 INSERT INTO Historial_Estado (Id_Ticket, Fecha_Cambio, Estado_Anterior, Estado_Nuevo, Observaciones, Id_Usuario_Responsable) VALUES
-(4, '2025-01-18 22:50:00', 1, 1, 'Ticket creado - EMERGENCIA', 17),
-(4, '2025-01-18 22:51:00', 1, 2, 'Equipo de seguridad en camino', 1),
-(4, '2025-01-18 22:53:00', 2, 3, 'Separando a los involucrados. Situación bajo control.', 8),
-(4, '2025-01-18 23:05:00', 3, 4, '4 personas expulsadas del evento. Área despejada.', 8),
-(4, '2025-01-18 23:10:00', 4, 5, 'Situación resuelta rápidamente. Gracias!', 17);
+(4, '2025-10-18 22:50:00', 1, 1, 'Ticket creado - EMERGENCIA', 17),
+(4, '2025-10-18 22:51:00', 1, 2, 'Equipo de seguridad en camino', 1),
+(4, '2025-10-18 22:53:00', 2, 3, 'Separando a los involucrados. Situación bajo control.', 8),
+(4, '2025-10-18 23:05:00', 3, 4, '4 personas expulsadas del evento. Área despejada.', 8),
+(4, '2025-10-18 23:10:00', 4, 5, 'Situación resuelta rápidamente. Gracias!', 17);
 
 -- Ticket 5: Programación de luces (Pendiente → Asignado)
 INSERT INTO Historial_Estado (Id_Ticket, Fecha_Cambio, Estado_Anterior, Estado_Nuevo, Observaciones, Id_Usuario_Responsable) VALUES
-(5, '2025-01-18 10:30:00', 1, 1, 'Ticket creado', 18),
-(5, '2025-01-18 11:00:00', 1, 2, 'Asignado manualmente a técnico especialista', 1);
+(5, '2025-10-18 10:30:00', 1, 1, 'Ticket creado', 18),
+(5, '2025-10-18 11:00:00', 1, 2, 'Asignado manualmente a técnico especialista', 1);
 
 -- Ticket 6: Extintores (Pendiente)
 INSERT INTO Historial_Estado (Id_Ticket, Fecha_Cambio, Estado_Anterior, Estado_Nuevo, Observaciones, Id_Usuario_Responsable) VALUES
-(6, '2025-01-19 01:30:00', 1, 1, 'Ticket creado - Pendiente de asignación', 14);
+(6, '2025-10-19 01:30:00', 1, 1, 'Ticket creado - Pendiente de asignación', 14);
 
 -- =============================================
 -- ASIGNACIONES
@@ -749,14 +749,14 @@ INSERT INTO Historial_Estado (Id_Ticket, Fecha_Cambio, Estado_Anterior, Estado_N
 
 -- Asignaciones Automáticas (Método 2)
 INSERT INTO Asignacion (Id_Ticket, Id_Tecnico, Id_ReglaAutobriage, Fecha_Asignacion, Metodo_Asignacion, Prioridad) VALUES
-(1, 3, NULL, '2025-01-18 20:32:00', 2, 5),  -- Miguel Ángel Torres (Audio)
-(2, 5, NULL, '2025-01-18 21:02:00', 2, 5),  -- Diego Ramírez (Iluminación)
-(3, 11, NULL, '2025-01-19 01:06:00', 2, 5); -- Carmen Ruiz (Paramédico)
+(1, 3, NULL, '2025-10-18 20:32:00', 2, 5),  -- Miguel Ángel Torres (Audio)
+(2, 5, NULL, '2025-10-18 21:02:00', 2, 5),  -- Diego Ramírez (Iluminación)
+(3, 11, NULL, '2025-10-19 01:06:00', 2, 5); -- Carmen Ruiz (Paramédico)
 
 -- Asignaciones Manuales (Método 1)
 INSERT INTO Asignacion (Id_Ticket, Id_Tecnico, Id_ReglaAutobriage, Fecha_Asignacion, Metodo_Asignacion, Prioridad) VALUES
-(4, 8, NULL, '2025-01-18 22:51:00', 1, 5),  -- Sofía Herrera (Seguridad)
-(5, 5, NULL, '2025-01-18 11:00:00', 1, 3);  -- Diego Ramírez (Iluminación)
+(4, 8, NULL, '2025-10-18 22:51:00', 1, 5),  -- Sofía Herrera (Seguridad)
+(5, 5, NULL, '2025-10-18 11:00:00', 1, 3);  -- Diego Ramírez (Iluminación)
 
 -- =============================================
 -- VALORACIONES (Solo tickets cerrados: 1 y 4)
@@ -775,9 +775,9 @@ INSERT INTO Notificacion (Id_Usuario_Destino, Tipo_Notificacion, Mensaje, Fecha_
 -- Asignación
 (3, 1, 'Se te ha asignado el ticket #1: Consola de audio no responde en escenario principal', '2025-01-18 20:32:00', 1),
 -- Cambios de estado
-(14, 2, 'Tu ticket #1 ha cambiado a estado: Asignado', '2025-01-18 20:32:00', 1),
-(14, 2, 'Tu ticket #1 ha cambiado a estado: En Proceso', '2025-01-18 20:35:00', 1),
-(14, 2, 'Tu ticket #1 ha cambiado a estado: Resuelto', '2025-01-18 23:45:00', 1),
+(14, 2, 'Tu ticket #1 ha cambiado a estado: Asignado', '2025-10-18 20:32:00', 1),
+(14, 2, 'Tu ticket #1 ha cambiado a estado: En Proceso', '2025-10-18 20:35:00', 1),
+(14, 2, 'Tu ticket #1 ha cambiado a estado: Resuelto', '2025-10-18 23:45:00', 1),
 -- Nueva observación
 (14, 3, 'Nuevo comentario en ticket #1: Consola reiniciada. Problema de firmware resuelto.', '2025-01-18 23:45:00', 1);
 
@@ -786,9 +786,9 @@ INSERT INTO Notificacion (Id_Usuario_Destino, Tipo_Notificacion, Mensaje, Fecha_
 -- Asignación
 (5, 1, 'Se te ha asignado el ticket #2: Falla masiva en lámparas LED del escenario', '2025-01-18 21:02:00', 1),
 -- Cambios de estado
-(15, 2, 'Tu ticket #2 ha cambiado a estado: Asignado', '2025-01-18 21:02:00', 1),
-(15, 2, 'Tu ticket #2 ha cambiado a estado: En Proceso', '2025-01-18 21:05:00', 1),
-(15, 2, 'Tu ticket #2 ha cambiado a estado: Resuelto', '2025-01-18 23:50:00', 1),
+(15, 2, 'Tu ticket #2 ha cambiado a estado: Asignado', '2025-10-18 21:02:00', 1),
+(15, 2, 'Tu ticket #2 ha cambiado a estado: En Proceso', '2025-10-18 21:05:00', 1),
+(15, 2, 'Tu ticket #2 ha cambiado a estado: Resuelto', '2025-10-18 23:50:00', 1),
 -- Nueva observación
 (15, 3, 'Nuevo comentario en ticket #2: Fusible reemplazado. 18 de 20 luces funcionando.', '2025-01-18 23:50:00', 1);
 
@@ -797,39 +797,49 @@ INSERT INTO Notificacion (Id_Usuario_Destino, Tipo_Notificacion, Mensaje, Fecha_
 -- Asignación
 (11, 1, 'Se te ha asignado el ticket #3: Desmayo en zona de pit - EMERGENCIA', '2025-01-19 01:06:00', 1),
 -- Cambios de estado
-(16, 2, 'Tu ticket #3 ha cambiado a estado: Asignado', '2025-01-19 01:06:00', 1),
-(16, 2, 'Tu ticket #3 ha cambiado a estado: En Proceso', '2025-01-19 01:08:00', 1),
+(16, 2, 'Tu ticket #3 ha cambiado a estado: Asignado', '2025-10-19 01:06:00', 1),
+(16, 2, 'Tu ticket #3 ha cambiado a estado: En Proceso', '2025-10-19 01:08:00', 1),
 -- Nueva observación
-(16, 3, 'Nuevo comentario en ticket #3: Paciente atendida. Signos vitales estables.', '2025-01-19 01:08:00', 1);
+(16, 3, 'Nuevo comentario en ticket #3: Paciente atendida. Signos vitales estables.', '2025-10-19 01:08:00', 1);
 
 -- Notificaciones Ticket 4: Pelea
 INSERT INTO Notificacion (Id_Usuario_Destino, Tipo_Notificacion, Mensaje, Fecha_Envio, Estado) VALUES
 -- Asignación
 (8, 1, 'Se te ha asignado el ticket #4: Pelea entre asistentes - EMERGENCIA', '2025-01-18 22:51:00', 1),
 -- Cambios de estado
-(17, 2, 'Tu ticket #4 ha cambiado a estado: Asignado', '2025-01-18 22:51:00', 1),
-(17, 2, 'Tu ticket #4 ha cambiado a estado: En Proceso', '2025-01-18 22:53:00', 1),
-(17, 2, 'Tu ticket #4 ha cambiado a estado: Resuelto', '2025-01-18 23:05:00', 1),
+(17, 2, 'Tu ticket #4 ha cambiado a estado: Asignado', '2025-10-18 22:51:00', 1),
+(17, 2, 'Tu ticket #4 ha cambiado a estado: En Proceso', '2025-10-18 22:53:00', 1),
+(17, 2, 'Tu ticket #4 ha cambiado a estado: Resuelto', '2025-10-18 23:05:00', 1),
 -- Nueva observación
-(17, 3, 'Nuevo comentario en ticket #4: 4 personas expulsadas del evento. Área despejada.', '2025-01-18 23:05:00', 1);
+(17, 3, 'Nuevo comentario en ticket #4: 4 personas expulsadas del evento. Área despejada.', '2025-10-18 23:05:00', 1);
 
 -- Notificaciones Ticket 5: Programación
 INSERT INTO Notificacion (Id_Usuario_Destino, Tipo_Notificacion, Mensaje, Fecha_Envio, Estado) VALUES
 -- Asignación
-(5, 1, 'Se te ha asignado el ticket #5: Ajuste de programación de luces para banda', '2025-01-18 11:00:00', 1),
+(5, 1, 'Se te ha asignado el ticket #5: Ajuste de programación de luces para banda', '2025-10-18 11:00:00', 1),
 -- Cambio de estado
-(18, 2, 'Tu ticket #5 ha cambiado a estado: Asignado', '2025-01-18 11:00:00', 1);
+(18, 2, 'Tu ticket #5 ha cambiado a estado: Asignado', '2025-10-18 11:00:00', 1);
 
 -- Notificaciones de Inicio de Sesión (ejemplos)
 INSERT INTO Notificacion (Id_Usuario_Destino, Tipo_Notificacion, Mensaje, Fecha_Envio, Estado) VALUES
-(3, 4, 'Inicio de sesión exitoso desde 192.168.1.100', '2025-01-18 20:30:00', 1),
-(5, 4, 'Inicio de sesión exitoso desde 192.168.1.101', '2025-01-18 21:00:00', 1),
-(11, 4, 'Inicio de sesión exitoso desde 192.168.1.102', '2025-01-19 01:05:00', 1),
-(8, 4, 'Inicio de sesión exitoso desde 192.168.1.103', '2025-01-18 22:50:00', 1);
+(3, 4, 'Inicio de sesión exitoso desde 192.168.1.100', '2025-10-18 20:30:00', 1),
+(5, 4, 'Inicio de sesión exitoso desde 192.168.1.101', '2025-10-18 21:00:00', 1),
+(11, 4, 'Inicio de sesión exitoso desde 192.168.1.102', '2025-10-19 01:05:00', 1),
+(8, 4, 'Inicio de sesión exitoso desde 192.168.1.103', '2025-10-18 22:50:00', 1);
+
+-- Insertar Imagenes
+INSERT INTO Imagen (Imagen, Id_Historial) VALUES 
+('extintor.jpg', 20),
+('desmayo.jpg', 12),
+('OIP.png', 5),
+('documento.png', 18),
+('pelea1.jpg', 13),
+('pelea2.jpg', 13),
+('lampara.png', 6);
 
 -- =============================================
 -- RESUMEN DE DATOS INSERTADOS
--- =============================================
+-- =============================================rolestado_ticketestado_ticket
 -- Roles: 3 (Administrador, Técnico, Usuario Final)
 -- Especialidades: 12 (3 Audio, 3 Visual, 3 Seguridad, 3 Médicas)
 -- Usuarios: 17 (2 Admin, 11 Técnicos, 4 Usuarios Finales)

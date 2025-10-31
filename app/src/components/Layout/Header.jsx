@@ -1,230 +1,151 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Layers,
-  BookOpen,
-  Filter,
-  Wrench,
-  LogIn,
-  UserPlus,
-  LogOut,
-  ShoppingCart,
-  Menu,
-  X,
-  ChevronDown,
-  Clapperboard,
-  User,
-  Film,
-} from "lucide-react";
-
-import { Badge } from "@/components/ui/badge";
-import {
-  Menubar,
-  MenubarMenu,
-  MenubarTrigger,
-  MenubarContent,
-  MenubarItem,
-} from "@/components/ui/menubar";
+import { useState } from "react";
+import sello from "@/assets/sello.png";
+import name from "@/assets/name.png";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
-
-const userData = { email: "demo@correo.com" };
-
-const navItems = [
-  { title: "Películas", href: "/movie", icon: <Film className="h-4 w-4" /> },
-  {
-    title: "Catálogo de Películas",
-    href: "/movie/",
-    icon: <BookOpen className="h-4 w-4" />,
-  },
-  {
-    title: "Filtrar Películas",
-    href: "/movie/filter",
-    icon: <Filter className="h-4 w-4" />,
-  },
-];
-
-const mantItems = [
-  {
-    title: "Mantenimiento Películas",
-    href: "movie/table",
-    icon: <Wrench className="h-4 w-4" />,
-  },
-];
-
-const userItems = [
-  { title: "Login", href: "/user/login", icon: <LogIn className="h-4 w-4" /> },
-  {
-    title: "Registrarse",
-    href: "/user/create",
-    icon: <UserPlus className="h-4 w-4" />,
-  },
-  {
-    title: "Logout",
-    href: "/user/logout",
-    icon: <LogOut className="h-4 w-4" />,
-  },
-];
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import "./sparkle-button.css";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileMaintOpen, setMobileMaintOpen] = useState(false);
+  const [maintenanceOpen, setMaintenanceOpen] = useState(false);
 
   return (
-    <header className="w-full fixed top-0 left-0 z-50 backdrop-blur-xl bg-gradient-to-r from-primary/80 via-primary/60 to-primary/80 border-b border-white/10 shadow-lg">
-      <div className="flex items-center justify-between px-6 py-3 max-w-[1280px] mx-auto text-white">
+    <header
+      className="w-full fixed top-0 left-0 z-50 
+      bg-[#ff95b5]/25 backdrop-blur-lg shadow-lg border-b border-white/20"
+    >
+      <div className="max-w-screen-xl mx-auto flex items-center justify-between px-6 py-3">
 
-        {/* -------- Logo -------- */}
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-xl font-semibold tracking-wide hover:opacity-90 transition"
-        >
-          <Clapperboard className="h-6 w-6" />
-          <span className="hidden sm:inline">MoviesApp</span>
+        {/* Logo + nombre con link al home */}
+        <Link to="/" className="flex items-center gap-3 hover:opacity-90 transition">
+          <img src={sello} alt="Andrómeda Sello" className="h-16 md:h-16 w-auto" />
+          <img src={name} alt="Andrómeda" className="h-10 md:h-10 w-auto" />
         </Link>
 
-        {/* -------- Menú escritorio -------- */}
-        <div className="hidden md:flex flex-1 justify-center">
-          <Menubar className="w-auto bg-transparent border-none shadow-none space-x-6">
-            {/* Películas */}
-            <MenubarMenu>
-              <MenubarTrigger className="text-white font-medium flex items-center gap-1 hover:text-secondary transition">
-                <Film className="h-4 w-4" /> Películas
-                <ChevronDown className="h-3 w-3" />
-              </MenubarTrigger>
-              <MenubarContent className="bg-primary/0 backdrop-blur-md border-white/10">
-                {navItems.map((item) => (
-                  <MenubarItem key={item.href} asChild>
-                    <Link
-                      to={item.href}
-                      className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-accent/10 transition"
-      >
-        
-                      {item.icon} {item.title}
-                    </Link>
-                  </MenubarItem>
-                ))}
-              </MenubarContent>
-            </MenubarMenu>
-
-            {/* Mantenimientos */}
-            <MenubarMenu>
-              <MenubarTrigger className="text-white font-medium flex items-center gap-1 hover:text-secondary transition">
-                <Layers className="h-4 w-4" /> Mantenimientos
-                <ChevronDown className="h-3 w-3" />
-              </MenubarTrigger>
-              <MenubarContent className="bg-primary/0 backdrop-blur-md border-white/10">
-                {mantItems.map((item) => (
-                  <MenubarItem key={item.href} asChild> 
-                    <Link
-                      to={item.href}
-                      className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-accent/10 transition"
-                    >
-                    {item.icon} {item.title}
-                    </Link>
-                  </MenubarItem>
-                ))}
-              </MenubarContent>
-            </MenubarMenu>
-
-            {/* Usuario */}
-            <MenubarMenu>
-              <MenubarTrigger className="text-white font-medium flex items-center gap-1 hover:text-secondary transition">
-                <User className="h-4 w-4" /> {userData.email}
-                <ChevronDown className="h-3 w-3" />
-              </MenubarTrigger>
-              <MenubarContent className="bg-primary/0 backdrop-blur-md border-white/10">
-                {userItems.map((item) => (
-                  <MenubarItem key={item.href} asChild>
-                    <Link
-                      to={item.href}
-                      className="flex items-center gap-2 py-2 px-3 rounded-md text-sm hover:bg-accent/10 transition"
-                    >
-                      {item.icon} {item.title}
-                    </Link>
-                  </MenubarItem>
-                ))}
-              </MenubarContent>
-            </MenubarMenu>
-          </Menubar>
-        </div>
-
-        {/* -------- Carrito + Menú móvil -------- */}
-        <div className="flex items-center gap-4">
-          <Link to="/cart" className="relative hover:opacity-80">
-            <ShoppingCart className="h-6 w-6" />
-            <Badge
-              className="absolute -top-2 -right-3 rounded-full px-2 py-0 text-xs font-semibold"
-              variant="secondary"
-            >
-              3
-            </Badge>
+        {/* Navegación centrada */}
+        <nav className="hidden md:flex items-center gap-10 text-white text-xs font-semibold tracking-wide">
+          <Link
+            to="/incidents"
+            className="hover:text-[#ff95b5] transition-colors"
+          >
+            GESTIÓN DE INCIDENTES
+          </Link>
+          <Link to="/admin" className="hover:text-[#ff95b5] transition-colors">
+            ADMINISTRACIÓN
+          </Link>
+          <Link to="/support" className="hover:text-[#ff95b5] transition-colors">
+            SOPORTE
           </Link>
 
-          {/* Menú móvil */}
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild>
-              <button className="md:hidden inline-flex items-center justify-center p-2 rounded-lg bg-white/10 hover:bg-white/20 transition">
-                {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {/* Dropdown Mantenimientos */}
+          <Popover open={maintenanceOpen} onOpenChange={setMaintenanceOpen}>
+            <PopoverTrigger asChild>
+              <button className="inline-flex items-center gap-1 hover:text-[#ff95b5] transition-colors">
+                MANTENIMIENTOS <ChevronDown className="w-4 h-4" />
               </button>
-            </SheetTrigger>
-            <SheetContent side="left" className="bg-accent/10 transition text-white backdrop-blur-lg w-72">
-              <nav className="mt-8 px-4 space-y-6">
-                <div>
-                  <Link to="/" className="flex items-center gap-2 text-lg font-semibold">
-                    <Clapperboard /> MoviesApp
-                  </Link>
-                </div>
+            </PopoverTrigger>
+            <PopoverContent
+              align="start"
+              className="w-56 bg-[#2b2143]/95 text-white border-white/20 backdrop-blur-md rounded-xl"
+            >
+              <div className="flex flex-col gap-2 text-sm">
+                <Link to="/Technician" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Técnicos</Link>
+                <Link to="/Category" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Categorías</Link>
+                <Link to="/Ticket" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Tickets</Link>
+                <Link to="/Assignment" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Asignaciones</Link>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </nav>
 
-                <div>
-                  <h4 className="mb-2 text-lg font-semibold flex items-center gap-2">
-                    <Film /> Películas
-                  </h4>
-                  {navItems.map((item) => (
+        {/* Botón iniciar sesión */}
+        <div className="hidden md:flex items-center gap-4">
+          <div className="sparkle-container">
+            <div className="sparkle-layer-1">
+              <div className="sparkle-layer-2">
+                <div className="sparkle-layer-3">
+                  <div className="sparkle-layer-4">
                     <Link
-                      key={item.href}
-                      to={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2 py-2 px-3 rounded-md text-white/90 hover:bg-white/10 transition"
+                      to="/login"
+                      className="font-semibold text-xs px-5 py-1.5 rounded-full transition btn-sparkle"
+                      style={{
+                        background: 'rgba(247, 244, 243, 0.15)',
+                        backdropFilter: 'blur(12px)',
+                        border: '2px solid rgba(247, 244, 243, 0.3)',
+                        color: '#f7f4f3'
+                      }}
                     >
-                      {item.icon} {item.title}
+                      INICIAR SESIÓN
                     </Link>
-                  ))}
+                  </div>
                 </div>
-
-                <div>
-                  <h4 className="mb-2 text-lg font-semibold flex items-center gap-2">
-                    <Layers /> Mantenimientos
-                  </h4>
-                  {mantItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      to={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2 py-2 px-3 rounded-md text-white/90 hover:bg-white/10 transition"
-                    >
-                      {item.icon} {item.title}
-                    </Link>
-                  ))}
-                </div>
-
-                <div>
-                  <h4 className="mb-2 text-lg font-semibold flex items-center gap-2">
-                    <User /> {userData.email}
-                  </h4>
-                  {userItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      to={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2 py-2 px-3 rounded-md text-white/90 hover:bg-white/10 transition"
-                    >
-                      {item.icon} {item.title}
-                    </Link>
-                  ))}
-                </div>
-              </nav>
-            </SheetContent>
-          </Sheet>
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Menú móvil */}
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetTrigger asChild>
+            <button className="md:hidden text-white p-2">
+              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </SheetTrigger>
+
+          <SheetContent side="left" className="bg-[#2b2143]/95 text-white backdrop-blur-md">
+            <nav className="mt-10 flex flex-col gap-6 text-sm font-medium">
+              <Link to="/incidents" onClick={() => setMobileOpen(false)}>
+                GESTIÓN DE INCIDENTES
+              </Link>
+              <Link to="/admin" onClick={() => setMobileOpen(false)}>
+                ADMINISTRACIÓN
+              </Link>
+              <Link to="/support" onClick={() => setMobileOpen(false)}>
+                SOPORTE
+              </Link>
+
+              {/* Mantenimientos (desplegable) */}
+              <button
+                type="button"
+                className="flex items-center justify-between w-full text-left hover:text-[#ff95b5] transition-colors"
+                onClick={() => setMobileMaintOpen((v) => !v)}
+              >
+                <span>MANTENIMIENTOS</span>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${
+                    mobileMaintOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {mobileMaintOpen && (
+                <div className="ml-4 flex flex-col gap-4 text-sm">
+                  <Link to="/Technician" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Técnicos</Link>
+                  <Link to="/Category" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Categorías</Link>
+                  <Link to="/Ticket" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Tickets</Link>
+                  <Link to="/Assignment" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Asignaciones</Link>
+                </div>
+              )}
+
+              <Link
+                to="/login"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-full px-4 py-2 text-center font-semibold btn-sparkle"
+                style={{
+                  background: 'rgba(247, 244, 243, 0.15)',
+                  backdropFilter: 'blur(12px)',
+                  border: '2px solid rgba(247, 244, 243, 0.3)',
+                  color: '#f7f4f3'
+                }}
+              >
+                INICIAR SESIÓN
+              </Link>
+            </nav>
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   );

@@ -1,0 +1,312 @@
+/* Sparkle effect for login button - Multiple sparkles with varying sizes */
+
+/* 16 different sparkle animations from various positions */
+@keyframes sparkle-1 {
+  0% { top: -5px; left: 15%; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+  100% { top: -15px; left: 20%; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-2 {
+  0% { top: -5px; right: 15%; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+  100% { top: -15px; right: 20%; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-3 {
+  0% { bottom: -5px; left: 20%; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+  100% { bottom: -15px; left: 25%; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-4 {
+  0% { bottom: -5px; right: 20%; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+  100% { bottom: -15px; right: 25%; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-5 {
+  0% { top: 30%; left: -8px; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+  100% { top: 30%; left: -18px; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-6 {
+  0% { top: 30%; right: -8px; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+  100% { top: 30%; right: -18px; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-7 {
+  0% { top: 70%; left: -8px; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(0.8) rotate(180deg); }
+  100% { top: 70%; left: -18px; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-8 {
+  0% { top: 70%; right: -8px; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(0.8) rotate(180deg); }
+  100% { top: 70%; right: -18px; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-9 {
+  0% { top: -8px; left: 50%; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.3) rotate(180deg); }
+  100% { top: -20px; left: 50%; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-10 {
+  0% { bottom: -8px; left: 50%; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.3) rotate(180deg); }
+  100% { bottom: -20px; left: 50%; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-11 {
+  0% { top: -8px; left: 30%; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(0.7) rotate(180deg); }
+  100% { top: -18px; left: 35%; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-12 {
+  0% { top: -8px; right: 30%; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(0.7) rotate(180deg); }
+  100% { top: -18px; right: 35%; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-13 {
+  0% { bottom: -8px; left: 35%; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(0.9) rotate(180deg); }
+  100% { bottom: -18px; left: 40%; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-14 {
+  0% { bottom: -8px; right: 35%; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(0.9) rotate(180deg); }
+  100% { bottom: -18px; right: 40%; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-15 {
+  0% { top: 15%; left: -10px; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.1) rotate(180deg); }
+  100% { top: 15%; left: -22px; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+@keyframes sparkle-16 {
+  0% { top: 85%; right: -10px; opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.1) rotate(180deg); }
+  100% { top: 85%; right: -22px; opacity: 0; transform: scale(0) rotate(360deg); }
+}
+
+.btn-sparkle {
+  position: relative;
+  overflow: visible !important;
+}
+
+/* Usar múltiples capas para más estrellas */
+.sparkle-container,
+.sparkle-layer-1,
+.sparkle-layer-2,
+.sparkle-layer-3,
+.sparkle-layer-4 {
+  position: relative;
+  display: inline-block;
+}
+
+/* Crear 16 estrellitas usando pseudo-elementos con tamaños variados */
+
+/* Sparkle Container - Estrellas pequeñas */
+.sparkle-container::before {
+  content: "✨";
+  position: absolute;
+  font-size: 0.5rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  top: -5px;
+  left: 15%;
+}
+
+.sparkle-container::after {
+  content: "✨";
+  position: absolute;
+  font-size: 0.5rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  top: -5px;
+  right: 15%;
+}
+
+/* Layer 1 - Estrellas medianas */
+.sparkle-layer-1::before {
+  content: "✨";
+  position: absolute;
+  font-size: 0.75rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  bottom: -5px;
+  left: 20%;
+}
+
+.sparkle-layer-1::after {
+  content: "✨";
+  position: absolute;
+  font-size: 0.75rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  bottom: -5px;
+  right: 20%;
+}
+
+/* Layer 2 - Estrellas grandes */
+.sparkle-layer-2::before {
+  content: "✨";
+  position: absolute;
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  top: 30%;
+  left: -8px;
+}
+
+.sparkle-layer-2::after {
+  content: "✨";
+  position: absolute;
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  top: 30%;
+  right: -8px;
+}
+
+/* Layer 3 - Estrellas pequeñas */
+.sparkle-layer-3::before {
+  content: "✨";
+  position: absolute;
+  font-size: 0.55rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  top: 70%;
+  left: -8px;
+}
+
+.sparkle-layer-3::after {
+  content: "✨";
+  position: absolute;
+  font-size: 0.55rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  top: 70%;
+  right: -8px;
+}
+
+/* Layer 4 - Estrellas muy grandes */
+.sparkle-layer-4::before {
+  content: "✨";
+  position: absolute;
+  font-size: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.sparkle-layer-4::after {
+  content: "✨";
+  position: absolute;
+  font-size: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Button sparkles - Estrellas pequeñas adicionales */
+.btn-sparkle::before {
+  content: "✨";
+  position: absolute;
+  font-size: 0.6rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  top: -8px;
+  left: 30%;
+}
+
+.btn-sparkle::after {
+  content: "✨";
+  position: absolute;
+  font-size: 0.6rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  top: -8px;
+  right: 30%;
+}
+
+/* Animaciones en hover - 14 estrellas */
+.sparkle-container:hover::before {
+  animation: sparkle-1 1.3s ease-in-out infinite;
+}
+
+.sparkle-container:hover::after {
+  animation: sparkle-2 1.3s ease-in-out 0.1s infinite;
+}
+
+.sparkle-layer-1:hover::before {
+  animation: sparkle-3 1.4s ease-in-out 0.2s infinite;
+}
+
+.sparkle-layer-1:hover::after {
+  animation: sparkle-4 1.4s ease-in-out 0.3s infinite;
+}
+
+.sparkle-layer-2:hover::before {
+  animation: sparkle-5 1.5s ease-in-out 0.4s infinite;
+}
+
+.sparkle-layer-2:hover::after {
+  animation: sparkle-6 1.5s ease-in-out 0.5s infinite;
+}
+
+.sparkle-layer-3:hover::before {
+  animation: sparkle-7 1.2s ease-in-out 0.6s infinite;
+}
+
+.sparkle-layer-3:hover::after {
+  animation: sparkle-8 1.2s ease-in-out 0.7s infinite;
+}
+
+.sparkle-layer-4:hover::before {
+  animation: sparkle-9 1.6s ease-in-out 0.8s infinite;
+}
+
+.sparkle-layer-4:hover::after {
+  animation: sparkle-10 1.6s ease-in-out 0.9s infinite;
+}
+
+.btn-sparkle:hover::before {
+  animation: sparkle-11 1.1s ease-in-out 0.15s infinite;
+}
+
+.btn-sparkle:hover::after {
+  animation: sparkle-12 1.1s ease-in-out 0.25s infinite;
+}
+
+/* Subtle glow on hover */
+.btn-sparkle:hover {
+  filter: brightness(1.2);
+  background: rgba(247, 244, 243, 0.25) !important;
+  box-shadow: 0 0 20px rgba(247, 244, 243, 0.4);
+  transition: all 0.3s ease;
+}

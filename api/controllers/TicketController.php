@@ -25,4 +25,24 @@ class Ticket
         //Dar respuesta
         $response->toJSON($result);
     }
+
+    public function technician($param)
+    {
+        $response = new Response();
+        //Obtener el listado del Modelo
+        $Ticket = new TicketModel();
+        $result = $Ticket->technician($param);
+        //Dar respuesta
+        $response->toJSON($result);
+    }
+
+    public function client($param)
+    {
+        $response = new Response();
+        //Obtener el listado del Modelo
+        $Ticket = new TicketModel();
+        $result = $Ticket->client($param);
+        //Dar respuesta
+        $response->toJSON($result);
+    }
 }

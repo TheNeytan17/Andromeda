@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import error from "../../assets/error.jpg";
 
 export function PageNotFound() {
-  const navigate = useNavigate();
+   const navigate = useNavigate();
 
   return (
     <main className="mx-auto mt-20 mb-6 max-w-4xl p-6">

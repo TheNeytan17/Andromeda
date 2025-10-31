@@ -12,8 +12,19 @@ class AssignmentModel
 	}
 	public function all()
 	{
-		//Consulta sql
-		$vSql = "SELECT * FROM Asignacion;";
+		//Consulta sql: incluir datos legibles del ticket y del técnico
+		$vSql = "SELECT 
+					 a.Id,
+					 a.Id_Ticket,
+					 t.Titulo,
+					 a.Id_Tecnico,
+					 u.Nombre AS Tecnico,
+					 a.Metodo_Asignacion,
+					 a.Prioridad,
+					 a.Fecha_Asignacion
+				FROM Asignacion a
+				JOIN Ticket t ON t.Id = a.Id_Ticket
+				INNER JOIN Usuario u ON u.Id = a.Id_Tecnico;";
 
 		//Ejecutar la consulta
 		$vResultado = $this->enlace->ExecuteSQL($vSql);
@@ -48,5 +59,26 @@ class AssignmentModel
 		} else {
 			return null;
 		}
+	}
+
+	public function getById($id)
+	{
+		$TicketM = new TicketModel();
+		$CategoryM = new CategoryModel();
+		$vSql = "SELECT * FROM Asignacion WHERE Id=$id LIMIT 1";
+		$rows = $this->enlace->ExecuteSQL($vSql);
+		if (is_array($rows) && count($rows) > 0) {
+			$asignacion = $rows[0];
+			$ticket = $TicketM->get($asignacion->Id_Ticket);
+			if ($ticket) {
+				$Categoria = $CategoryM->getByCategory($ticket->Id_Categoria);
+				$asignacion->Categoria = isset($Categoria[0]->Nombre) ? $Categoria[0]->Nombre : null;
+				$Estado = $TicketM->getEstado($ticket->Estado);
+				$asignacion->Estado = isset($Estado[0]->Nombre) ? $Estado[0]->Nombre : null;
+				$asignacion->TiempoLimite = $ticket->Fecha_Limite_Resolucion ?: null;
+			}
+			return $asignacion;
+		}
+		return null;
 	}
 }

@@ -25,4 +25,13 @@ class Assignment
         //Dar respuesta
         $response->toJSON($result);
     }
+
+    // Obtener una sola asignación por Id de asignación
+    public function single($param)
+    {
+        $response = new Response();
+        $AssignmentM = new AssignmentModel();
+        $result = $AssignmentM->getById($param);
+        $response->toJSON($result);
+    }
 }

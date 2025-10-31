@@ -12,10 +12,12 @@ class CategoryModel
 	}
 	public function all()
 	{
-		//Consulta sql
-		$vSql = "SELECT * FROM Categoria;";
+		// Incluir la descripción del SLA asociado en el listado
+		$vSql = "SELECT c.Id, c.Nombre, c.Id_SLA, s.Tiempo_Respuesta, s.Tiempo_Resolucion, s.Descripcion AS SLA_Descripcion
+				 FROM Categoria c
+				 INNER JOIN SLA s ON s.Id = c.Id_SLA";
 
-		//Ejecutar la consulta
+		// Ejecutar la consulta
 		$vResultado = $this->enlace->ExecuteSQL($vSql);
 
 		// Retornar el objeto
@@ -60,4 +62,5 @@ class CategoryModel
 		// Retornar el objeto
 		return $vResultado;
 	}
+	
 }

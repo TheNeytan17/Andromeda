@@ -25,10 +25,14 @@ class HistoryModel
 	public function get($id)
 	{
 		$ImageM = new ImageModel();
-		//Consulta sql
-		$vSql = "SELECT *
+		//Consulta sql con JOIN para obtener el nombre del usuario responsable
+		$vSql = "SELECT 
+					H.*,
+					U.Nombre AS Usuario_Responsable
 				FROM Historial_Estado H
-				WHERE H.Id_Ticket = '$id';";
+				LEFT JOIN Usuario U ON H.Id_Usuario_Responsable = U.Id
+				WHERE H.Id_Ticket = '$id'
+				ORDER BY H.Fecha_Cambio ASC;";
 		$vResultado = $this->enlace->ExecuteSQL($vSql);
 
 		if (is_array($vResultado) && count($vResultado) > 0) {
