@@ -453,18 +453,29 @@ export function CreateCategory() {
                                 <Button
                                     type="submit"
                                     disabled={saving}
-                                    className="flex items-center gap-2 bg-[#fc52af] text-white hover:bg-[#fc52af]/90"
+                                    className="flex items-center gap-2 font-semibold"
+                                    style={{
+                                        background: 'rgba(247, 244, 243, 0.15)',
+                                        backdropFilter: 'blur(12px)',
+                                        border: '2px solid rgba(247, 244, 243, 0.3)',
+                                        color: '#f7f4f3'
+                                    }}
                                 >
                                     <Save className="w-4 h-4" />
                                     {saving ? 'Guardando...' : isCreateMode ? 'Crear Categoría' : 'Guardar Cambios'}
                                 </Button>
                                 <Button
                                     type="button"
-                                    variant="outline"
                                     onClick={() => navigate('/TableCategory')}
                                     disabled={saving}
+                                    className="flex items-center gap-2"
+                                    style={{
+                                        background: 'transparent',
+                                        border: '2px solid #f7f4f3',
+                                        color: '#f7f4f3'
+                                    }}
                                 >
-                                    <ArrowLeft className="w-4 h-4 mr-2" />
+                                    <ArrowLeft className="w-4 h-4" />
                                     Cancelar
                                 </Button>
                             </div>
