@@ -30,7 +30,7 @@ class Category
     {
         $response = new Response();
         $request = new Request();
-        $data = $request->getBody();
+        $data = (array) $request->getJSON();
 
         $Category = new CategoryModel();
         $result = $Category->create($data);
@@ -47,7 +47,7 @@ class Category
     {
         $response = new Response();
         $request = new Request();
-        $data = $request->getBody();
+        $data = (array) $request->getJSON();
 
         $Category = new CategoryModel();
         $result = $Category->update($id, $data);

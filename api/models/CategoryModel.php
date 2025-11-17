@@ -87,24 +87,20 @@ class CategoryModel
 			$descripcionSLA = "SLA para categoría " . $data['Nombre'];
 			$vSqlSLA = "INSERT INTO SLA (Descripcion, Tiempo_Respuesta, Tiempo_Resolucion) 
 						VALUES ('$descripcionSLA', '{$data['Tiempo_Respuesta']}', '{$data['Tiempo_Resolucion']}')";
-			$this->enlace->ExecuteSQL($vSqlSLA);
-			$idSLA = $this->enlace->enlace->insert_id;
+			$idSLA = $this->enlace->ExecuteSQL_DML_last($vSqlSLA);
 		}
 
 		// Insertar categoría
-		$nombre = $this->enlace->enlace->real_escape_string($data['Nombre']);
-		$vSql = "INSERT INTO Categoria (Nombre, Id_SLA) VALUES ('$nombre', '$idSLA')";
-		$resultado = $this->enlace->ExecuteSQL($vSql);
+		$vSql = "INSERT INTO Categoria (Nombre, Id_SLA) VALUES ('{$data['Nombre']}', '$idSLA')";
+		$idCategoria = $this->enlace->ExecuteSQL_DML_last($vSql);
 
-		if ($resultado) {
-			$idCategoria = $this->enlace->enlace->insert_id;
-
+		if ($idCategoria) {
 			// Asociar etiquetas
 			if (!empty($data['Etiquetas']) && is_array($data['Etiquetas'])) {
 				foreach ($data['Etiquetas'] as $idEtiqueta) {
 					$vSqlEtiqueta = "INSERT INTO Categoria_Etiqueta (Id_Categoria, Id_Etiqueta) 
 									VALUES ('$idCategoria', '$idEtiqueta')";
-					$this->enlace->ExecuteSQL($vSqlEtiqueta);
+					$this->enlace->ExecuteSQL_DML($vSqlEtiqueta);
 				}
 			}
 
@@ -113,7 +109,7 @@ class CategoryModel
 				foreach ($data['Especialidades'] as $idEspecialidad) {
 					$vSqlEspecialidad = "INSERT INTO Categoria_Especialidad (Id_Categoria, Id_Especialidad) 
 										VALUES ('$idCategoria', '$idEspecialidad')";
-					$this->enlace->ExecuteSQL($vSqlEspecialidad);
+					$this->enlace->ExecuteSQL_DML($vSqlEspecialidad);
 				}
 			}
 
@@ -159,38 +155,37 @@ class CategoryModel
 								Tiempo_Respuesta = '$tiempoRespuesta', 
 								Tiempo_Resolucion = '$tiempoResolucion' 
 							WHERE Id = '$idSLAActual'";
-			$this->enlace->ExecuteSQL($vSqlUpdateSLA);
+			$this->enlace->ExecuteSQL_DML($vSqlUpdateSLA);
 		}
 
 		// Actualizar categoría
-		$nombre = $this->enlace->enlace->real_escape_string($data['Nombre']);
-		$vSql = "UPDATE Categoria SET Nombre = '$nombre', Id_SLA = '$idSLA' WHERE Id = '$id'";
-		$resultado = $this->enlace->ExecuteSQL($vSql);
+		$vSql = "UPDATE Categoria SET Nombre = '{$data['Nombre']}', Id_SLA = '$idSLA' WHERE Id = '$id'";
+		$resultado = $this->enlace->ExecuteSQL_DML($vSql);
 
 		if ($resultado !== false) {
 			// Eliminar etiquetas anteriores
 			$vSqlDeleteEtiquetas = "DELETE FROM Categoria_Etiqueta WHERE Id_Categoria = '$id'";
-			$this->enlace->ExecuteSQL($vSqlDeleteEtiquetas);
+			$this->enlace->ExecuteSQL_DML($vSqlDeleteEtiquetas);
 
 			// Asociar nuevas etiquetas
 			if (!empty($data['Etiquetas']) && is_array($data['Etiquetas'])) {
 				foreach ($data['Etiquetas'] as $idEtiqueta) {
 					$vSqlEtiqueta = "INSERT INTO Categoria_Etiqueta (Id_Categoria, Id_Etiqueta) 
 									VALUES ('$id', '$idEtiqueta')";
-					$this->enlace->ExecuteSQL($vSqlEtiqueta);
+					$this->enlace->ExecuteSQL_DML($vSqlEtiqueta);
 				}
 			}
 
 			// Eliminar especialidades anteriores
 			$vSqlDeleteEspecialidades = "DELETE FROM Categoria_Especialidad WHERE Id_Categoria = '$id'";
-			$this->enlace->ExecuteSQL($vSqlDeleteEspecialidades);
+			$this->enlace->ExecuteSQL_DML($vSqlDeleteEspecialidades);
 
 			// Asociar nuevas especialidades
 			if (!empty($data['Especialidades']) && is_array($data['Especialidades'])) {
 				foreach ($data['Especialidades'] as $idEspecialidad) {
 					$vSqlEspecialidad = "INSERT INTO Categoria_Especialidad (Id_Categoria, Id_Especialidad) 
 										VALUES ('$id', '$idEspecialidad')";
-					$this->enlace->ExecuteSQL($vSqlEspecialidad);
+					$this->enlace->ExecuteSQL_DML($vSqlEspecialidad);
 				}
 			}
 

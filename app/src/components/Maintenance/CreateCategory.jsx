@@ -4,6 +4,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Shadcn UI Components
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,8 +36,6 @@ export function CreateCategory() {
     // Estado de datos y UI
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
-    const [error, setError] = useState(null);
 
     // Estados para los catálogos
     const [etiquetasDisponibles, setEtiquetasDisponibles] = useState([]);
@@ -52,8 +52,6 @@ export function CreateCategory() {
         Especialidades: [],
         usarSLAExistente: true
     });
-
-    const [validationErrors, setValidationErrors] = useState({});
 
     // Cargar catálogos al montar el componente
     useEffect(() => {
@@ -94,7 +92,7 @@ export function CreateCategory() {
             try {
                 const response = await CategoryService.getCategoryById(id);
                 if (!response.data.success) {
-                    setError(response.data.message);
+                    toast.error(response.data.message);
                 } else {
                     const categoria = response.data.data;
                     const sla = Array.isArray(categoria.SLA) ? categoria.SLA[0] : categoria.SLA;
@@ -110,7 +108,7 @@ export function CreateCategory() {
                     });
                 }
             } catch (err) {
-                if (err.name !== 'AbortError') setError(err.message);
+                if (err.name !== 'AbortError') toast.error(err.message);
             } finally {
                 setLoading(false);
             }
@@ -119,10 +117,11 @@ export function CreateCategory() {
     }, [id, isEditMode]);
 
     const validateForm = () => {
-        const errors = {};
+        let isValid = true;
 
         if (!formData.Nombre.trim()) {
-            errors.Nombre = 'El nombre de la categoría es requerido';
+            toast.error('El nombre de la categoría es requerido');
+            isValid = false;
         }
 
         if (!formData.usarSLAExistente) {
@@ -130,18 +129,25 @@ export function CreateCategory() {
             const tiempoResolucion = parseFloat(formData.Tiempo_Resolucion);
 
             if (!formData.Tiempo_Respuesta || tiempoRespuesta <= 0) {
-                errors.Tiempo_Respuesta = 'El tiempo de respuesta debe ser mayor a cero';
+                toast.error('El tiempo de respuesta debe ser mayor o igual que 1');
+                isValid = false;
             }
 
-            if (!formData.Tiempo_Resolucion || tiempoResolucion <= tiempoRespuesta) {
-                errors.Tiempo_Resolucion = 'El tiempo de resolución debe ser mayor que el tiempo de respuesta';
+            if (!formData.Tiempo_Resolucion || tiempoResolucion <= 0) {
+                toast.error('El tiempo de resolución debe ser mayor o igual que 1');
+                isValid = false;
+            }
+
+            if (tiempoRespuesta && tiempoResolucion && tiempoResolucion <= tiempoRespuesta) {
+                toast.error('El tiempo de resolución debe ser mayor que el tiempo de respuesta');
+                isValid = false;
             }
         } else if (!formData.Id_SLA) {
-            errors.Id_SLA = 'Debe seleccionar un SLA';
+            toast.error('Debe seleccionar un SLA');
+            isValid = false;
         }
 
-        setValidationErrors(errors);
-        return Object.keys(errors).length === 0;
+        return isValid;
     };
 
     const handleSubmit = async (e) => {
@@ -152,8 +158,6 @@ export function CreateCategory() {
         }
 
         setSaving(true);
-        setError(null);
-        setSuccessMessage('');
 
         try {
             const dataToSend = {
@@ -169,6 +173,9 @@ export function CreateCategory() {
                 dataToSend.Tiempo_Resolucion = parseFloat(formData.Tiempo_Resolucion);
             }
 
+            console.log('Datos a enviar:', dataToSend);
+            console.log('Modo:', isCreateMode ? 'Crear' : 'Editar');
+
             let response;
             if (isCreateMode) {
                 response = await CategoryService.createCategory(dataToSend);
@@ -176,16 +183,20 @@ export function CreateCategory() {
                 response = await CategoryService.updateCategory(id, dataToSend);
             }
 
+            console.log('Respuesta del servidor:', response.data);
+
             if (response.data.success) {
-                setSuccessMessage(response.data.message);
+                toast.success(response.data.message);
                 setTimeout(() => {
                     navigate('/TableCategory');
                 }, 1500);
             } else {
-                setError(response.data.message);
+                toast.error(response.data.message);
             }
         } catch (err) {
-            setError(err.response?.data?.message || err.message);
+            console.error('Error completo:', err);
+            console.error('Respuesta del error:', err.response?.data);
+            toast.error(err.response?.data?.message || err.message);
         } finally {
             setSaving(false);
         }
@@ -193,9 +204,6 @@ export function CreateCategory() {
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
-        if (validationErrors[field]) {
-            setValidationErrors(prev => ({ ...prev, [field]: undefined }));
-        }
     };
 
     const toggleEtiqueta = (idEtiqueta) => {
@@ -226,17 +234,18 @@ export function CreateCategory() {
                     {isCreateMode ? 'Crear Categoría' : 'Editar Categoría'}
                 </h1>
 
-                {successMessage && (
-                    <Alert className="border-green-500 bg-green-50">
-                        <AlertDescription className="text-green-800">{successMessage}</AlertDescription>
-                    </Alert>
-                )}
-
-                {error && (
-                    <Alert className="border-red-500 bg-red-50">
-                        <AlertDescription className="text-red-800">{error}</AlertDescription>
-                    </Alert>
-                )}
+                <ToastContainer 
+                    position="top-right"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                />
 
                 <form onSubmit={handleSubmit}>
                     <Card 
@@ -257,11 +266,7 @@ export function CreateCategory() {
                                     value={formData.Nombre}
                                     onChange={(e) => handleInputChange('Nombre', e.target.value)}
                                     placeholder="Ingrese el nombre de la categoría"
-                                    className={validationErrors.Nombre ? 'border-red-500' : ''}
                                 />
-                                {validationErrors.Nombre && (
-                                    <p className="text-red-500 text-sm">{validationErrors.Nombre}</p>
-                                )}
                             </div>
 
                             {/* SLA */}
@@ -291,7 +296,7 @@ export function CreateCategory() {
                                             value={formData.Id_SLA?.toString()} 
                                             onValueChange={(value) => handleInputChange('Id_SLA', value)}
                                         >
-                                            <SelectTrigger className={validationErrors.Id_SLA ? 'border-red-500' : ''}>
+                                            <SelectTrigger>
                                                 <SelectValue placeholder="Seleccione un SLA" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -302,9 +307,6 @@ export function CreateCategory() {
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        {validationErrors.Id_SLA && (
-                                            <p className="text-red-500 text-sm">{validationErrors.Id_SLA}</p>
-                                        )}
                                         {formData.Id_SLA && (
                                             <div className="p-3 border rounded-lg" style={{ backgroundColor: 'rgb(255, 143, 87, 0.1)', borderColor: '#ff8f57' }}>
                                                 <p className="text-sm" style={{ color: '#f7f4f3' }}>
@@ -327,11 +329,7 @@ export function CreateCategory() {
                                                 value={formData.Tiempo_Respuesta}
                                                 onChange={(e) => handleInputChange('Tiempo_Respuesta', e.target.value)}
                                                 placeholder="Ej: 30"
-                                                className={validationErrors.Tiempo_Respuesta ? 'border-red-500' : ''}
                                             />
-                                            {validationErrors.Tiempo_Respuesta && (
-                                                <p className="text-red-500 text-sm">{validationErrors.Tiempo_Respuesta}</p>
-                                            )}
                                         </div>
 
                                         <div className="space-y-2">
@@ -345,11 +343,7 @@ export function CreateCategory() {
                                                 value={formData.Tiempo_Resolucion}
                                                 onChange={(e) => handleInputChange('Tiempo_Resolucion', e.target.value)}
                                                 placeholder="Ej: 120"
-                                                className={validationErrors.Tiempo_Resolucion ? 'border-red-500' : ''}
                                             />
-                                            {validationErrors.Tiempo_Resolucion && (
-                                                <p className="text-red-500 text-sm">{validationErrors.Tiempo_Resolucion}</p>
-                                            )}
                                         </div>
                                     </div>
                                 )}
@@ -453,12 +447,20 @@ export function CreateCategory() {
                                 <Button
                                     type="submit"
                                     disabled={saving}
-                                    className="flex items-center gap-2 font-semibold"
+                                    className="flex items-center gap-2 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
                                     style={{
                                         background: 'rgba(247, 244, 243, 0.15)',
                                         backdropFilter: 'blur(12px)',
                                         border: '2px solid rgba(247, 244, 243, 0.3)',
                                         color: '#f7f4f3'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = 'rgba(247, 244, 243, 0.25)';
+                                        e.currentTarget.style.borderColor = 'rgba(247, 244, 243, 0.5)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = 'rgba(247, 244, 243, 0.15)';
+                                        e.currentTarget.style.borderColor = 'rgba(247, 244, 243, 0.3)';
                                     }}
                                 >
                                     <Save className="w-4 h-4" />
@@ -468,11 +470,19 @@ export function CreateCategory() {
                                     type="button"
                                     onClick={() => navigate('/TableCategory')}
                                     disabled={saving}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg"
                                     style={{
                                         background: 'transparent',
                                         border: '2px solid #f7f4f3',
                                         color: '#f7f4f3'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = 'rgba(247, 244, 243, 0.1)';
+                                        e.currentTarget.style.borderColor = '#fc52af';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = 'transparent';
+                                        e.currentTarget.style.borderColor = '#f7f4f3';
                                     }}
                                 >
                                     <ArrowLeft className="w-4 h-4" />

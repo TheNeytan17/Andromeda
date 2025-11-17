@@ -140,7 +140,10 @@ class RoutesController
 
                     case 'PUT':
                     case 'PATCH':
-                        if ($param1) {
+                        if ($action && is_numeric($action)) {
+                            // URL del tipo /Category/5
+                            $response->update($action);
+                        } elseif ($param1) {
                             $response->update($param1);
                         } elseif ($action && method_exists($response, $action)) {
                             $response->$action();
