@@ -30,4 +30,5 @@ class SLAModel
         // Retornar el objeto
         return $vResultado;
     }
+
 }

@@ -57,8 +57,8 @@ export function DetailCategory() {
     const sla = Array.isArray(categoria.SLA) ? categoria.SLA[0] : categoria.SLA;
 
     return (
-        <div className="max-w-5xl mx-auto py-12 px-6 md:px-10 lg:px-16">
-            <div className="space-y-6">
+        <div className="max-w-5xl mx-auto py-6 px-4 md:px-6 lg:px-8">
+            <div className="space-y-4">
                 {/* Título */}
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
                     {categoria.Nombre}
@@ -96,8 +96,8 @@ export function DetailCategory() {
                                 </div>
                                 {sla ? (
                                     <div className="text-muted-foreground space-y-1">
-                                        <p>Tiempo de respuesta: <span className="font-semibold">{sla.Tiempo_Respuesta}</span> h</p>
-                                        <p>Tiempo de resolución: <span className="font-semibold">{sla.Tiempo_Resolucion}</span> h</p>
+                                        <p>Tiempo de respuesta: <span className="font-semibold">{sla.Tiempo_Respuesta}</span> min</p>
+                                        <p>Tiempo de resolución: <span className="font-semibold">{sla.Tiempo_Resolucion}</span> min</p>
                                         <p className="mt-2">{sla.Descripcion}</p>
                                     </div>
                                 ) : (

@@ -36,8 +36,11 @@ require_once "models/AssignmentModel.php";
 require_once "controllers/UserController.php";
 require_once "controllers/TechController.php";
 require_once "controllers/CategoryController.php";
+require_once "controllers/EtiquetaController.php";
+require_once "controllers/EspecialidadController.php";
 require_once "controllers/TicketController.php";
 require_once "controllers/AssignmentController.php";
+require_once "controllers/SLAController.php";
 
 
 //Enrutador

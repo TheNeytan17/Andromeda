@@ -53,7 +53,7 @@ export default function Header() {
             >
               <div className="flex flex-col gap-2 text-sm">
                 <Link to="/Technician" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Técnicos</Link>
-                <Link to="/Category" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Categorías</Link>
+                <Link to="/TableCategory" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Categorías</Link>
                 <Link to="/Ticket" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Tickets</Link>
                 <Link to="/Assignment" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Asignaciones</Link>
               </div>
@@ -124,7 +124,7 @@ export default function Header() {
               {mobileMaintOpen && (
                 <div className="ml-4 flex flex-col gap-4 text-sm">
                   <Link to="/Technician" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Técnicos</Link>
-                  <Link to="/Category" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Categorías</Link>
+                  <Link to="/TableCategory" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Categorías</Link>
                   <Link to="/Ticket" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Tickets</Link>
                   <Link to="/Assignment" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Asignaciones</Link>
                 </div>

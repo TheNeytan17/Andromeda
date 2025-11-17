@@ -12,6 +12,7 @@ import ListTechnician from './components/Maintenance/TableTechnician'
 import { DetailTechnician } from './components/Maintenance/DetailTechnician'
 import ListCategories from './components/Maintenance/TableCategory'
 import { DetailCategory } from './components/Maintenance/DetailCategory'
+import { CreateCategory } from './components/Maintenance/CreateCategory'
 import ListTickets from './components/Maintenance/TableTicket'
 import { DetailTicket } from './components/Maintenance/DetailTicket'
 import TableAssignments from './components/Maintenance/TableAssign'
@@ -28,8 +29,9 @@ const rutas = createBrowserRouter([
       //Rutas componentes
       { path: "Technician", element: <ListTechnician /> },// Lista Tecnicos
       { path: "Technician/:id", element: <DetailTechnician /> }, // Detalle Tecnico
-      { path: "Category", element: <ListCategories /> }, // Lista Categorías
+      { path: "TableCategory", element: <ListCategories /> }, // Lista Categorías
       { path: "Category/:id", element: <DetailCategory /> }, // Detalle Categoría
+      { path: "CreateCategory/:id", element: <CreateCategory /> }, // Crear/Editar Categoría
       { path: "Ticket", element: <ListTickets /> }, // Lista Tickets
       { path: "Ticket/:id", element: <DetailTicket /> }, // Detalle Ticket
       { path: "Assignment", element: <TableAssignments /> }, // Lista Asignaciones

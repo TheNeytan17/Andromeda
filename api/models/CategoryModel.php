@@ -62,5 +62,142 @@ class CategoryModel
 		// Retornar el objeto
 		return $vResultado;
 	}
+
+	public function create($data)
+	{
+		// Validaciones
+		if (empty($data['Nombre'])) {
+			return ['success' => false, 'message' => 'El nombre de la categoría es requerido'];
+		}
+
+		// Determinar si se usa un SLA existente o se crea uno nuevo
+		$idSLA = null;
+		if (!empty($data['Id_SLA'])) {
+			$idSLA = $data['Id_SLA'];
+		} else {
+			// Validar tiempos de SLA
+			if (empty($data['Tiempo_Respuesta']) || $data['Tiempo_Respuesta'] <= 0) {
+				return ['success' => false, 'message' => 'El tiempo de respuesta debe ser mayor a cero'];
+			}
+			if (empty($data['Tiempo_Resolucion']) || $data['Tiempo_Resolucion'] <= $data['Tiempo_Respuesta']) {
+				return ['success' => false, 'message' => 'El tiempo de resolución debe ser mayor que el tiempo de respuesta'];
+			}
+
+			// Crear nuevo SLA
+			$descripcionSLA = "SLA para categoría " . $data['Nombre'];
+			$vSqlSLA = "INSERT INTO SLA (Descripcion, Tiempo_Respuesta, Tiempo_Resolucion) 
+						VALUES ('$descripcionSLA', '{$data['Tiempo_Respuesta']}', '{$data['Tiempo_Resolucion']}')";
+			$this->enlace->ExecuteSQL($vSqlSLA);
+			$idSLA = $this->enlace->enlace->insert_id;
+		}
+
+		// Insertar categoría
+		$nombre = $this->enlace->enlace->real_escape_string($data['Nombre']);
+		$vSql = "INSERT INTO Categoria (Nombre, Id_SLA) VALUES ('$nombre', '$idSLA')";
+		$resultado = $this->enlace->ExecuteSQL($vSql);
+
+		if ($resultado) {
+			$idCategoria = $this->enlace->enlace->insert_id;
+
+			// Asociar etiquetas
+			if (!empty($data['Etiquetas']) && is_array($data['Etiquetas'])) {
+				foreach ($data['Etiquetas'] as $idEtiqueta) {
+					$vSqlEtiqueta = "INSERT INTO Categoria_Etiqueta (Id_Categoria, Id_Etiqueta) 
+									VALUES ('$idCategoria', '$idEtiqueta')";
+					$this->enlace->ExecuteSQL($vSqlEtiqueta);
+				}
+			}
+
+			// Asociar especialidades
+			if (!empty($data['Especialidades']) && is_array($data['Especialidades'])) {
+				foreach ($data['Especialidades'] as $idEspecialidad) {
+					$vSqlEspecialidad = "INSERT INTO Categoria_Especialidad (Id_Categoria, Id_Especialidad) 
+										VALUES ('$idCategoria', '$idEspecialidad')";
+					$this->enlace->ExecuteSQL($vSqlEspecialidad);
+				}
+			}
+
+			return ['success' => true, 'message' => 'Categoría creada exitosamente', 'id' => $idCategoria];
+		}
+
+		return ['success' => false, 'message' => 'Error al crear la categoría'];
+	}
+
+	public function update($id, $data)
+	{
+		// Validaciones
+		if (empty($data['Nombre'])) {
+			return ['success' => false, 'message' => 'El nombre de la categoría es requerido'];
+		}
+
+		// Obtener categoría actual
+		$categoriaActual = $this->getByCategory($id);
+		if (!$categoriaActual || empty($categoriaActual)) {
+			return ['success' => false, 'message' => 'Categoría no encontrada'];
+		}
+
+		$idSLAActual = $categoriaActual[0]->Id_SLA;
+
+		// Determinar si se actualiza el SLA o se crea uno nuevo
+		$idSLA = $idSLAActual;
+		if (!empty($data['Id_SLA']) && $data['Id_SLA'] != $idSLAActual) {
+			$idSLA = $data['Id_SLA'];
+		} else if (!empty($data['Tiempo_Respuesta']) || !empty($data['Tiempo_Resolucion'])) {
+			// Validar tiempos de SLA
+			$tiempoRespuesta = !empty($data['Tiempo_Respuesta']) ? $data['Tiempo_Respuesta'] : 0;
+			$tiempoResolucion = !empty($data['Tiempo_Resolucion']) ? $data['Tiempo_Resolucion'] : 0;
+
+			if ($tiempoRespuesta <= 0) {
+				return ['success' => false, 'message' => 'El tiempo de respuesta debe ser mayor a cero'];
+			}
+			if ($tiempoResolucion <= $tiempoRespuesta) {
+				return ['success' => false, 'message' => 'El tiempo de resolución debe ser mayor que el tiempo de respuesta'];
+			}
+
+			// Actualizar SLA existente
+			$vSqlUpdateSLA = "UPDATE SLA SET 
+								Tiempo_Respuesta = '$tiempoRespuesta', 
+								Tiempo_Resolucion = '$tiempoResolucion' 
+							WHERE Id = '$idSLAActual'";
+			$this->enlace->ExecuteSQL($vSqlUpdateSLA);
+		}
+
+		// Actualizar categoría
+		$nombre = $this->enlace->enlace->real_escape_string($data['Nombre']);
+		$vSql = "UPDATE Categoria SET Nombre = '$nombre', Id_SLA = '$idSLA' WHERE Id = '$id'";
+		$resultado = $this->enlace->ExecuteSQL($vSql);
+
+		if ($resultado !== false) {
+			// Eliminar etiquetas anteriores
+			$vSqlDeleteEtiquetas = "DELETE FROM Categoria_Etiqueta WHERE Id_Categoria = '$id'";
+			$this->enlace->ExecuteSQL($vSqlDeleteEtiquetas);
+
+			// Asociar nuevas etiquetas
+			if (!empty($data['Etiquetas']) && is_array($data['Etiquetas'])) {
+				foreach ($data['Etiquetas'] as $idEtiqueta) {
+					$vSqlEtiqueta = "INSERT INTO Categoria_Etiqueta (Id_Categoria, Id_Etiqueta) 
+									VALUES ('$id', '$idEtiqueta')";
+					$this->enlace->ExecuteSQL($vSqlEtiqueta);
+				}
+			}
+
+			// Eliminar especialidades anteriores
+			$vSqlDeleteEspecialidades = "DELETE FROM Categoria_Especialidad WHERE Id_Categoria = '$id'";
+			$this->enlace->ExecuteSQL($vSqlDeleteEspecialidades);
+
+			// Asociar nuevas especialidades
+			if (!empty($data['Especialidades']) && is_array($data['Especialidades'])) {
+				foreach ($data['Especialidades'] as $idEspecialidad) {
+					$vSqlEspecialidad = "INSERT INTO Categoria_Especialidad (Id_Categoria, Id_Especialidad) 
+										VALUES ('$id', '$idEspecialidad')";
+					$this->enlace->ExecuteSQL($vSqlEspecialidad);
+				}
+			}
+
+			return ['success' => true, 'message' => 'Categoría actualizada exitosamente'];
+		}
+
+		return ['success' => false, 'message' => 'Error al actualizar la categoría'];
+	}
 	
 }

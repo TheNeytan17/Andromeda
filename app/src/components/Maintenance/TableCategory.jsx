@@ -12,7 +12,7 @@ import { EmptyState } from "../ui/custom/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Plus, ArrowLeft, Eye } from "lucide-react";
+import { Plus, ArrowLeft, Eye, Edit } from "lucide-react";
 
 // Servicio
 import CategoryService from "../../services/CategoryService";
@@ -20,7 +20,7 @@ import CategoryService from "../../services/CategoryService";
 // ========================================
 // CONFIGURACIÓN DE TABLA
 // ========================================
-// Columnas de la tabla (máximo 3 campos)
+// Columnas de la tabla
 const categoryColumns = [
     { key: "Nombre", label: "Nombre" },
     { key: "SLA", label: "SLA" },
@@ -70,16 +70,15 @@ export default function TableCategories() {
         return <EmptyState message="No se encontraron categorías registradas." />;
 
     return (
-        <div className="container mx-auto py-12 px-6 md:px-10 lg:px-16">
+        <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
             {/* Encabezado con acción de creación */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4">
                 <h1 className="text-4xl font-bold tracking-wider" style={{ color: '#f7f4f3' }}>Listado de Categorías</h1>
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            {/* Ajustar ruta cuando exista pantalla de creación */}
                             <Button asChild variant="outline" size="icon" className="text-primary">
-                                <Link to="/Category">
+                                <Link to="/CreateCategory/new">
                                     <Plus className="h-4 w-4" />
                                 </Link>
                             </Button>
@@ -123,7 +122,7 @@ export default function TableCategories() {
                                 <TableCell className="text-muted-foreground">
                                     {row.SLA_Descripcion
                                         || (row.Tiempo_Respuesta != null && row.Tiempo_Resolucion != null
-                                                    ? `Resp: ${row.Tiempo_Respuesta}h · Res: ${row.Tiempo_Resolucion}h`
+                                                    ? `Resp: ${row.Tiempo_Respuesta}min · Res: ${row.Tiempo_Resolucion}min`
                                                     : (SLA_DESCS[row.Id_SLA] ?? '-'))}
                                 </TableCell>
                                 <TableCell className="flex justify-start items-center gap-1">
@@ -140,6 +139,19 @@ export default function TableCategories() {
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>Ver detalle</TooltipContent>
+                                        </Tooltip>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => navigate(`/CreateCategory/${row.Id}`)}
+                                                    aria-label={`Editar ${row.Nombre}`}
+                                                >
+                                                    <Edit className="h-4 w-4" style={{ color: '#fc52af' }} />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>Editar categoría</TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </TableCell>
