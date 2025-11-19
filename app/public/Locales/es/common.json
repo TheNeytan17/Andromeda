@@ -1,0 +1,105 @@
+{
+  "title": "Aplicación Andromeda",
+  "subtitle": "Gestiona tus tareas eficientemente",
+  "buttons": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar"
+  },
+  "placeholders": {
+    "search": "Buscar...",
+    "name": "Ingresa tu nombre"
+  },
+  "messages": {
+    "saved_success": "Guardado con éxito.",
+    "field_required": "Este campo es obligatorio.",
+    "confirm_delete": "¿Estás seguro que deseas eliminar?"
+  },
+  "date": {
+    "format_long": "{{date, datetime}}"
+  },
+  "nav": {
+    "incidents": "GESTIÓN DE INCIDENTES",
+    "admin": "ADMINISTRACIÓN",
+    "support": "SOPORTE",
+    "maintenances": "MANTENIMIENTOS"
+  },
+  "maint": {
+    "technicians": "Técnicos",
+    "categories": "Categorías",
+    "tickets": "Tickets",
+    "assignments": "Asignaciones"
+  },
+  "login": {
+    "signin": "INICIAR SESIÓN"
+  },
+  "lang": {
+    "label": "Idioma"
+  },
+  "home": {
+    "hero": {
+      "brand": "ANDRÓMEDA:",
+      "line1": "Conciertos,",
+      "line2": "convenciones",
+      "line3": "y más",
+      "ctaText": "ÚNETE A NOSOTROS",
+      "register": "REGÍSTRATE"
+    },
+    "about": {
+      "over": "SOBRE",
+      "us": "NOSOTROS",
+      "text": "En Andrómeda, transformamos ideas en experiencias inolvidables.<br />Somos una empresa dedicada a la organización y producción de eventos masivos, comprometida con llevar cada proyecto a una nueva dimensión.",
+      "where": {
+        "title": "¿Dónde?",
+        "text": "Todos nuestros eventos son realizados en el Parque Viva."
+      },
+      "when": {
+        "title": "¿Cuándo?",
+        "text": "Nuestro eventos se realizan de jueves a domingo."
+      }
+    },
+    "our": {
+      "titleTop": "NUESTROS",
+      "title": "EVENTOS"
+    },
+    "stats": {
+      "concerts": "CONCIERTOS",
+      "conventions": "CONVENCIONES",
+      "festivals": "FESTIVALES",
+      "perYear": "Completados al año",
+      "otherPerYear": "Entre otros eventos completadas al año"
+    },
+    "program": {
+      "title": "PROGRAMA",
+      "subtitle": "DE ESTA SEMANA",
+      "description": "En este espacio aparecerá el cronograma de eventos de la semana actual"
+    },
+    "cards": {
+      "feria": {
+        "title": "ExpoImpacto",
+        "day": "Jue - 2:00pm",
+        "tag": "Feria de sostenibilidad y emprendimiento"
+      },
+      "convertech": {
+        "title": "ConverTech",
+        "day": "Vie - 1:00pm",
+        "tag": "Convención de innovación y tecnología"
+      },
+      "fest": {
+        "title": "Galaxy Fest",
+        "day": "Sáb - 5:00pm",
+        "tag": "Festival de música y arte urbano"
+      },
+      "star": {
+        "title": "Stellar Nights",
+        "day": "Dom - 7:00pm",
+        "tag": "Conciertos bajo las estrellas"
+      }
+    }
+  },
+  "footer": {
+    "tagline": "✨ Más que eventos,<br/> creamos constelaciones <br/>de recuerdos.",
+    "contact": "CONTÁCTANOS",
+    "rights": "Todos los derechos reservados"
+  }
+}

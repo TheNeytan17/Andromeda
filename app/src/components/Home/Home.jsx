@@ -1,4 +1,5 @@
 import React from "react";
+import { useI18n } from "@/hooks/useI18n";
 import { CalendarDays, MapPin } from "lucide-react";
 import mascot from "../../assets/mascot.png";
 import convertech from "../../assets/convertech.png";
@@ -7,6 +8,7 @@ import fest from "../../assets/fest.png";
 import starconcert from "../../assets/starconcert.png";
 
 export function Home() {
+  const { t } = useI18n();
 
   return (
     <main className="relative w-full min-h-screen bg-[#241b38] overflow-hidden flex flex-col items-center justify-start">
@@ -20,23 +22,19 @@ export function Home() {
             style={{ fontFamily: "Shrikhand" }}
           >
             <span className="bg-gradient-to-r from-[#FC52AF] to-[#FBB25F] text-transparent bg-clip-text">
-              ANDRÓMEDA:
+              {t('home.hero.brand')}
             </span>
             <br />
             <span className="text-[#f7f4f3]">
-              Conciertos, <br />
-              convenciones <br />y más
+              {t('home.hero.line1')} <br />
+              {t('home.hero.line2')} <br />{t('home.hero.line3')}
             </span>
           </h1>
 
-          <p className="text-sm tracking-wide text-[#f7f4f3] mt-4">
-            ÚNETE A NOSOTROS
-          </p>
+          <p className="text-sm tracking-wide text-[#f7f4f3] mt-4">{t('home.hero.ctaText')}</p>
 
           <div className="mt-8 flex items-center gap-4">
-            <button className="btn-ghost-neon font-medium">
-              REGÍSTRATE
-            </button>
+            <button className="btn-ghost-neon font-medium">{t('home.hero.register')}</button>
             <span className="text-4xl text-orange-300 rotate-[-30deg]">→</span>
           </div>
         </div>
@@ -113,13 +111,13 @@ export function Home() {
                   className="font-shrikhand text-lg md:text-xl text-white mb-0 uppercase tracking-wider"
                   style={{ fontFamily: "Shrikhand" }}
                 >
-                  SOBRE
+                  {t('home.about.over')}
                 </h2>
                 <h3
                   className="font-shrikhand text-4xl md:text-5xl text-white mb-0"
                   style={{ fontFamily: "Shrikhand" }}
                 >
-                  NOSOTROS
+                  {t('home.about.us')}
                 </h3>
               </div>
               <span className="text-3xl md:text-4xl text-[#ff8f57] font-bold" style={{marginTop:'1.5rem'}}>
@@ -130,10 +128,7 @@ export function Home() {
               </span>
             </div>
             <div className="flex-1">
-              <p className="text-white/80 leading-relaxed text-lg">
-                En Andrómeda, transformamos ideas en experiencias inolvidables.<br />
-                Somos una empresa dedicada a la organización y producción de eventos masivos, comprometida con llevar cada proyecto a una nueva dimensión.
-              </p>
+              <p className="text-white/80 leading-relaxed text-lg" dangerouslySetInnerHTML={{__html: t('home.about.text')}} />
             </div>
           </div>
 
@@ -144,8 +139,8 @@ export function Home() {
               {/* ¿Dónde? */}
               <div className="flex items-center justify-between p-8 rounded-3xl bg-[#bdb7c0]/40 neon-card-gradient" style={{minHeight:'120px'}}>
                 <div>
-                  <p className="font-shrikhand text-2xl text-white mb-2 font-normal tracking-widest" style={{ fontFamily: "Shrikhand" }}>¿Dónde?</p>
-                  <p className="text-lg text-white/80">Todos nuestros eventos son realizados en el Parque Viva.</p>
+                  <p className="font-shrikhand text-2xl text-white mb-2 font-normal tracking-widest" style={{ fontFamily: "Shrikhand" }}>{t('home.about.where.title')}</p>
+                  <p className="text-lg text-white/80">{t('home.about.where.text')}</p>
                 </div>
                 <div className="flex items-center justify-center ml-8">
                   <svg width="90" height="90" viewBox="0 0 200 200" className="block" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -161,8 +156,8 @@ export function Home() {
               {/* ¿Cuándo? */}
               <div className="flex items-center justify-between p-8 rounded-3xl bg-[#bdb7c0]/40 neon-card-gradient" style={{minHeight:'120px'}}>
                 <div>
-                  <p className="font-shrikhand text-2xl text-white mb-2 font-normal tracking-widest" style={{ fontFamily: "Shrikhand" }}>¿Cuándo?</p>
-                  <p className="text-lg text-white/80">Nuestro eventos se realizan de jueves a domingo.</p>
+                  <p className="font-shrikhand text-2xl text-white mb-2 font-normal tracking-widest" style={{ fontFamily: "Shrikhand" }}>{t('home.about.when.title')}</p>
+                  <p className="text-lg text-white/80">{t('home.about.when.text')}</p>
                 </div>
                 <div className="flex items-center justify-center ml-8">
                   <svg width="90" height="90" viewBox="0 0 200 200" className="block" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -183,29 +178,29 @@ export function Home() {
                 className="font-shrikhand text-lg md:text-xl text-white mb-0 uppercase tracking-wider"
                 style={{ fontFamily: "Shrikhand" }}
               >
-                NUESTROS
+                {t('home.our.titleTop')}
               </h3>
               <h4
                 className="font-shrikhand text-5xl md:text-6xl text-white mb-6 mt-0"
                 style={{ fontFamily: "Shrikhand" }}
               >
-                EVENTOS
+                {t('home.our.title')}
               </h4>
               <ul className="space-y-8">
                 <li>
                   <span className="font-shrikhand text-3xl md:text-4xl text-[#fc52af] font-bold mr-2" style={{ fontFamily: "Shrikhand" }}>+25</span>
-                  <span className="font-shrikhand text-2xl text-white font-bold mr-2" style={{ fontFamily: "Shrikhand" }}>CONCIERTOS</span>
-                  <p className="text-sm text-white/80 ml-1">Completados al año</p>
+                  <span className="font-shrikhand text-2xl text-white font-bold mr-2" style={{ fontFamily: "Shrikhand" }}>{t('home.stats.concerts')}</span>
+                  <p className="text-sm text-white/80 ml-1">{t('home.stats.perYear')}</p>
                 </li>
                 <li>
                   <span className="font-shrikhand text-3xl md:text-4xl text-[#b97aff] font-bold mr-2" style={{ fontFamily: "Shrikhand" }}>+15</span>
-                  <span className="font-shrikhand text-2xl text-white font-bold mr-2" style={{ fontFamily: "Shrikhand" }}>CONVENCIONES</span>
-                  <p className="text-sm text-white/80 ml-1">Completados al año</p>
+                  <span className="font-shrikhand text-2xl text-white font-bold mr-2" style={{ fontFamily: "Shrikhand" }}>{t('home.stats.conventions')}</span>
+                  <p className="text-sm text-white/80 ml-1">{t('home.stats.perYear')}</p>
                 </li>
                 <li>
                   <span className="font-shrikhand text-3xl md:text-4xl text-[#ff8f57] font-bold mr-2" style={{ fontFamily: "Shrikhand" }}>+30</span>
-                  <span className="font-shrikhand text-2xl text-white font-bold mr-2" style={{ fontFamily: "Shrikhand" }}>FESTIVALES</span>
-                  <p className="text-sm text-white/80 ml-1">Entre otros eventos completadas al año</p>
+                  <span className="font-shrikhand text-2xl text-white font-bold mr-2" style={{ fontFamily: "Shrikhand" }}>{t('home.stats.festivals')}</span>
+                  <p className="text-sm text-white/80 ml-1">{t('home.stats.otherPerYear')}</p>
                 </li>
               </ul>
             </div>
@@ -223,11 +218,9 @@ export function Home() {
                   className="font-shrikhand text-4xl md:text-5xl text-white mb-0 uppercase tracking-wider"
                   style={{ fontFamily: "Shrikhand" }}
                 >
-                  PROGRAMA
+                  {t('home.program.title')}
                 </h2>
-                <h3 className="font-shrikhand text-lg md:text-xl text-white mb-0 font-normal" style={{ fontFamily: "Shrikhand" }}>
-                  DE ESTA SEMANA
-                </h3>
+                <h3 className="font-shrikhand text-lg md:text-xl text-white mb-0 font-normal" style={{ fontFamily: "Shrikhand" }}>{t('home.program.subtitle')}</h3>
               </div>
               <span className="text-3xl md:text-4xl text-[#ff8f57] font-bold" style={{marginTop:'1.5rem'}}>
                 <svg width="70" height="30" viewBox="0 0 70 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -236,10 +229,7 @@ export function Home() {
                 </svg>
               </span>
             </div>
-            <p className="text-base md:text-lg text-white/80 max-w-md text-left mx-auto md:mx-auto">
-              En este espacio aparecerá el cronograma de eventos de la semana
-              actual
-            </p>
+            <p className="text-base md:text-lg text-white/80 max-w-md text-left mx-auto md:mx-auto">{t('home.program.description')}</p>
           </div>
 
           {/* Tarjetas */}
@@ -247,27 +237,27 @@ export function Home() {
             {[
               {
                 img: feria,
-                title: "ExpoImpacto",
-                day: "Jue - 2:00pm",
-                tag: "Feria de sostenibilidad y emprendimiento",
+                title: t('home.cards.feria.title'),
+                day: t('home.cards.feria.day'),
+                tag: t('home.cards.feria.tag'),
               },
               {
                 img: convertech,
-                title: "ConverTech",
-                day: "Vie - 1:00pm",
-                tag: "Convención de innovación y tecnología",
+                title: t('home.cards.convertech.title'),
+                day: t('home.cards.convertech.day'),
+                tag: t('home.cards.convertech.tag'),
               },
               {
                 img: fest,
-                title: "Galaxy Fest",
-                day: "Sáb - 5:00pm",
-                tag: "Festival de música y arte urbano",
+                title: t('home.cards.fest.title'),
+                day: t('home.cards.fest.day'),
+                tag: t('home.cards.fest.tag'),
               },
               {
                 img: starconcert,
-                title: "Stellar Nights",
-                day: "Dom - 7:00pm",
-                tag: "Conciertos bajo las estrellas",
+                title: t('home.cards.star.title'),
+                day: t('home.cards.star.day'),
+                tag: t('home.cards.star.tag'),
               },
             ].map((event, i) => (
               <div

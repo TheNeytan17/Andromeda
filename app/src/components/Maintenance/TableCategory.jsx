@@ -3,6 +3,7 @@
 // ========================================
 import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useI18n } from "@/hooks/useI18n";
 
 // Hooks y UI
 import { useState, useEffect } from "react";
@@ -21,11 +22,13 @@ import CategoryService from "../../services/CategoryService";
 // CONFIGURACIÓN DE TABLA
 // ========================================
 // Columnas de la tabla
-const categoryColumns = [
-    { key: "Nombre", label: "Nombre" },
-    { key: "SLA", label: "SLA" },
-    { key: "actions", label: "Acciones" },
-];
+function useColumns(t) {
+    return [
+        { key: "Nombre", label: t('tables.categories.columns.name') },
+        { key: "SLA", label: t('tables.categories.columns.sla') },
+        { key: "actions", label: t('tables.common.actions') },
+    ];
+}
 
 // Fallback local por si el backend aún no devuelve la descripción del SLA en el listado
 const SLA_DESCS = {
@@ -40,6 +43,8 @@ const SLA_DESCS = {
 // ========================================
 export default function TableCategories() {
     const navigate = useNavigate();
+    const { t } = useI18n();
+    const categoryColumns = useColumns(t);
 
     // Estado API
     const [data, setData] = useState(null);
@@ -65,15 +70,15 @@ export default function TableCategories() {
     }, []);
 
     if (loading) return <LoadingGrid type="grid" />;
-    if (error) return <ErrorAlert title="Error al cargar categorías" message={error} />;
+    if (error) return <ErrorAlert title={t('tables.categories.loadError')} message={error} />;
     if (!data || !data.data || data.data.length === 0)
-        return <EmptyState message="No se encontraron categorías registradas." />;
+        return <EmptyState message={t('tables.categories.empty')} />;
 
     return (
         <div className="container mx-auto py-6 px-4 md:px-6 lg:px-8">
             {/* Encabezado con acción de creación */}
             <div className="flex items-center justify-between mb-4">
-                <h1 className="text-4xl font-bold tracking-wider" style={{ color: '#f7f4f3' }}>Listado de Categorías</h1>
+                <h1 className="text-4xl font-bold tracking-wider" style={{ color: '#f7f4f3' }}>{t('tables.categories.title')}</h1>
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -83,7 +88,7 @@ export default function TableCategories() {
                                 </Link>
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Crear categoría</TooltipContent>
+                        <TooltipContent>{t('tables.categories.create')}</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </div>
@@ -133,12 +138,12 @@ export default function TableCategories() {
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => navigate(`/Category/${row.Id}`)}
-                                                    aria-label={`Ver detalle de ${row.Nombre}`}
+                                                    aria-label={`${t('tables.common.viewDetail')} ${row.Nombre}`}
                                                 >
                                                     <Eye className="h-4 w-4" style={{ color: '#fbb25f' }} />
                                                 </Button>
                                             </TooltipTrigger>
-                                            <TooltipContent>Ver detalle</TooltipContent>
+                                            <TooltipContent>{t('tables.common.viewDetail')}</TooltipContent>
                                         </Tooltip>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
@@ -146,12 +151,12 @@ export default function TableCategories() {
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => navigate(`/CreateCategory/${row.Id}`)}
-                                                    aria-label={`Editar ${row.Nombre}`}
+                                                    aria-label={`${t('tables.common.edit')} ${row.Nombre}`}
                                                 >
                                                     <Edit className="h-4 w-4" style={{ color: '#fc52af' }} />
                                                 </Button>
                                             </TooltipTrigger>
-                                            <TooltipContent>Editar categoría</TooltipContent>
+                                            <TooltipContent>{t('tables.categories.edit')}</TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </TableCell>
@@ -168,7 +173,7 @@ export default function TableCategories() {
                 className="flex items-center gap-2 bg-accent text-white hover:bg-accent/90 mt-6"
             >
                 <ArrowLeft className="w-4 h-4" />
-                Regresar
+                {t('common.back')}
             </Button>
         </div>
     );

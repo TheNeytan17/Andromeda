@@ -3,6 +3,7 @@
 // ========================================
 import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useI18n } from "@/hooks/useI18n";
 
 // Hooks
 import { useState, useEffect } from "react";
@@ -23,17 +24,21 @@ import TechService from "../../services/TechnicianService";
 // CONFIGURACIÓN DE TABLA
 // ========================================
 // Columnas a mostrar (máximo 3 campos para el cliente)
-const techColumns = [
-    { key: "Nombre", label: "Nombre" },
-    { key: "Especialidades", label: "Especialidades" },
-    { key: "actions", label: "Acciones" },
-];
+function useColumns(t) {
+    return [
+        { key: "Nombre", label: t('tables.technicians.columns.name') },
+        { key: "Especialidades", label: t('tables.technicians.columns.skills') },
+        { key: "actions", label: t('tables.common.actions') },
+    ];
+}
 
 // ========================================
 // COMPONENTE: Tabla de Técnicos
 // ========================================
 export default function TableTechnicians() {
     const navigate = useNavigate();
+    const { t } = useI18n();
+    const techColumns = useColumns(t);
 
     // Resultado de consumo del API
     const [data, setData] = useState(null);
@@ -59,16 +64,16 @@ export default function TableTechnicians() {
     }, []);
 
     if (loading) return <LoadingGrid type="grid" />;
-    if (error) return <ErrorAlert title="Error al cargar técnicos" message={error} />;
+    if (error) return <ErrorAlert title={t('tables.technicians.loadError')} message={error} />;
     if (!data || !data.data || data.data.length === 0)
-        return <EmptyState message="No se encontraron técnicos registrados." />;
+        return <EmptyState message={t('tables.technicians.empty')} />;
 
     // Interfaz
     return (
     <div className="container mx-auto py-12 px-6 md:px-10 lg:px-16">
             {/* Encabezado con acción de creación */}
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-4xl font-bold tracking-wider" style={{ color: '#f7f4f3' }}>Listado de Técnicos</h1>
+                <h1 className="text-4xl font-bold tracking-wider" style={{ color: '#f7f4f3' }}>{t('tables.technicians.title')}</h1>
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -79,7 +84,7 @@ export default function TableTechnicians() {
                                 </Link>
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Crear técnico</TooltipContent>
+                        <TooltipContent>{t('tables.technicians.create')}</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </div>
@@ -128,12 +133,12 @@ export default function TableTechnicians() {
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => navigate(`/Technician/${row.Id}`)}
-                                                    aria-label={`Ver detalle de ${row.Nombre}`}
+                                                    aria-label={`${t('tables.common.viewDetail')} ${row.Nombre}`}
                                                 >
                                                     <Eye className="h-4 w-4" style={{ color: '#fbb25f' }} />
                                                 </Button>
                                             </TooltipTrigger>
-                                            <TooltipContent>Ver detalle</TooltipContent>
+                                            <TooltipContent>{t('tables.common.viewDetail')}</TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </TableCell>
@@ -150,7 +155,7 @@ export default function TableTechnicians() {
                 className="flex items-center gap-2 bg-accent text-white hover:bg-accent/90 mt-6"
             >
                 <ArrowLeft className="w-4 h-4" />
-                Regresar
+                {t('common.back')}
             </Button>
         </div>
     );

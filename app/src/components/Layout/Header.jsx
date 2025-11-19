@@ -1,16 +1,27 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import sello from "@/assets/sello.png";
 import name from "@/assets/name.png";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import "./sparkle-button.css";
+import { useI18n } from "@/hooks/useI18n";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileMaintOpen, setMobileMaintOpen] = useState(false);
   const [maintenanceOpen, setMaintenanceOpen] = useState(false);
+  const { t, lang, changeLanguage } = useI18n();
+
+  const handleChangeLang = async (value) => {
+    try {
+      await changeLanguage(value);
+    } catch (err) {
+      console.error("Error changing language:", err);
+    }
+  };
 
   return (
     <header
@@ -31,20 +42,20 @@ export default function Header() {
             to="/incidents"
             className="hover:text-[#ff95b5] transition-colors"
           >
-            GESTIÓN DE INCIDENTES
+            {t('nav.incidents')}
           </Link>
           <Link to="/admin" className="hover:text-[#ff95b5] transition-colors">
-            ADMINISTRACIÓN
+            {t('nav.admin')}
           </Link>
           <Link to="/support" className="hover:text-[#ff95b5] transition-colors">
-            SOPORTE
+            {t('nav.support')}
           </Link>
 
           {/* Dropdown Mantenimientos */}
           <Popover open={maintenanceOpen} onOpenChange={setMaintenanceOpen}>
             <PopoverTrigger asChild>
               <button className="inline-flex items-center gap-1 hover:text-[#ff95b5] transition-colors">
-                MANTENIMIENTOS <ChevronDown className="w-4 h-4" />
+                {t('nav.maintenances')} <ChevronDown className="w-4 h-4" />
               </button>
             </PopoverTrigger>
             <PopoverContent
@@ -52,17 +63,33 @@ export default function Header() {
               className="w-56 bg-[#2b2143]/95 text-white border-white/20 backdrop-blur-md rounded-xl"
             >
               <div className="flex flex-col gap-2 text-sm">
-                <Link to="/Technician" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Técnicos</Link>
-                <Link to="/TableCategory" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Categorías</Link>
-                <Link to="/Ticket" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Tickets</Link>
-                <Link to="/Assignment" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>Asignaciones</Link>
+                <Link to="/Technician" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>{t('maint.technicians')}</Link>
+                <Link to="/TableCategory" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>{t('maint.categories')}</Link>
+                <Link to="/Ticket" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>{t('maint.tickets')}</Link>
+                <Link to="/Assignment" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>{t('maint.assignments')}</Link>
               </div>
             </PopoverContent>
           </Popover>
         </nav>
 
-        {/* Botón iniciar sesión */}
+        {/* Selector de idioma y botón iniciar sesión */}
         <div className="hidden md:flex items-center gap-4">
+          {/* Selector de idioma (estilo como en TableAssign) */}
+          <label htmlFor="lang-select" className="sr-only">{t('lang.label')}</label>
+          <Select value={lang} onValueChange={handleChangeLang}>
+            <SelectTrigger
+              id="lang-select"
+              aria-label="Selector de idioma"
+              className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-3 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md focus-visible:ring-[#6f3c82]/50 focus-visible:border-[#6f3c82] selection:bg-[#6f3c82] selection:text-[#f7f4f3] w-[120px]"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-[rgba(111,60,130,0.15)] backdrop-blur-md border-[#6f3c82] text-[#f7f4f3] focus-visible:ring-0 selection:bg-[#6f3c82] selection:text-[#f7f4f3]">
+              <SelectItem value="es" className="data-[highlighted]:bg-[#6f3c82] data-[highlighted]:text-[#f7f4f3] focus:bg-[#6f3c82] focus:text-[#f7f4f3]">Español</SelectItem>
+              <SelectItem value="en" className="data-[highlighted]:bg-[#6f3c82] data-[highlighted]:text-[#f7f4f3] focus:bg-[#6f3c82] focus:text-[#f7f4f3]">English</SelectItem>
+            </SelectContent>
+          </Select>
+          
           <div className="sparkle-container">
             <div className="sparkle-layer-1">
               <div className="sparkle-layer-2">
@@ -78,7 +105,7 @@ export default function Header() {
                         color: '#f7f4f3'
                       }}
                     >
-                      INICIAR SESIÓN
+                      {t('login.signin')}
                     </Link>
                   </div>
                 </div>
@@ -98,13 +125,13 @@ export default function Header() {
           <SheetContent side="left" className="bg-[#2b2143]/95 text-white backdrop-blur-md">
             <nav className="mt-10 flex flex-col gap-6 text-sm font-medium">
               <Link to="/incidents" onClick={() => setMobileOpen(false)}>
-                GESTIÓN DE INCIDENTES
+                {t('nav.incidents')}
               </Link>
               <Link to="/admin" onClick={() => setMobileOpen(false)}>
-                ADMINISTRACIÓN
+                {t('nav.admin')}
               </Link>
               <Link to="/support" onClick={() => setMobileOpen(false)}>
-                SOPORTE
+                {t('nav.support')}
               </Link>
 
               {/* Mantenimientos (desplegable) */}
@@ -113,7 +140,7 @@ export default function Header() {
                 className="flex items-center justify-between w-full text-left hover:text-[#ff95b5] transition-colors"
                 onClick={() => setMobileMaintOpen((v) => !v)}
               >
-                <span>MANTENIMIENTOS</span>
+                <span>{t('nav.maintenances')}</span>
                 <ChevronDown
                   className={`w-4 h-4 transition-transform ${
                     mobileMaintOpen ? "rotate-180" : ""
@@ -123,12 +150,29 @@ export default function Header() {
 
               {mobileMaintOpen && (
                 <div className="ml-4 flex flex-col gap-4 text-sm">
-                  <Link to="/Technician" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Técnicos</Link>
-                  <Link to="/TableCategory" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Categorías</Link>
-                  <Link to="/Ticket" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Tickets</Link>
-                  <Link to="/Assignment" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Asignaciones</Link>
+                    <Link to="/Technician" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">{t('maint.technicians')}</Link>
+                    <Link to="/TableCategory" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">{t('maint.categories')}</Link>
+                    <Link to="/Ticket" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">{t('maint.tickets')}</Link>
+                    <Link to="/Assignment" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">{t('maint.assignments')}</Link>
                 </div>
               )}
+
+              {/* Selector de idioma en menú móvil */}
+              <div className="pt-2">
+                <Select value={lang} onValueChange={(v) => { handleChangeLang(v); }}>
+                  <SelectTrigger
+                    id="lang-select-mobile"
+                    aria-label="Selector de idioma"
+                    className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-3 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md focus-visible:ring-[#6f3c82]/50 focus-visible:border-[#6f3c82] selection:bg-[#6f3c82] selection:text-[#f7f4f3] w-[160px]"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[rgba(111,60,130,0.15)] backdrop-blur-md border-[#6f3c82] text-[#f7f4f3] focus-visible:ring-0 selection:bg-[#6f3c82] selection:text-[#f7f4f3]">
+                    <SelectItem value="es" className="data-[highlighted]:bg-[#6f3c82] data-[highlighted]:text-[#f7f4f3] focus:bg-[#6f3c82] focus:text-[#f7f4f3]">Español</SelectItem>
+                    <SelectItem value="en" className="data-[highlighted]:bg-[#6f3c82] data-[highlighted]:text-[#f7f4f3] focus:bg-[#6f3c82] focus:text-[#f7f4f3]">English</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
               <Link
                 to="/login"
@@ -141,7 +185,7 @@ export default function Header() {
                   color: '#f7f4f3'
                 }}
               >
-                INICIAR SESIÓN
+                {t('login.signin')}
               </Link>
             </nav>
           </SheetContent>

@@ -1,0 +1,139 @@
+{
+  "title": "Andromeda Application",
+  "subtitle": "Manage your tasks efficiently",
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "placeholders": {
+    "search": "Search...",
+    "name": "Enter your name"
+  },
+  "messages": {
+    "saved_success": "Saved successfully.",
+    "field_required": "This field is required.",
+    "confirm_delete": "Are you sure you want to delete?"
+  },
+  "date": {
+    "format_long": "{{date, datetime}}"
+  },
+  "nav": {
+    "incidents": "INCIDENT MANAGEMENT",
+    "admin": "ADMINISTRATION",
+    "support": "SUPPORT",
+    "maintenances": "MAINTENANCE"
+  },
+  "maint": {
+    "technicians": "Technicians",
+    "categories": "Categories",
+    "tickets": "Tickets",
+    "assignments": "Assignments"
+  },
+  "login": { "signin": "SIGN IN" },
+  "lang": { "label": "Language" },
+  "home": {
+    "hero": {
+      "brand": "ANDROMEDA:",
+      "line1": "Concerts,",
+      "line2": "conventions",
+      "line3": "and more",
+      "ctaText": "JOIN US",
+      "register": "REGISTER"
+    },
+    "about": {
+      "over": "ABOUT",
+      "us": "US",
+      "text": "At Andromeda, we turn ideas into unforgettable experiences.<br />We are dedicated to organizing and producing mass events, committed to taking every project to the next level.",
+      "where": { "title": "Where?", "text": "All our events take place at Parque Viva." },
+      "when": { "title": "When?", "text": "Our events are held from Thursday to Sunday." }
+    },
+    "our": { "titleTop": "OUR", "title": "EVENTS" },
+    "stats": {
+      "concerts": "CONCERTS",
+      "conventions": "CONVENTIONS",
+      "festivals": "FESTIVALS",
+      "perYear": "Completed per year",
+      "otherPerYear": "Among other events completed per year"
+    },
+    "program": {
+      "title": "SCHEDULE",
+      "subtitle": "THIS WEEK",
+      "description": "This space will show the schedule of events for the current week"
+    },
+    "cards": {
+      "feria": { "title": "ExpoImpacto", "day": "Thu - 2:00pm", "tag": "Sustainability and entrepreneurship fair" },
+      "convertech": { "title": "ConverTech", "day": "Fri - 1:00pm", "tag": "Innovation and technology convention" },
+      "fest": { "title": "Galaxy Fest", "day": "Sat - 5:00pm", "tag": "Music and urban art festival" },
+      "star": { "title": "Stellar Nights", "day": "Sun - 7:00pm", "tag": "Concerts under the stars" }
+    }
+  },
+  "footer": {
+    "tagline": "✨ More than events,<br/> we create constellations <br/>of memories.",
+    "contact": "CONTACT US",
+    "rights": "All rights reserved"
+  },
+  "common": { "saving": "Saving...", "cancel": "Cancel", "back": "Back" },
+  "tables": {
+    "common": { "actions": "Actions", "viewDetail": "View detail", "viewDetails": "View details", "edit": "Edit" },
+    "categories": {
+      "title": "Categories List",
+      "create": "Create category",
+      "edit": "Edit category",
+      "loadError": "Error loading categories",
+      "empty": "No categories found.",
+      "columns": { "name": "Name", "sla": "SLA" }
+    },
+    "technicians": {
+      "title": "Technicians List",
+      "create": "Create technician",
+      "loadError": "Error loading technicians",
+      "empty": "No technicians found.",
+      "columns": { "name": "Name", "skills": "Skills" }
+    },
+    "tickets": {
+      "title": "Tickets",
+      "loadError": "Error loading tickets",
+      "empty": "No tickets found.",
+      "columns": { "user": "User", "title": "Title", "status": "Status" }
+    }
+  },
+  "tickets": {
+    "status": {
+      "pending": "Pending",
+      "assigned": "Assigned",
+      "inProgress": "In Progress",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    }
+  },
+  "category": {
+    "titleCreate": "Create Category",
+    "titleEdit": "Edit Category",
+    "form": {
+      "nameLabel": "Category Name",
+      "namePlaceholder": "Enter the category name",
+      "slaConfig": "SLA Configuration",
+      "useExistingSLA": "Use Existing SLA",
+      "defineNewSLA": "Define New SLA",
+      "selectSLA": "Select an SLA",
+      "selectedSLA": "Selected SLA",
+      "responseTimeLabel": "Response Time (minutes)",
+      "responseTimePlaceholder": "e.g., 30",
+      "resolutionTimeLabel": "Resolution Time (minutes)",
+      "resolutionTimePlaceholder": "e.g., 120",
+      "tags": "Associated Tags",
+      "noTags": "No tags available",
+      "requiredSkills": "Required Skills",
+      "noSkills": "No skills available"
+    },
+    "actions": { "create": "Create Category", "saveChanges": "Save Changes" },
+    "validation": {
+      "nameRequired": "Category name is required",
+      "responseTimeMin": "Response time must be greater than or equal to 1",
+      "resolutionTimeMin": "Resolution time must be greater than or equal to 1",
+      "resolutionGreater": "Resolution time must be greater than response time",
+      "slaRequired": "You must select an SLA"
+    }
+  }
+}

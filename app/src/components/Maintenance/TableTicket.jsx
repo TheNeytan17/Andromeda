@@ -3,6 +3,7 @@
 // ========================================
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
+import { useI18n } from "@/hooks/useI18n";
 
 //Componentes UI
 import { useState } from "react";
@@ -36,18 +37,22 @@ import UserService from "../../services/UserService";
 // ========================================
 // CONFIGURACIÓN DE TABLA
 // ========================================
-const columns = [
-    { key: "Usuario", label: "Usuario" },
-    { key: "Titulo", label: "Título" },
-    {key: "Estado", label: "Estado"},
-    { key: "actions", label: "Acciones" },
-];
+function useColumns(t) {
+    return [
+        { key: "Usuario", label: t('tables.tickets.columns.user') },
+        { key: "Titulo", label: t('tables.tickets.columns.title') },
+        { key: "Estado", label: t('tables.tickets.columns.status') },
+        { key: "actions", label: t('tables.common.actions') },
+    ];
+}
 
 // ========================================
 // COMPONENTE: Tabla de Tickets
 // ========================================
 export default function TableTickets() {
     const navigate = useNavigate();
+    const { t } = useI18n();
+    const columns = useColumns(t);
 
     //#region API
     // Resultado de consumo del API, respuesta
@@ -93,9 +98,9 @@ export default function TableTickets() {
     }, []);
 
     if (loaded) return <LoadingGrid type="grid" />;
-    if (error) return <ErrorAlert title="Error al cargar tickets" message={error} />;
+    if (error) return <ErrorAlert title={t('tables.tickets.loadError')} message={error} />;
     if (!data || data.data.length === 0)
-        return <EmptyState message="No se encontraron tickets." />;
+        return <EmptyState message={t('tables.tickets.empty')} />;
     //#endregion API
 
     /**
@@ -106,15 +111,15 @@ export default function TableTickets() {
     function Estado(estado) {
         switch (parseInt(estado)) {
             case 1:
-                return "Pendiente";
+                return t('tickets.status.pending');
             case 2:
-                return "Asignado";
+                return t('tickets.status.assigned');
             case 3:
-                return "En Progreso";
+                return t('tickets.status.inProgress');
             case 4:
-                return "Resuelto";
+                return t('tickets.status.resolved');
             case 5:
-                return "Cerrado";
+                return t('tickets.status.closed');
         }
     }
 
@@ -123,7 +128,7 @@ export default function TableTickets() {
         <div className="py-12 px-6 md:px-10 lg:px-16">
             {/* Encabezado */}
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-bold font-shrikhand tracking-wider" style={{ fontFamily: "Shrikhand" }}>Tickets</h1>
+                <h1 className="text-3xl font-bold font-shrikhand tracking-wider" style={{ fontFamily: "Shrikhand" }}>{t('tables.tickets.title')}</h1>
             </div>
 
             <div className="rounded-lg border-2 border-[#fc52af] overflow-hidden">
@@ -165,7 +170,7 @@ export default function TableTickets() {
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <p>Ver detalles</p>
+                                                <p>{t('tables.common.viewDetails')}</p>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>

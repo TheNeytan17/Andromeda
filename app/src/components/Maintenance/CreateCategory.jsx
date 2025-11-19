@@ -2,6 +2,7 @@
 // IMPORTS
 // ========================================
 import React, { useEffect, useState } from 'react';
+import { useI18n } from "@/hooks/useI18n";
 import { useNavigate, useParams } from 'react-router-dom';
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
 import { toast, ToastContainer } from 'react-toastify';
@@ -28,6 +29,7 @@ import EspecialidadService from "@/services/EspecialidadService";
 // COMPONENTE: Crear/Editar Categoría
 // ========================================
 export function CreateCategory() {
+    const { t } = useI18n();
     const navigate = useNavigate();
     const { id } = useParams();
     const isEditMode = id && id !== 'new';
@@ -120,7 +122,7 @@ export function CreateCategory() {
         let isValid = true;
 
         if (!formData.Nombre.trim()) {
-            toast.error('El nombre de la categoría es requerido');
+            toast.error(t('category.validation.nameRequired'));
             isValid = false;
         }
 
@@ -129,21 +131,21 @@ export function CreateCategory() {
             const tiempoResolucion = parseFloat(formData.Tiempo_Resolucion);
 
             if (!formData.Tiempo_Respuesta || tiempoRespuesta <= 0) {
-                toast.error('El tiempo de respuesta debe ser mayor o igual que 1');
+                toast.error(t('category.validation.responseTimeMin'));
                 isValid = false;
             }
 
             if (!formData.Tiempo_Resolucion || tiempoResolucion <= 0) {
-                toast.error('El tiempo de resolución debe ser mayor o igual que 1');
+                toast.error(t('category.validation.resolutionTimeMin'));
                 isValid = false;
             }
 
             if (tiempoRespuesta && tiempoResolucion && tiempoResolucion <= tiempoRespuesta) {
-                toast.error('El tiempo de resolución debe ser mayor que el tiempo de respuesta');
+                toast.error(t('category.validation.resolutionGreater'));
                 isValid = false;
             }
         } else if (!formData.Id_SLA) {
-            toast.error('Debe seleccionar un SLA');
+            toast.error(t('category.validation.slaRequired'));
             isValid = false;
         }
 
@@ -231,7 +233,7 @@ export function CreateCategory() {
         <div className="max-w-5xl mx-auto py-12 px-6 md:px-10 lg:px-16">
             <div className="space-y-6">
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-                    {isCreateMode ? 'Crear Categoría' : 'Editar Categoría'}
+                    {isCreateMode ? t('category.titleCreate') : t('category.titleEdit')}
                 </h1>
 
                 <ToastContainer 
@@ -259,19 +261,19 @@ export function CreateCategory() {
                             {/* Nombre de la categoría */}
                             <div className="space-y-2">
                                 <Label htmlFor="nombre" style={{ color: '#f7f4f3' }}>
-                                    Nombre de la Categoría *
+                                    {t('category.form.nameLabel')} *
                                 </Label>
                                 <Input
                                     id="nombre"
                                     value={formData.Nombre}
                                     onChange={(e) => handleInputChange('Nombre', e.target.value)}
-                                    placeholder="Ingrese el nombre de la categoría"
+                                    placeholder={t('category.form.namePlaceholder')}
                                 />
                             </div>
 
                             {/* SLA */}
                             <div className="space-y-4">
-                                <Label style={{ color: '#f7f4f3' }}>Configuración de SLA *</Label>
+                                <Label style={{ color: '#f7f4f3' }}>{t('category.form.slaConfig')} *</Label>
                                 
                                 <div className="flex gap-4">
                                     <Button
@@ -279,14 +281,14 @@ export function CreateCategory() {
                                         variant={formData.usarSLAExistente ? "default" : "outline"}
                                         onClick={() => handleInputChange('usarSLAExistente', true)}
                                     >
-                                        Usar SLA Existente
+                                        {t('category.form.useExistingSLA')}
                                     </Button>
                                     <Button
                                         type="button"
                                         variant={!formData.usarSLAExistente ? "default" : "outline"}
                                         onClick={() => handleInputChange('usarSLAExistente', false)}
                                     >
-                                        Definir Nuevo SLA
+                                        {t('category.form.defineNewSLA')}
                                     </Button>
                                 </div>
 
@@ -297,7 +299,7 @@ export function CreateCategory() {
                                             onValueChange={(value) => handleInputChange('Id_SLA', value)}
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Seleccione un SLA" />
+                                                <SelectValue placeholder={t('category.form.selectSLA')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {slasDisponibles.map((sla) => (
@@ -310,7 +312,7 @@ export function CreateCategory() {
                                         {formData.Id_SLA && (
                                             <div className="p-3 border rounded-lg" style={{ backgroundColor: 'rgb(255, 143, 87, 0.1)', borderColor: '#ff8f57' }}>
                                                 <p className="text-sm" style={{ color: '#f7f4f3' }}>
-                                                    <strong>SLA Seleccionado:</strong>{' '}
+                                                    <strong>{t('category.form.selectedSLA')}:</strong>{' '}
                                                     {slasDisponibles.find(s => s.Id.toString() === formData.Id_SLA)?.Descripcion}
                                                 </p>
                                             </div>
@@ -320,7 +322,7 @@ export function CreateCategory() {
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
                                             <Label htmlFor="tiempoRespuesta" style={{ color: '#f7f4f3' }}>
-                                                Tiempo de Respuesta (minutos) *
+                                                {t('category.form.responseTimeLabel')} *
                                             </Label>
                                             <Input
                                                 id="tiempoRespuesta"
@@ -328,13 +330,13 @@ export function CreateCategory() {
                                                 min="1"
                                                 value={formData.Tiempo_Respuesta}
                                                 onChange={(e) => handleInputChange('Tiempo_Respuesta', e.target.value)}
-                                                placeholder="Ej: 30"
+                                                placeholder={t('category.form.responseTimePlaceholder')}
                                             />
                                         </div>
 
                                         <div className="space-y-2">
                                             <Label htmlFor="tiempoResolucion" style={{ color: '#f7f4f3' }}>
-                                                Tiempo de Resolución (minutos) *
+                                                {t('category.form.resolutionTimeLabel')} *
                                             </Label>
                                             <Input
                                                 id="tiempoResolucion"
@@ -342,7 +344,7 @@ export function CreateCategory() {
                                                 min="1"
                                                 value={formData.Tiempo_Resolucion}
                                                 onChange={(e) => handleInputChange('Tiempo_Resolucion', e.target.value)}
-                                                placeholder="Ej: 120"
+                                                placeholder={t('category.form.resolutionTimePlaceholder')}
                                             />
                                         </div>
                                     </div>
@@ -352,7 +354,7 @@ export function CreateCategory() {
                             {/* Etiquetas */}
                             <div className="space-y-3">
                                 <Label style={{ color: '#f7f4f3' }}>
-                                    Etiquetas Asociadas
+                                    {t('category.form.tags')}
                                     <Badge
                                         className="ml-2"
                                         style={{
@@ -384,14 +386,14 @@ export function CreateCategory() {
                                     ))}
                                 </div>
                                 {etiquetasDisponibles.length === 0 && (
-                                    <p className="text-muted-foreground text-sm">No hay etiquetas disponibles</p>
+                                    <p className="text-muted-foreground text-sm">{t('category.form.noTags')}</p>
                                 )}
                             </div>
 
                             {/* Especialidades */}
                             <div className="space-y-3">
                                 <Label style={{ color: '#f7f4f3' }}>
-                                    Especialidades Requeridas
+                                    {t('category.form.requiredSkills')}
                                     <Badge
                                         className="ml-2"
                                         style={{
@@ -438,7 +440,7 @@ export function CreateCategory() {
                                     ))}
                                 </div>
                                 {especialidadesDisponibles.length === 0 && (
-                                    <p className="text-muted-foreground text-sm">No hay especialidades disponibles</p>
+                                    <p className="text-muted-foreground text-sm">{t('category.form.noSkills')}</p>
                                 )}
                             </div>
 
@@ -464,7 +466,7 @@ export function CreateCategory() {
                                     }}
                                 >
                                     <Save className="w-4 h-4" />
-                                    {saving ? 'Guardando...' : isCreateMode ? 'Crear Categoría' : 'Guardar Cambios'}
+                                    {saving ? t('common.saving') : isCreateMode ? t('category.actions.create') : t('category.actions.saveChanges')}
                                 </Button>
                                 <Button
                                     type="button"
@@ -486,7 +488,7 @@ export function CreateCategory() {
                                     }}
                                 >
                                     <ArrowLeft className="w-4 h-4" />
-                                    Cancelar
+                                    {t('common.cancel')}
                                 </Button>
                             </div>
                         </CardContent>
