@@ -2,8 +2,11 @@ import React from "react";
 import logo from "@/assets/logo.png";
 import { Facebook, Instagram, Mail } from "lucide-react";
 import "./sparkle-button.css";
+import { useI18n } from "@/hooks/useI18n";
+import { Link } from "react-router-dom";
 
 export function Footer() {
+  const { t } = useI18n();
   return (
     <footer className="w-full relative text-white py-8">
       {/* Degradado superior */}
@@ -16,9 +19,9 @@ export function Footer() {
         {/* IZQUIERDA */}
         <div className="flex flex-col items-center justify-center text-left">
           <p className="font-shrikhand text-1xl md:text-2xl font-normal mb-4 leading-tight"
-            style={{ fontFamily: "Shrikhand" }}>
-            ✨ Más que eventos,<br/> creamos constelaciones <br/>de recuerdos.
-          </p>
+            style={{ fontFamily: "Shrikhand" }}
+            dangerouslySetInnerHTML={{ __html: t('footer.tagline') }}
+          />
         </div>
 
         {/* CENTRO */}
@@ -34,7 +37,7 @@ export function Footer() {
 
         {/* DERECHA */}
         <div className="flex flex-col items-center justify-center gap-3">
-          <p className="font-bold text-lg tracking-widest">CONTACTANOS</p>
+          <p className="font-bold text-lg tracking-widest">{t('footer.contact')}</p>
           <div className="flex gap-4">
             <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
               <Facebook className="w-5 h-5 hover:text-pink-400 cursor-pointer transition-colors" />
@@ -51,7 +54,8 @@ export function Footer() {
               <div className="sparkle-layer-2">
                 <div className="sparkle-layer-3">
                   <div className="sparkle-layer-4">
-                    <button 
+                    <Link
+                      to="/login"
                       className="px-5 py-2 rounded-full font-semibold text-xs transition btn-sparkle"
                       style={{
                         background: 'rgba(247, 244, 243, 0.15)',
@@ -60,8 +64,8 @@ export function Footer() {
                         color: '#f7f4f3'
                       }}
                     >
-                      INICIAR SESIÓN
-                    </button>
+                      {t('login.signin')}
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -72,8 +76,7 @@ export function Footer() {
 
       {/* COPYRIGHT */}
       <div className="border-t border-white/10 mt-8 pt-4 text-center text-xs text-white/70">
-        2025 © Andrómeda by - Naomy Díaz y Neytan Morales - Todos los derechos
-        reservados
+        {new Date().getFullYear()} © Andrómeda by - Naomy Díaz y Neytan Morales - {t('footer.rights')}
       </div>
     </footer>
   );
