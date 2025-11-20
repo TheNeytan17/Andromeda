@@ -45,4 +45,28 @@ class Ticket
         //Dar respuesta
         $response->toJSON($result);
     }
+
+    public function create()
+    {
+        $response = new Response();
+        $request = new Request();
+        
+        // Manejar FormData (multipart) o JSON
+        if (!empty($_FILES)) {
+            $data = $_POST;
+            $data['Archivo'] = $_FILES;
+        } else {
+            $data = (array) $request->getJSON();
+        }
+
+        $Ticket = new TicketModel();
+        $result = $Ticket->create($data);
+
+        if ($result['success']) {
+            $response->status(201);
+        } else {
+            $response->status(400);
+        }
+        $response->toJSON($result);
+    }
 }

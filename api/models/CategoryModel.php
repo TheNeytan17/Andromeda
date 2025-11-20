@@ -63,6 +63,20 @@ class CategoryModel
 		return $vResultado;
 	}
 
+	public function getByEtiqueta($idEtiqueta)
+	{
+		$vSql = "SELECT * 
+				FROM Categoria c
+				JOIN Categoria_Etiqueta ce ON $idEtiqueta = ce.Id_Etiqueta
+				Where c.Id = ce.Id_Categoria;";
+
+		//Ejecutar la consulta
+		$vResultado = $this->enlace->ExecuteSQL($vSql);
+
+		// Retornar el objeto
+		return $vResultado;
+	}
+
 	public function create($data)
 	{
 		// Validaciones

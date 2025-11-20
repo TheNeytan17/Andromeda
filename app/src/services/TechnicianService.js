@@ -8,6 +8,12 @@ class TechnicianService {
   getTechnicianById(Id) {
     return axios.get(BASE_URL + '/' + Id);
   }
+  createTechnician(data) {
+    return axios.post(BASE_URL, data);
+  }
+  updateTechnician(Id, data) {
+    return axios.put(BASE_URL + '/' + Id, data);
+  }
 }
 
 export default new TechnicianService();

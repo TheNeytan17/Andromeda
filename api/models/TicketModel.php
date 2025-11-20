@@ -145,4 +145,28 @@ class TicketModel
 		// Retornar el objeto
 		return $vResultado;
 	}
+
+	public function create($data)
+	{
+		//Insertar Ticket
+		$vTicketSQL = "INSERT INTO Ticket (Id_Usuario, Titulo, Descripcion, Fecha_Creacion, Fecha_Limite_Respuesta, Fecha_Limite_Resolucion, Prioridad, Estado, Id_Categoria) 
+						VALUES ('{$data['Id_Usuario']}', '{$data['Titulo']}', '{$data['Descripcion']}', '{$data['Fecha_Creacion']}', '{$data['Fecha_Limite_Respuesta']}', '{$data['Fecha_Limite_Resolucion']}', '{$data['Prioridad']}', 1 , '{$data['Categoria']}')";
+		$idTicket = $this->enlace->ExecuteSQL_DML_last($vTicketSQL);
+		//Insertar Historial Estado
+		if ($idTicket) {
+			$vHistorial = "INSERT Into Historial_Estado (Id_Ticket, Fecha_Cambio, Estado_Anterior, Estado_Nuevo, Observaciones, Id_Usuario_Responsable) 
+							VALUES ($idTicket, '{$data['Fecha_Creacion']}', 1 , 1, 'Ticket creado por usuario', '{$data['Id_Usuario']}');";
+			$idHistorialEstado = $this->enlace->ExecuteSQL_DML_last($vHistorial);
+			if (!empty($data['Archivo']) && isset($data['Archivo']['Archivo'])) {
+				$ImageM = new ImageModel();
+				$fileData = [
+					'file' => $data['Archivo']['Archivo']
+				];
+				$ImageM->uploadFile($fileData, $idHistorialEstado);	
+			}
+			return ['success' => true, 'message' => 'Usuario creado exitosamente', 'id' => $idTicket];
+		} else {
+			return ['success' => false, 'message' => 'Error al crear el usuario'];
+		}
+	}
 }

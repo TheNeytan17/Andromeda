@@ -12,6 +12,7 @@ import { LoadingGrid } from "../ui/custom/LoadingGrid";
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
 import { EmptyState } from "../ui/custom/EmptyState";
 
+
 // Shadcn UI Components
 import {
     Table,
@@ -29,6 +30,8 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Plus, ArrowLeft, Edit } from "lucide-react";
+import { Link} from "react-router-dom";
 
 // Servicio a llamar
 import TicketService from "../../services/TicketService";
@@ -37,14 +40,12 @@ import UserService from "../../services/UserService";
 // ========================================
 // CONFIGURACIÓN DE TABLA
 // ========================================
-function useColumns(t) {
-    return [
-        { key: "Usuario", label: t('tables.tickets.columns.user') },
-        { key: "Titulo", label: t('tables.tickets.columns.title') },
-        { key: "Estado", label: t('tables.tickets.columns.status') },
-        { key: "actions", label: t('tables.common.actions') },
-    ];
-}
+const columns = [
+    { key: "Usuario", label: "Usuario" },
+    { key: "Titulo", label: "Título" },
+    { key: "Estado", label: "Estado" },
+    { key: "actions", label: "Acciones" },
+];
 
 // ========================================
 // COMPONENTE: Tabla de Tickets
@@ -62,25 +63,25 @@ export default function TableTickets() {
     // Booleano para establecer si se ha recibido respuesta
     const [loaded, setLoaded] = useState(true);
     // Variable temporal (ejemplo) para seleccionar usuario
-    const id = 17;
+    const id = 1;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const user = await UserService.getUserById(id);
                 const rol = user.data.data.Rol;
-                if (rol == 1){
+                if (rol == 1) {
                     const response = await TicketService.getTickets();
                     setData(response.data)
                     if (!response.data.success) {
                         setError(response.data.message)
                     }
-                }else{
-                    if(rol == 2){
+                } else {
+                    if (rol == 2) {
                         const response = await TicketService.getTicketTechnician(user.data.data.Id);
                         console.log(response.data)
                         setData(response.data)
-                    }else{
+                    } else {
                         const response = await TicketService.getTicketClient(user.data.data.Id);
                         console.log(response.data)
                         setData(response.data)
@@ -128,7 +129,19 @@ export default function TableTickets() {
         <div className="py-12 px-6 md:px-10 lg:px-16">
             {/* Encabezado */}
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-bold font-shrikhand tracking-wider" style={{ fontFamily: "Shrikhand" }}>{t('tables.tickets.title')}</h1>
+                <h1 className="text-3xl font-bold font-shrikhand tracking-wider" style={{ fontFamily: "Shrikhand" }}>Tickets</h1>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button asChild variant="outline" size="icon" className="text-primary">
+                                <Link to="/CreateTicket/new">
+                                    <Plus className="h-4 w-4" />
+                                </Link>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Crear Ticket</TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </div>
 
             <div className="rounded-lg border-2 border-[#fc52af] overflow-hidden">
