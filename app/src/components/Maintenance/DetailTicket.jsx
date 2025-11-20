@@ -36,7 +36,7 @@ import TicketService from "@/services/TicketService";
 // COMPONENTE PRINCIPAL
 // ========================================
 export function DetailTicket() {
-    const { t } = useI18n();
+    const { t, lang } = useI18n();
     const navigate = useNavigate();
     const { id } = useParams();
     const [ticketResp, setData] = useState(null); // Respuesta cruda del API
@@ -44,23 +44,6 @@ export function DetailTicket() {
     const [loading, setLoading] = useState(true); // Flag de carga
     // Base URL para imágenes adjuntas al historial
     const BASE_URL = import.meta.env.VITE_BASE_URL + "uploads";
-
-    // Mapeos dinámicos con traducciones
-    const PRIORIDAD_DESC = {
-        1: t('details.ticket.priority.veryLow'),
-        2: t('details.ticket.priority.low'),
-        3: t('details.ticket.priority.medium'),
-        4: t('details.ticket.priority.high'),
-        5: t('details.ticket.priority.critical')
-    };
-
-    const ESTADO_DESC = {
-        1: t('tickets.status.pending'),
-        2: t('tickets.status.assigned'),
-        3: t('tickets.status.inProgress'),
-        4: t('tickets.status.resolved'),
-        5: t('tickets.status.closed'),
-    };
 
     // ========================================
     // EFECTO: CARGA DE TICKET POR ID
@@ -148,12 +131,9 @@ export function DetailTicket() {
                                 <div className="flex items-center gap-3">
                                     <Target className="h-5 w-5" style={{ color: '#fbb25f' }} />
                                     <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.priority.label')}:</span>
-                                    <Badge variant={ticket.Prioridad >= 4 ? 'destructive' : 'secondary'}>
-                                        {ticket.Prioridad}
-                                    </Badge>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {PRIORIDAD_DESC[ticket.Prioridad] || 'N/D'}
+                                    {ticket.Prioridad || 'N/D'}
                                 </p>
                             </div>
 
@@ -164,7 +144,7 @@ export function DetailTicket() {
                                     <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.status')}:</span>
                                 </div>
                                 <Badge variant="outline">
-                                    {ESTADO_DESC[ticket.Estado] || ticket.Estado || 'N/D'}
+                                    {ticket.Estado || 'N/D'}
                                 </Badge>
                             </div>
                         </div>
@@ -189,7 +169,7 @@ export function DetailTicket() {
                                     <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.creationDate')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {ticket.Fecha_Creacion ? formatDate(new Date(ticket.Fecha_Creacion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/D'}
+                                    {ticket.Fecha_Creacion ? formatDate(new Date(ticket.Fecha_Creacion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : 'N/D'}
                                 </p>
                             </div>
 
@@ -200,7 +180,7 @@ export function DetailTicket() {
                                     <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.responseDeadline')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {ticket.Fecha_Limite_Respuesta ? formatDate(new Date(ticket.Fecha_Limite_Respuesta), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/D'}
+                                    {ticket.Fecha_Limite_Respuesta ? formatDate(new Date(ticket.Fecha_Limite_Respuesta), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : 'N/D'}
                                 </p>
                             </div>
 
@@ -211,7 +191,7 @@ export function DetailTicket() {
                                     <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.resolutionDeadline')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {ticket.Fecha_Limite_Resolucion ? formatDate(new Date(ticket.Fecha_Limite_Resolucion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/D'}
+                                    {ticket.Fecha_Limite_Resolucion ? formatDate(new Date(ticket.Fecha_Limite_Resolucion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : 'N/D'}
                                 </p>
                             </div>
 
@@ -223,7 +203,7 @@ export function DetailTicket() {
                                         <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.closeDate')}:</span>
                                     </div>
                                     <p className="text-muted-foreground">
-                                        {formatDate(new Date(ticket.Fecha_Cierre), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                        {formatDate(new Date(ticket.Fecha_Cierre), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang)}
                                     </p>
                                 </div>
                             )}
@@ -280,18 +260,18 @@ export function DetailTicket() {
                                             {/* Línea de cambio de estado */}
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 <Badge variant="outline" className="bg-red-100 dark:bg-red-900">
-                                                    {ESTADO_DESC[historial.Estado_Anterior] || `Estado ${historial.Estado_Anterior}`}
+                                                    {historial.Estado_Anterior || 'N/D'}
                                                 </Badge>
                                                 <span className="text-sm">→</span>
                                                 <Badge variant="outline" className="bg-green-100 dark:bg-green-900">
-                                                    {ESTADO_DESC[historial.Estado_Nuevo] || `Estado ${historial.Estado_Nuevo}`}
+                                                    {historial.Estado_Nuevo || 'N/D'}
                                                 </Badge>
                                             </div>
 
                                             {/* Fecha del cambio */}
                                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                 <Calendar className="h-4 w-4" style={{ color: '#fbb25f' }} />
-                                                {historial.Fecha_Cambio ? formatDate(new Date(historial.Fecha_Cambio), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/D'}
+                                                {historial.Fecha_Cambio ? formatDate(new Date(historial.Fecha_Cambio), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : 'N/D'}
                                             </div>
 
                                             {/* Usuario responsable */}
@@ -370,7 +350,7 @@ export function DetailTicket() {
                                             <div>
                                                 <span className="font-medium" style={{ color: '#f7f4f3' }}>{t('details.ticket.date')}:</span>
                                                 <p className="text-muted-foreground mt-1">
-                                                    {val.Fecha_Valoracion ? formatDate(new Date(val.Fecha_Valoracion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/D'}
+                                                    {val.Fecha_Valoracion ? formatDate(new Date(val.Fecha_Valoracion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : 'N/D'}
                                                 </p>
                                             </div>
                                         </div>

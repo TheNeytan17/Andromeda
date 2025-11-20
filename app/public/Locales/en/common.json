@@ -93,6 +93,7 @@
     },
     "tickets": {
       "title": "Tickets",
+        "create": "Create Ticket",
       "loadError": "Error loading tickets",
       "empty": "No tickets found.",
       "columns": { "user": "User", "title": "Title", "status": "Status" }
@@ -258,6 +259,70 @@
       "noRuleApplied": "Not applied (manual assignment)",
       "ticketInfo": "Ticket Information",
       "timeLimit": "Time Limit"
+    }
+  },
+  "technician": {
+    "titleCreate": "Create Technician",
+    "titleEdit": "Edit Technician",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "validation": {
+      "nameRequired": "Technician name is required",
+      "emailRequired": "Technician email is required",
+      "statusRequired": "Technician status is required",
+      "skillsRequired": "You must select at least one skill"
+    },
+    "form": {
+      "nameLabel": "Technician Name",
+      "namePlaceholder": "Enter technician name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter technician email",
+      "statusLabel": "Status",
+      "statusPlaceholder": "Select a status",
+      "workloadLabel": "Workload",
+      "workloadPlaceholder": "0",
+      "skills": "Skills",
+      "noSkills": "No skills available"
+    },
+    "actions": {
+      "create": "Create Technician",
+      "saveChanges": "Save Changes"
+    }
+  },
+  "ticket": {
+    "titleCreate": "Create Ticket",
+    "titleEdit": "Edit Ticket",
+    "validation": {
+      "titleRequired": "Ticket title is required",
+      "priorityRequired": "Priority is required",
+      "descriptionRequired": "Description is required",
+      "categoryRequired": "Category is required",
+      "tagRequired": "Tag is required"
+    },
+    "form": {
+      "titleLabel": "Title",
+      "titlePlaceholder": "Enter ticket title",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter ticket description",
+      "requesterLabel": "Requesting User",
+      "emailLabel": "Email",
+      "priorityLabel": "Priority",
+      "priorityPlaceholder": "Select ticket priority",
+      "tagLabel": "Tag",
+      "tagPlaceholder": "Select a tag",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "Select a tag",
+      "creationDateLabel": "Creation Date",
+      "statusLabel": "Status",
+      "imageLabel": "Image",
+      "imageClickText": "Click or drag an image",
+      "imageFormatText": "(jpg, png, maximum 5MB)"
+    },
+    "actions": {
+      "create": "Create Ticket",
+      "saveChanges": "Save Changes"
     }
   }
 }

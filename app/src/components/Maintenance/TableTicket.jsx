@@ -40,12 +40,14 @@ import UserService from "../../services/UserService";
 // ========================================
 // CONFIGURACIÓN DE TABLA
 // ========================================
-const columns = [
-    { key: "Usuario", label: "Usuario" },
-    { key: "Titulo", label: "Título" },
-    { key: "Estado", label: "Estado" },
-    { key: "actions", label: "Acciones" },
-];
+function useColumns(t) {
+    return [
+        { key: "Usuario", label: t('tables.tickets.columns.user') },
+        { key: "Titulo", label: t('tables.tickets.columns.title') },
+        { key: "Estado", label: t('tables.tickets.columns.status') },
+        { key: "actions", label: t('tables.common.actions') },
+    ];
+}
 
 // ========================================
 // COMPONENTE: Tabla de Tickets
@@ -104,32 +106,12 @@ export default function TableTickets() {
         return <EmptyState message={t('tables.tickets.empty')} />;
     //#endregion API
 
-    /**
-     * Convierte el código numérico de estado a etiqueta legible
-     * @param {number|string} estado
-     * @returns {string}
-     */
-    function Estado(estado) {
-        switch (parseInt(estado)) {
-            case 1:
-                return t('tickets.status.pending');
-            case 2:
-                return t('tickets.status.assigned');
-            case 3:
-                return t('tickets.status.inProgress');
-            case 4:
-                return t('tickets.status.resolved');
-            case 5:
-                return t('tickets.status.closed');
-        }
-    }
-
     // Interfaz
     return (
         <div className="py-12 px-6 md:px-10 lg:px-16">
             {/* Encabezado */}
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-bold font-shrikhand tracking-wider" style={{ fontFamily: "Shrikhand" }}>Tickets</h1>
+                <h1 className="text-3xl font-bold font-shrikhand tracking-wider" style={{ fontFamily: "Shrikhand" }}>{t('tables.tickets.title')}</h1>
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -139,7 +121,7 @@ export default function TableTickets() {
                                 </Link>
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Crear Ticket</TooltipContent>
+                        <TooltipContent>{t('tables.tickets.create')}</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </div>
@@ -168,7 +150,7 @@ export default function TableTickets() {
                                     {row.Titulo}
                                 </TableCell>
                                 <TableCell>
-                                    {Estado(row.Estado)}
+                                    {row.Estado}
                                 </TableCell>
                                 <TableCell>
                                     <TooltipProvider>

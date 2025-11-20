@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
+import { useI18n } from "@/hooks/useI18n";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -25,13 +26,14 @@ import TechnicianService from '@/services/TechnicianService';
 // COMPONENTE: Crear/Editar Técnico
 // ========================================
 export function CreateTechnician() {
+    const { t } = useI18n();
     const navigate = useNavigate();
     const { id } = useParams();
     const isEditMode = id && id !== 'new';
     const isCreateMode = !id || id === 'new';
     const Estados = [
-        { value: '1', label: 'Activo' },
-        { value: '0', label: 'Inactivo' }
+        { value: '1', label: t('technician.status.active') },
+        { value: '0', label: t('technician.status.inactive') }
     ];
 
     // Estado de datos y UI
@@ -105,21 +107,20 @@ export function CreateTechnician() {
 
     const validateForm = () => {
         let isValid = true;
-
         if (!formData.Nombre.trim()) {
-            toast.error('El nombre del técnico es requerido');
+            toast.error(t('technician.validation.nameRequired'));
             isValid = false;
         }
         if (!formData.Correo.trim()) {
-            toast.error('El correo del técnico es requerido');
+            toast.error(t('technician.validation.emailRequired'));
             isValid = false;
         }
         if (!formData.Estado) {
-            toast.error('El estado del técnico es requerido');
+            toast.error(t('technician.validation.statusRequired'));
             isValid = false;
         }
         if(!formData.Especialidades.length){
-            toast.error('Debe seleccionar al menos una especialidad');
+            toast.error(t('technician.validation.skillsRequired'));
             isValid = false;
         }
         return isValid;
@@ -193,7 +194,7 @@ export function CreateTechnician() {
         <div className="max-w-5xl mx-auto py-12 px-6 md:px-10 lg:px-16">
             <div className="space-y-6">
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-                    {isCreateMode ? 'Crear Técnico' : 'Editar Técnico'}
+                    {isCreateMode ? t('technician.titleCreate') : t('technician.titleEdit')}
                 </h1>
 
                 <ToastContainer
@@ -221,25 +222,25 @@ export function CreateTechnician() {
                             {/* Nombre del técnico */}
                             <div className="space-y-2">
                                 <Label htmlFor="nombre" style={{ color: '#f7f4f3' }}>
-                                    Nombre del Técnico *
+                                    {t('technician.form.nameLabel')} *
                                 </Label>
                                 <Input style={{ marginBottom: '2em' }}
                                     id="nombre"
                                     value={formData.Nombre}
                                     onChange={(e) => handleInputChange('Nombre', e.target.value)}
-                                    placeholder="Ingrese el nombre del técnico"
+                                    placeholder={t('technician.form.namePlaceholder')}
                                 />
                                 <Label htmlFor="Correo" style={{ color: '#f7f4f3' }}>
-                                    Correo *
+                                    {t('technician.form.emailLabel')} *
                                 </Label>
                                 <Input style={{ marginBottom: '2em' }}
                                     id="Correo"
                                     value={formData.Correo}
                                     onChange={(e) => handleInputChange('Correo', e.target.value)}
-                                    placeholder="Ingrese el correo del técnico"
+                                    placeholder={t('technician.form.emailPlaceholder')}
                                 />
                                 <Label htmlFor="Estado" style={{ color: '#f7f4f3' }}>
-                                    Estado *
+                                    {t('technician.form.statusLabel')} *
                                 </Label>
                                 <div className="space-y-2">
                                     <Select
@@ -247,7 +248,7 @@ export function CreateTechnician() {
                                         onValueChange={(value) => handleInputChange('Estado', value)}
                                     >
                                         <SelectTrigger style={{ marginBottom: '2em' }}>
-                                            <SelectValue placeholder="Seleccione un estado" />
+                                            <SelectValue placeholder={t('technician.form.statusPlaceholder')} />
                                         </SelectTrigger>
                                         <SelectContent> 
                                             {Estados.map((estado) => (
@@ -259,13 +260,13 @@ export function CreateTechnician() {
                                     </Select>
                                 </div>
                                 <Label htmlFor="CargaTrabajo" style={{ color: '#f7f4f3' }}>
-                                    Carga Trabajo *
+                                    {t('technician.form.workloadLabel')} *
                                 </Label>
                                 <Input 
                                     id="CargaTrabajo"
                                     value={formData.CargaTrabajo}
                                     onChange={(e) => handleInputChange('CargaTrabajo', e.target.value)}
-                                    placeholder="0"
+                                    placeholder={t('technician.form.workloadPlaceholder')}
                                     readOnly
                                 />
                             </div>
@@ -273,7 +274,7 @@ export function CreateTechnician() {
                             {/* Especialidades */}
                             <div className="space-y-3">
                                 <Label style={{ color: '#f7f4f3' }}>
-                                    Especialidades
+                                    {t('technician.form.skills')}
                                     <Badge
                                         className="ml-2"
                                         style={{
@@ -320,7 +321,7 @@ export function CreateTechnician() {
                                     ))}
                                 </div>
                                 {especialidadesDisponibles.length === 0 && (
-                                    <p className="text-muted-foreground text-sm">No hay especialidades disponibles</p>
+                                    <p className="text-muted-foreground text-sm">{t('technician.form.noSkills')}</p>
                                 )}
                             </div>
 
@@ -346,7 +347,7 @@ export function CreateTechnician() {
                                     }}
                                 >
                                     <Save className="w-4 h-4" />
-                                    {saving ? 'Guardando...' : isCreateMode ? 'Crear Técnico' : 'Guardar Cambios'}
+                                    {saving ? t('common.saving') : isCreateMode ? t('technician.actions.create') : t('technician.actions.saveChanges')}
                                 </Button>
                                 <Button
                                     type="button"
@@ -368,7 +369,7 @@ export function CreateTechnician() {
                                     }}
                                 >
                                     <ArrowLeft className="w-4 h-4" />
-                                    Cancelar
+                                    {t('common.cancel')}
                                 </Button>
                             </div>
                         </CardContent>

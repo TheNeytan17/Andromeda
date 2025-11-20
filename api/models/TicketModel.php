@@ -23,7 +23,7 @@ class TicketModel
 						t.Fecha_Limite_Respuesta,
 						t.Fecha_Limite_Resolucion,
 						t.Prioridad,
-						t.Estado,
+						e.Nombre AS Estado,
 						t.Id_Categoria,
 						c.Nombre AS Categoria,
 						t.Fecha_Cierre,
@@ -31,7 +31,8 @@ class TicketModel
 						t.cumplimiento_resolucion
 					FROM Ticket t
 					INNER JOIN Usuario u ON t.Id_Usuario = u.Id
-					INNER JOIN Categoria c ON t.Id_Categoria = c.Id;";
+					INNER JOIN Categoria c ON t.Id_Categoria = c.Id
+					INNER JOIN Estado_Ticket e ON t.Estado = e.Id;";
 
 		//Ejecutar la consulta
 		$vResultado = $this->enlace->ExecuteSQL($vSql);
@@ -46,11 +47,24 @@ class TicketModel
 		$ValoracionM = new ValoracionModel();
 		//Consulta sql
 		$vSql = "SELECT 
-					t.*,
-					c.Nombre AS Categoria
+					t.Id,
+					t.Id_Usuario,
+					t.Titulo,
+					t.Descripcion,
+					t.Fecha_Creacion,
+					t.Fecha_Limite_Respuesta,
+					t.Fecha_Limite_Resolucion,
+					t.Prioridad,
+					e.Nombre AS Estado,
+					t.Id_Categoria,
+					c.Nombre AS Categoria,
+					t.Fecha_Cierre,
+					t.cumplimiento_respuesta,
+					t.cumplimiento_resolucion
 				FROM Ticket t
 				INNER JOIN Categoria c ON t.Id_Categoria = c.Id
-				WHERE t.Id = '$id';";
+				INNER JOIN Estado_Ticket e ON t.Estado = e.Id
+				WHERE t.Id = '$id';";;
 		$vResultado = $this->enlace->ExecuteSQL($vSql);
 
 		if ($vResultado) {
@@ -96,7 +110,7 @@ class TicketModel
 						t.Fecha_Limite_Respuesta,
 						t.Fecha_Limite_Resolucion,
 						t.Prioridad,
-						t.Estado,
+						e.Nombre AS Estado,
 						t.Id_Categoria,
 						c.Nombre AS Categoria,
 						t.Fecha_Cierre,
@@ -105,6 +119,7 @@ class TicketModel
 					FROM Ticket t
 					INNER JOIN Usuario u ON t.Id_Usuario = u.Id
 					INNER JOIN Categoria c ON t.Id_Categoria = c.Id
+					INNER JOIN Estado_Ticket e ON t.Estado = e.Id
 					INNER JOIN Asignacion a ON a.Id_Tecnico = '$id'
 					WHERE t.Id = a.Id_Ticket;";
 
@@ -128,7 +143,7 @@ class TicketModel
 						t.Fecha_Limite_Respuesta,
 						t.Fecha_Limite_Resolucion,
 						t.Prioridad,
-						t.Estado,
+						e.Nombre AS Estado,
 						t.Id_Categoria,
 						c.Nombre AS Categoria,
 						t.Fecha_Cierre,
@@ -137,7 +152,8 @@ class TicketModel
 					FROM Ticket t
 					INNER JOIN Usuario u ON t.Id_Usuario = u.Id
 					INNER JOIN Categoria c ON t.Id_Categoria = c.Id
-					WHERE t.Id_Usuario = '$id';";
+					INNER JOIN Estado_Ticket e ON t.Estado = e.Id
+					WHERE t.Id_Usuario = '$id';";;
 
 		//Ejecutar la consulta
 		$vResultado = $this->enlace->ExecuteSQL($vSql);

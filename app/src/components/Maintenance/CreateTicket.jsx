@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import {useNavigate, useParams } from 'react-router-dom';
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
+import { useI18n } from "@/hooks/useI18n";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -32,6 +33,7 @@ const IdUser = 1;
 // COMPONENTE: Crear/Editar Ticket
 // ========================================
 export function CreateTicket() {
+    const { t } = useI18n();
     const [file, setFile] = useState(null);
     const [fileURL, setFileURL] = useState(null);
     const navigate = useNavigate();
@@ -128,23 +130,23 @@ export function CreateTicket() {
 
         if (!formData.Titulo.trim()) {
             console.log(formData.Titulo);
-            toast.error('El título del ticket es requerido');
+            toast.error(t('ticket.validation.titleRequired'));
             isValid = false;
         }
         if (!formData.Prioridad) {
-            toast.error('La prioridad es requerida');
+            toast.error(t('ticket.validation.priorityRequired'));
             isValid = false;
         }
         if (!formData.Descripcion.trim()) {
-            toast.error('La descripción es requerida');
+            toast.error(t('ticket.validation.descriptionRequired'));
             isValid = false;
         }
         if (!formData.Categoria) {
-            toast.error('La categoría es requerida');
+            toast.error(t('ticket.validation.categoryRequired'));
             isValid = false;
         }
         if (!formData.Etiqueta) {
-            toast.error('La etiqueta es requerida');
+            toast.error(t('ticket.validation.tagRequired'));
             isValid = false;
         }
         return isValid;
@@ -241,7 +243,7 @@ export function CreateTicket() {
         <div className="max-w-5xl mx-auto py-12 px-6 md:px-10 lg:px-16">
             <div className="space-y-6">
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-                    {isCreateMode ? 'Crear Ticket' : 'Editar Ticket'}
+                    {isCreateMode ? t('ticket.titleCreate') : t('ticket.titleEdit')}
                 </h1>
 
                 <ToastContainer
@@ -269,25 +271,25 @@ export function CreateTicket() {
                             {/* Titulo */}
                             <div className="space-y-2">
                                 <Label htmlFor="Titulo" style={{ color: '#f7f4f3' }}>
-                                    Título *
+                                    {t('ticket.form.titleLabel')} *
                                 </Label>
                                 <Input style={{ marginBottom: '2em' }}
                                     id="Titulo"
                                     value={formData.Titulo}
                                     onChange={(e) => handleInputChange('Titulo', e.target.value)}
-                                    placeholder="Ingrese el título del ticket"
+                                    placeholder={t('ticket.form.titlePlaceholder')}
                                 />
                                 <Label htmlFor="Descripcion" style={{ color: '#f7f4f3' }}>
-                                    Descripción *
+                                    {t('ticket.form.descriptionLabel')} *
                                 </Label>
                                 <Input style={{ marginBottom: '2em', height: '100px' }}
                                     id="Descripcion"
                                     value={formData.Descripcion}
                                     onChange={(e) => handleInputChange('Descripcion', e.target.value)}
-                                    placeholder="Ingrese la descripción del ticket"
+                                    placeholder={t('ticket.form.descriptionPlaceholder')}
                                 />
                                 <Label htmlFor="UsuarioSolicitante" style={{ color: '#f7f4f3' }}>
-                                    Usuario Solicitante *
+                                    {t('ticket.form.requesterLabel')} *
                                 </Label>
                                 <Input style={{ marginBottom: '2em' }}
                                     id="UsuarioSolicitante"
@@ -296,7 +298,7 @@ export function CreateTicket() {
                                     readOnly
                                 />
                                 <Label htmlFor="UsuarioSolicitante" style={{ color: '#f7f4f3' }}>
-                                    Correo *
+                                    {t('ticket.form.emailLabel')} *
                                 </Label>
                                 <Input style={{ marginBottom: '2em' }}
                                     id="UsuarioSolicitante"
@@ -307,7 +309,7 @@ export function CreateTicket() {
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1em' }}>
                                     <div> {/* Prioridad */}
                                         <Label htmlFor="Prioridad" style={{ color: '#f7f4f3', marginBottom: '1em' }}>
-                                            Prioridad *
+                                            {t('ticket.form.priorityLabel')} *
                                         </Label>
                                         <div className="space-y-2">
                                             <Select
@@ -315,7 +317,7 @@ export function CreateTicket() {
                                                 onValueChange={(value) => handleInputChange('Prioridad', value)}
                                             >
                                                 <SelectTrigger style={{ marginBottom: '2em' }}>
-                                                    <SelectValue placeholder="Seleccione la prioridad del Ticket" />
+                                                    <SelectValue placeholder={t('ticket.form.priorityPlaceholder')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {prioridadesDisponibles.map((estado) => (
@@ -329,7 +331,7 @@ export function CreateTicket() {
                                     </div>
                                     <div> {/* Etiqueta */}
                                         <Label htmlFor="Etiqueta" style={{ color: '#f7f4f3', marginBottom: '1em' }}>
-                                            Etiqueta *
+                                            {t('ticket.form.tagLabel')} *
                                         </Label>
                                         <div className="space-y-2">
                                             <Select
@@ -340,7 +342,7 @@ export function CreateTicket() {
                                                 }}
                                             >
                                                 <SelectTrigger style={{ marginBottom: '0.5em' }}>
-                                                    <SelectValue placeholder="Seleccione una Etiqueta" />
+                                                    <SelectValue placeholder={t('ticket.form.tagPlaceholder')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {etiquetasDisponibles.map((etiqueta) => (
@@ -354,29 +356,29 @@ export function CreateTicket() {
                                     </div>
                                     <div> {/* Categoria */}
                                         <Label htmlFor="Categoria" style={{ color: '#f7f4f3', marginBottom: '1em' }}>
-                                            Categoria *
+                                            {t('ticket.form.categoryLabel')} *
                                         </Label>
                                         <Input style={{ marginBottom: '2em' }}
                                             id="Categoria"
                                             value={formData.Categoria?.Nombre || ''}
-                                            placeholder="Seleccione una Etiqueta"
+                                            placeholder={t('ticket.form.categoryPlaceholder')}
                                             readOnly
                                         />
                                     </div>
                                 </div>
                                 <Label htmlFor="UsuarioSolicitante" style={{ color: '#f7f4f3' }}>
-                                    Fecha de Creación *
+                                    {t('ticket.form.creationDateLabel')} *
                                 </Label>
                                 <h1>{new Date().toLocaleDateString()}</h1>
                                 <Label htmlFor="UsuarioSolicitante" style={{ color: '#f7f4f3' }}>
-                                    Estado *
+                                    {t('ticket.form.statusLabel')} *
                                 </Label>
-                                <h1>Pendiente</h1>
+                                <h1>{t('tickets.status.pending')}</h1>
 
                                 {/* Imagen */}
                                 <div className="mb-6">
                                     <Label htmlFor="image" className="block mb-1 text-sm font-medium">
-                                        Imagen
+                                        {t('ticket.form.imageLabel')}
                                     </Label>
                                     <div
                                         className="relative w-56 h-56 border-2 border-dashed border-muted/50 rounded-lg flex items-center justify-center cursor-pointer overflow-hidden hover:border-primary transition-colors"
@@ -384,8 +386,8 @@ export function CreateTicket() {
                                     >
                                         {!fileURL && (
                                             <div className="text-center px-4">
-                                                <p className="text-sm text-muted-foreground">Haz clic o arrastra una imagen</p>
-                                                <p className="text-xs text-muted-foreground">(jpg, png, máximo 5MB)</p>
+                                                <p className="text-sm text-muted-foreground">{t('ticket.form.imageClickText')}</p>
+                                                <p className="text-xs text-muted-foreground">{t('ticket.form.imageFormatText')}</p>
                                             </div>
                                         )}
                                         {fileURL && (
@@ -429,7 +431,7 @@ export function CreateTicket() {
                                     }}
                                 >
                                     <Save className="w-4 h-4" />
-                                    {saving ? 'Guardando...' : isCreateMode ? 'Crear Ticket' : 'Guardar Cambios'}
+                                    {saving ? t('common.saving') : isCreateMode ? t('ticket.actions.create') : t('ticket.actions.saveChanges')}
                                 </Button>
                                 <Button
                                     type="button"
@@ -451,7 +453,7 @@ export function CreateTicket() {
                                     }}
                                 >
                                     <ArrowLeft className="w-4 h-4" />
-                                    Cancelar
+                                    {t('common.cancel')}
                                 </Button>
                             </div>
                         </CardContent>

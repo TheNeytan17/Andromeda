@@ -6,24 +6,36 @@ export function cn(...inputs) {
 }
 
 export function getCurrentLang() {
-  if (typeof document !== 'undefined' && document.documentElement.lang) {
-    return document.documentElement.lang;
-  }
+  // Intentar obtener de localStorage primero (más actualizado)
   try {
-    const pref = localStorage.getItem('preferredLanguage');
-    if (pref) return pref;
+    const pref = localStorage.getItem('i18nextLng') || localStorage.getItem('preferredLanguage');
+    if (pref) {
+      // Limpiar el código de idioma (remover -US, -ES, etc. si existe)
+      const cleanLang = pref.split('-')[0];
+      return cleanLang;
+    }
   } catch {}
+  
+  // Luego intentar obtener del atributo lang del document
+  if (typeof document !== 'undefined' && document.documentElement.lang) {
+    const cleanLang = document.documentElement.lang.split('-')[0];
+    return cleanLang;
+  }
+  
+  // Por defecto español
   return 'es';
 }
 
-export function formatDate(date, options = {}) {
-  const lang = getCurrentLang();
+export function formatDate(date, options = {}, lang = null) {
+  const currentLang = lang || getCurrentLang();
   // Map common language codes to full locale codes
   const localeMap = {
     'es': 'es-ES',
-    'en': 'en-US'
+    'en': 'en-US',
+    'es-ES': 'es-ES',
+    'en-US': 'en-US'
   };
-  const locale = localeMap[lang] || lang;
+  const locale = localeMap[currentLang] || 'es-ES';
   
   const defaultOptions = { year: 'numeric', month: 'short', day: '2-digit' };
   const fmt = new Intl.DateTimeFormat(locale, { ...defaultOptions, ...options });

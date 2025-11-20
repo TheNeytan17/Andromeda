@@ -2,9 +2,9 @@
 // IMPORTS
 // ========================================
 import React, { useEffect, useState } from 'react';
-import { useI18n } from "@/hooks/useI18n";
 import { useNavigate, useParams } from 'react-router-dom';
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
+import { useI18n } from "@/hooks/useI18n";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -38,38 +38,26 @@ export function CreateCategory() {
     // Estado de datos y UI
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-
-    // Estados para los catálogos
     const [etiquetasDisponibles, setEtiquetasDisponibles] = useState([]);
-    const [slasDisponibles, setSlasDisponibles] = useState([]);
     const [especialidadesDisponibles, setEspecialidadesDisponibles] = useState([]);
 
-    // Estados del formulario
+    // Estado del formulario
     const [formData, setFormData] = useState({
         Nombre: '',
-        Id_SLA: '',
-        Tiempo_Respuesta: '',
-        Tiempo_Resolucion: '',
         Etiquetas: [],
-        Especialidades: [],
-        usarSLAExistente: true
+        Especialidades: []
     });
 
     // Cargar catálogos al montar el componente
     useEffect(() => {
         const fetchCatalogos = async () => {
             try {
-                const [etiquetasRes, slasRes, especialidadesRes] = await Promise.all([
+                const [etiquetasRes, especialidadesRes] = await Promise.all([
                     EtiquetaService.getEtiquetas(),
-                    SLAService.getSLAs(),
                     EspecialidadService.getEspecialidades()
                 ]);
-
                 if (etiquetasRes.data.success) {
                     setEtiquetasDisponibles(etiquetasRes.data.data || []);
-                }
-                if (slasRes.data.success) {
-                    setSlasDisponibles(slasRes.data.data || []);
                 }
                 if (especialidadesRes.data.success) {
                     setEspecialidadesDisponibles(especialidadesRes.data.data || []);
@@ -86,10 +74,7 @@ export function CreateCategory() {
     // Cargar detalle de la categoría si es modo edición
     useEffect(() => {
         const fetchData = async () => {
-            if (!isEditMode) {
-                return;
-            }
-
+            if (!isEditMode) return;
             setLoading(true);
             try {
                 const response = await CategoryService.getCategoryById(id);
@@ -97,16 +82,10 @@ export function CreateCategory() {
                     toast.error(response.data.message);
                 } else {
                     const categoria = response.data.data;
-                    const sla = Array.isArray(categoria.SLA) ? categoria.SLA[0] : categoria.SLA;
-                    
                     setFormData({
                         Nombre: categoria.Nombre || '',
-                        Id_SLA: categoria.Id_SLA || '',
-                        Tiempo_Respuesta: sla?.Tiempo_Respuesta || '',
-                        Tiempo_Resolucion: sla?.Tiempo_Resolucion || '',
                         Etiquetas: (categoria.Etiquetas || []).map(e => e.Id),
-                        Especialidades: (categoria.Especialidades || []).map(e => e.Id),
-                        usarSLAExistente: true
+                        Especialidades: (categoria.Especialidades || []).map(e => e.Id)
                     });
                 }
             } catch (err) {
@@ -120,73 +99,37 @@ export function CreateCategory() {
 
     const validateForm = () => {
         let isValid = true;
-
         if (!formData.Nombre.trim()) {
             toast.error(t('category.validation.nameRequired'));
             isValid = false;
         }
-
-        if (!formData.usarSLAExistente) {
-            const tiempoRespuesta = parseFloat(formData.Tiempo_Respuesta);
-            const tiempoResolucion = parseFloat(formData.Tiempo_Resolucion);
-
-            if (!formData.Tiempo_Respuesta || tiempoRespuesta <= 0) {
-                toast.error(t('category.validation.responseTimeMin'));
-                isValid = false;
-            }
-
-            if (!formData.Tiempo_Resolucion || tiempoResolucion <= 0) {
-                toast.error(t('category.validation.resolutionTimeMin'));
-                isValid = false;
-            }
-
-            if (tiempoRespuesta && tiempoResolucion && tiempoResolucion <= tiempoRespuesta) {
-                toast.error(t('category.validation.resolutionGreater'));
-                isValid = false;
-            }
-        } else if (!formData.Id_SLA) {
-            toast.error(t('category.validation.slaRequired'));
+        if (!formData.Etiquetas.length) {
+            toast.error(t('category.validation.tagsRequired'));
             isValid = false;
         }
-
+        if (!formData.Especialidades.length) {
+            toast.error(t('category.validation.skillsRequired'));
+            isValid = false;
+        }
         return isValid;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        if (!validateForm()) {
-            return;
-        }
-
+        if (!validateForm()) return;
         setSaving(true);
-
         try {
             const dataToSend = {
                 Nombre: formData.Nombre,
                 Etiquetas: formData.Etiquetas,
                 Especialidades: formData.Especialidades
             };
-
-            if (formData.usarSLAExistente) {
-                dataToSend.Id_SLA = formData.Id_SLA;
-            } else {
-                dataToSend.Tiempo_Respuesta = parseFloat(formData.Tiempo_Respuesta);
-                dataToSend.Tiempo_Resolucion = parseFloat(formData.Tiempo_Resolucion);
-            }
-
-            console.log('Datos a enviar:', dataToSend);
-            console.log('Modo:', isCreateMode ? 'Crear' : 'Editar');
-
             let response;
             if (isCreateMode) {
                 response = await CategoryService.createCategory(dataToSend);
             } else {
                 response = await CategoryService.updateCategory(id, dataToSend);
             }
-
-            console.log('Respuesta del servidor:', response.data);
-
             if (response.data.success) {
                 toast.success(response.data.message);
                 setTimeout(() => {
@@ -196,8 +139,6 @@ export function CreateCategory() {
                 toast.error(response.data.message);
             }
         } catch (err) {
-            console.error('Error completo:', err);
-            console.error('Respuesta del error:', err.response?.data);
             toast.error(err.response?.data?.message || err.message);
         } finally {
             setSaving(false);
@@ -236,7 +177,7 @@ export function CreateCategory() {
                     {isCreateMode ? t('category.titleCreate') : t('category.titleEdit')}
                 </h1>
 
-                <ToastContainer 
+                <ToastContainer
                     position="top-right"
                     autoClose={3000}
                     hideProgressBar={false}
@@ -250,7 +191,7 @@ export function CreateCategory() {
                 />
 
                 <form onSubmit={handleSubmit}>
-                    <Card 
+                    <Card
                         className="border-2 border-[#fc52af] backdrop-blur-lg"
                         style={{
                             backgroundColor: 'rgba(252, 82, 175, 0.05)',
@@ -269,86 +210,6 @@ export function CreateCategory() {
                                     onChange={(e) => handleInputChange('Nombre', e.target.value)}
                                     placeholder={t('category.form.namePlaceholder')}
                                 />
-                            </div>
-
-                            {/* SLA */}
-                            <div className="space-y-4">
-                                <Label style={{ color: '#f7f4f3' }}>{t('category.form.slaConfig')} *</Label>
-                                
-                                <div className="flex gap-4">
-                                    <Button
-                                        type="button"
-                                        variant={formData.usarSLAExistente ? "default" : "outline"}
-                                        onClick={() => handleInputChange('usarSLAExistente', true)}
-                                    >
-                                        {t('category.form.useExistingSLA')}
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant={!formData.usarSLAExistente ? "default" : "outline"}
-                                        onClick={() => handleInputChange('usarSLAExistente', false)}
-                                    >
-                                        {t('category.form.defineNewSLA')}
-                                    </Button>
-                                </div>
-
-                                {formData.usarSLAExistente ? (
-                                    <div className="space-y-2">
-                                        <Select 
-                                            value={formData.Id_SLA?.toString()} 
-                                            onValueChange={(value) => handleInputChange('Id_SLA', value)}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder={t('category.form.selectSLA')} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {slasDisponibles.map((sla) => (
-                                                    <SelectItem key={sla.Id} value={sla.Id.toString()}>
-                                                        {sla.Descripcion} - Resp: {sla.Tiempo_Respuesta}min / Res: {sla.Tiempo_Resolucion}min
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        {formData.Id_SLA && (
-                                            <div className="p-3 border rounded-lg" style={{ backgroundColor: 'rgb(255, 143, 87, 0.1)', borderColor: '#ff8f57' }}>
-                                                <p className="text-sm" style={{ color: '#f7f4f3' }}>
-                                                    <strong>{t('category.form.selectedSLA')}:</strong>{' '}
-                                                    {slasDisponibles.find(s => s.Id.toString() === formData.Id_SLA)?.Descripcion}
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="grid gap-4 md:grid-cols-2">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="tiempoRespuesta" style={{ color: '#f7f4f3' }}>
-                                                {t('category.form.responseTimeLabel')} *
-                                            </Label>
-                                            <Input
-                                                id="tiempoRespuesta"
-                                                type="number"
-                                                min="1"
-                                                value={formData.Tiempo_Respuesta}
-                                                onChange={(e) => handleInputChange('Tiempo_Respuesta', e.target.value)}
-                                                placeholder={t('category.form.responseTimePlaceholder')}
-                                            />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="tiempoResolucion" style={{ color: '#f7f4f3' }}>
-                                                {t('category.form.resolutionTimeLabel')} *
-                                            </Label>
-                                            <Input
-                                                id="tiempoResolucion"
-                                                type="number"
-                                                min="1"
-                                                value={formData.Tiempo_Resolucion}
-                                                onChange={(e) => handleInputChange('Tiempo_Resolucion', e.target.value)}
-                                                placeholder={t('category.form.resolutionTimePlaceholder')}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
                             </div>
 
                             {/* Etiquetas */}
@@ -410,8 +271,8 @@ export function CreateCategory() {
                                             key={especialidad.Id}
                                             className="flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors"
                                             style={{
-                                                backgroundColor: formData.Especialidades.includes(especialidad.Id) 
-                                                    ? 'rgb(255, 143, 87, 0.1)' 
+                                                backgroundColor: formData.Especialidades.includes(especialidad.Id)
+                                                    ? 'rgb(255, 143, 87, 0.1)'
                                                     : 'transparent',
                                                 borderColor: formData.Especialidades.includes(especialidad.Id)
                                                     ? '#ff8f57'
@@ -419,7 +280,7 @@ export function CreateCategory() {
                                             }}
                                             onClick={() => toggleEspecialidad(especialidad.Id)}
                                         >
-                                            <Badge 
+                                            <Badge
                                                 variant={formData.Especialidades.includes(especialidad.Id) ? "default" : "outline"}
                                                 className="mt-0.5"
                                                 style={{

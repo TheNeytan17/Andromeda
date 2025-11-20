@@ -225,5 +225,135 @@
       "ticketInfo": "Información del Ticket",
       "timeLimit": "Tiempo Límite"
     }
+  },
+  "technician": {
+    "titleCreate": "Crear Técnico",
+    "titleEdit": "Editar Técnico",
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "validation": {
+      "nameRequired": "El nombre del técnico es requerido",
+      "emailRequired": "El correo del técnico es requerido",
+      "statusRequired": "El estado del técnico es requerido",
+      "skillsRequired": "Debe seleccionar al menos una especialidad"
+    },
+    "form": {
+      "nameLabel": "Nombre del Técnico",
+      "namePlaceholder": "Ingrese el nombre del técnico",
+      "emailLabel": "Correo",
+      "emailPlaceholder": "Ingrese el correo del técnico",
+      "statusLabel": "Estado",
+      "statusPlaceholder": "Seleccione un estado",
+      "workloadLabel": "Carga de Trabajo",
+      "workloadPlaceholder": "0",
+      "skills": "Especialidades",
+      "noSkills": "No hay especialidades disponibles"
+    },
+    "actions": {
+      "create": "Crear Técnico",
+      "saveChanges": "Guardar Cambios"
+    }
+  },
+  "category": {
+    "titleCreate": "Crear Categoría",
+    "titleEdit": "Editar Categoría",
+    "validation": {
+      "nameRequired": "El nombre de la categoría es requerido",
+      "tagsRequired": "Debe seleccionar al menos una etiqueta",
+      "skillsRequired": "Debe seleccionar al menos una especialidad"
+    },
+    "form": {
+      "nameLabel": "Nombre de la Categoría",
+      "namePlaceholder": "Ingrese el nombre de la categoría",
+      "tags": "Etiquetas",
+      "noTags": "No hay etiquetas disponibles",
+      "requiredSkills": "Especialidades",
+      "noSkills": "No hay especialidades disponibles"
+    },
+    "actions": {
+      "create": "Crear Categoría",
+      "saveChanges": "Guardar Cambios"
+    }
+  },
+  "common": {
+    "saving": "Guardando...",
+    "cancel": "Cancelar",
+    "back": "Volver"
+  },
+  "tables": {
+    "common": {
+        "actions": "Acciones",
+        "viewDetail": "Ver detalle",
+        "viewDetails": "Ver detalles",
+      "edit": "Editar"
+    },
+    "categories": {
+        "title": "Listado de Categorías",
+        "create": "Crear categoría",
+        "edit": "Editar categoría",
+        "loadError": "Error al cargar categorías",
+        "empty": "No se encontraron categorías.",
+        "columns": {
+          "name": "Nombre",
+          "sla": "SLA"
+      }
+    },
+    "technicians": {
+        "title": "Listado de Técnicos",
+        "create": "Crear técnico",
+        "loadError": "Error al cargar técnicos",
+        "empty": "No se encontraron técnicos.",
+        "columns": {
+          "name": "Nombre",
+          "skills": "Especialidades"
+      }
+    },
+    "tickets": {
+        "title": "Tickets",
+        "create": "Crear Ticket",
+        "loadError": "Error al cargar tickets",
+        "empty": "No se encontraron tickets.",
+        "columns": {
+          "user": "Usuario",
+          "title": "Título",
+          "status": "Estado"
+      }
+    }
+  },
+  "ticket": {
+    "titleCreate": "Crear Ticket",
+    "titleEdit": "Editar Ticket",
+    "validation": {
+      "titleRequired": "El título del ticket es requerido",
+      "priorityRequired": "La prioridad es requerida",
+      "descriptionRequired": "La descripción es requerida",
+      "categoryRequired": "La categoría es requerida",
+      "tagRequired": "La etiqueta es requerida"
+    },
+    "form": {
+      "titleLabel": "Título",
+      "titlePlaceholder": "Ingrese el título del ticket",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Ingrese la descripción del ticket",
+      "requesterLabel": "Usuario Solicitante",
+      "emailLabel": "Correo",
+      "priorityLabel": "Prioridad",
+      "priorityPlaceholder": "Seleccione la prioridad del Ticket",
+      "tagLabel": "Etiqueta",
+      "tagPlaceholder": "Seleccione una Etiqueta",
+      "categoryLabel": "Categoría",
+      "categoryPlaceholder": "Seleccione una Etiqueta",
+      "creationDateLabel": "Fecha de Creación",
+      "statusLabel": "Estado",
+      "imageLabel": "Imagen",
+      "imageClickText": "Haz clic o arrastra una imagen",
+      "imageFormatText": "(jpg, png, máximo 5MB)"
+    },
+    "actions": {
+      "create": "Crear Ticket",
+      "saveChanges": "Guardar Cambios"
+    }
   }
 }
