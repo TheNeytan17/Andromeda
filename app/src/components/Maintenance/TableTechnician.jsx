@@ -14,7 +14,7 @@ import { EmptyState } from "../ui/custom/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Plus, ArrowLeft, Eye } from "lucide-react";
+import { Plus, ArrowLeft, Eye, Edit } from "lucide-react";
 
 // API Service
 import TechService from "../../services/TechnicianService";
@@ -72,9 +72,8 @@ export default function TableTechnicians() {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            {/* En el futuro, ajustar esta ruta cuando exista la pantalla de creación */}
                             <Button asChild variant="outline" size="icon" className="text-primary">
-                                <Link to="/Technician">
+                                <Link to="/CreateTechnician/new">
                                     <Plus className="h-4 w-4" />
                                 </Link>
                             </Button>
@@ -134,6 +133,19 @@ export default function TableTechnicians() {
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>Ver detalle</TooltipContent>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => navigate(`/CreateTechnician/${row.Id}`)}
+                                                        aria-label={`Editar ${row.Nombre}`}
+                                                    >
+                                                        <Edit className="h-4 w-4" style={{ color: '#fc52af' }} />
+                                                    </Button>
+                                                </TooltipTrigger>
+                                            <TooltipContent>Editar Técnico</TooltipContent>
+                                        </Tooltip>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </TableCell>

@@ -8,6 +8,9 @@ class CategoryService {
   getCategoryById(Id) {
     return axios.get(BASE_URL + '/' + Id);
   }
+  getCategoriesByEtiqueta(IdEtiqueta) {
+    return axios.get(BASE_URL + '/etiqueta/' + IdEtiqueta);
+  }
   createCategory(data) {
     return axios.post(BASE_URL, data);
   }

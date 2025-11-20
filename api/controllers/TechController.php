@@ -25,4 +25,38 @@ class Tech
         //Dar respuesta
         $response->toJSON($result);
     }
+
+    public function create()
+    {
+        $response = new Response();
+        $request = new Request();
+        $data = (array) $request->getJSON();
+
+        $Tech = new TechnicianModel();
+        $result = $Tech->create($data);
+
+        if ($result['success']) {
+            $response->status(201);
+        } else {
+            $response->status(400);
+        }
+        $response->toJSON($result);
+    }
+
+    public function update($id)
+    {
+        $response = new Response();
+        $request = new Request();
+        $data = (array) $request->getJSON();
+
+        $Tech = new TechnicianModel();
+        $result = $Tech->update($id, $data);
+
+        if ($result['success']) {
+            $response->status(200);
+        } else {
+            $response->status(400);
+        }
+        $response->toJSON($result);
+    }
 }

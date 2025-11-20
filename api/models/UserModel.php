@@ -38,6 +38,5 @@ class UserModel
 			} else {
 				return null;
 			}
-		
 	}
 }

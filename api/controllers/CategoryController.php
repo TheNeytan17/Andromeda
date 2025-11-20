@@ -26,6 +26,15 @@ class Category
         $response->toJSON($result);
     }
 
+    public function Etiqueta($param)
+    {
+        $response = new Response();
+        $Category = new CategoryModel();
+        $result = $Category->getByEtiqueta($param);
+        //Dar respuesta
+        $response->toJSON($result);
+    }
+
     public function create()
     {
         $response = new Response();

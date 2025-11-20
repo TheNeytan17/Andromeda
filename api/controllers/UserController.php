@@ -25,4 +25,21 @@ class User
         //Dar respuesta
         $response->toJSON($result);
     }
+
+    public function create()
+    {
+        $response = new Response();
+        $request = new Request();
+        $data = (array) $request->getJSON();
+
+        $User = new UserModel();
+        $result = $User->create($data);
+
+        if ($result['success']) {
+            $response->status(201);
+        } else {
+            $response->status(400);
+        }
+        $response->toJSON($result);
+    }
 }

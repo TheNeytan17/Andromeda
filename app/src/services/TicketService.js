@@ -1,5 +1,4 @@
 import axios from 'axios';
-import UserService from './UserService';
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'Ticket';
 
 class TicketService {
@@ -14,6 +13,16 @@ class TicketService {
   }
   getTicketClient(Id) {
     return axios.get(BASE_URL + '/client/' + Id);
+  }
+  createTicket(data) {
+    return axios.post(BASE_URL, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  }
+  updateTicket(Id, data) {
+    return axios.put(BASE_URL + '/' + Id, data);
   }
 }
 
