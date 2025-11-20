@@ -3,6 +3,7 @@
 // ========================================
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useI18n } from "@/hooks/useI18n";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -13,9 +14,16 @@ import TicketService from "../../services/TicketService";
 // ========================================
 // CONSTANTES
 // ========================================
-// Estados del tablero Kanban (4 columnas principales)
-// No incluye "Pendiente" ya que ese estado es anterior a la asignación
-const statuses = ["Asignado", "En Proceso", "Resuelto", "Cerrado"];
+// Estados del tablero Kanban - Las claves se usarán para traducción
+const STATUS_KEYS = {
+    ASSIGNED: 'assigned',
+    IN_PROGRESS: 'inProgress',
+    RESOLVED: 'resolved',
+    CLOSED: 'closed',
+    PENDING: 'pending'
+};
+
+const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 // ========================================
 // FUNCIONES AUXILIARES DE ESTILO
@@ -85,6 +93,7 @@ export default function TableAssignments() {
     // HOOKS Y ESTADO
     // ========================================
     const navigate = useNavigate(); // Para navegación entre rutas
+    const { t } = useI18n(); // Hook de internacionalización
     
     // Estado para almacenar todas las asignaciones desde la API
     const [assignments, setAssignments] = useState([]);
@@ -209,11 +218,15 @@ export default function TableAssignments() {
 
         // Priorizar días sobre horas para mensajes más significativos
         if (days > 0) {
-            return `Vencido hace ${days} día${days !== 1 ? 's' : ''}`;
+            return days > 1 
+                ? t('assignments.board.sla.overdueDays_plural', { count: days })
+                : t('assignments.board.sla.overdueDays', { count: days });
         } else if (hours > 0) {
-            return `Vencido hace ${hours} hora${hours !== 1 ? 's' : ''}`;
+            return hours > 1
+                ? t('assignments.board.sla.overdueHours_plural', { count: hours })
+                : t('assignments.board.sla.overdueHours', { count: hours });
         } else {
-            return 'Vencido recientemente';
+            return t('assignments.board.sla.overdueRecently');
         }
     }
 
@@ -235,7 +248,7 @@ export default function TableAssignments() {
             Id_Ticket: row.Id_Ticket ?? row.id_ticket ?? null,
             Titulo: row.Titulo ?? row.title ?? row.Titulo_Ticket ?? `Ticket #${row.Id ?? row.id ?? row.Id_Ticket ?? ""}`,
             Categoria: row.Categoria ?? row.Category ?? row.Categoria_Ticket ?? (row.CategoriaId ? String(row.CategoriaId) : "General"),
-            Estado: mapTicketEstadoToColumn(rawEstado) ?? "Pendiente",
+            Estado: mapTicketEstadoToColumn(rawEstado) ?? "pending",
             OriginalEstadoRaw: rawEstado ?? null,
             Urgencia: row.Urgencia ?? row.urgency ?? row.Prioridad ?? "Baja",
             SLA_hours_left: row.SLA_hours_left ?? row.sla_hours_left ?? row.SLA ?? 0,
@@ -252,16 +265,17 @@ export default function TableAssignments() {
     /**
      * Normaliza nombres de estados en español/inglés a formato estándar
      * @param {string} s - Estado a normalizar
-     * @returns {string} Estado normalizado
+     * @returns {string} Estado normalizado (clave constante)
      */
     function normalizeStatus(s) {
         const v = String(s || "").toLowerCase();
         // Buscar coincidencias parciales para soportar variaciones del backend
-        if (v.includes("pen")) return "Pendiente";
-        if (v.includes("asign") || v.includes("esper")) return "Asignado";
-        if (v.includes("progre") || v.includes("proce")) return "En Proceso";
-        if (v.includes("resuel") || v.includes("resolv")) return "Resuelto";
-        if (v.includes("cerr")) return "Cerrado";
+        // Retornar claves constantes que luego se traducirán al renderizar
+        if (v.includes("pen")) return "pending";
+        if (v.includes("asign") || v.includes("esper")) return "assigned";
+        if (v.includes("progre") || v.includes("proce")) return "inProgress";
+        if (v.includes("resuel") || v.includes("resolv")) return "resolved";
+        if (v.includes("cerr") || v.includes("clos")) return "closed";
         return s; // Retornar original si no coincide
     }
 
@@ -272,14 +286,14 @@ export default function TableAssignments() {
      * @returns {string} Nombre de columna normalizado
      */
     function mapTicketEstadoToColumn(estado) {
-        if (estado === null || estado === undefined) return "Pendiente";
+        if (estado === null || estado === undefined) return "pending";
 
         // Caso 1: Viene como objeto (ej: {Id: 2, Nombre: "En Progreso"})
         if (typeof estado === "object") {
             const maybe = estado.Id ?? estado.Id_Estado ?? estado.id ?? estado.estado ?? estado.Nombre ?? estado.name;
             if (typeof maybe === "number") return mapTicketEstadoToColumn(maybe);
             if (typeof maybe === "string") return mapTicketEstadoToColumn(maybe);
-            return "Pendiente";
+            return "pending";
     
         /**
          * Filtra asignaciones que pertenecen a una semana específica
@@ -307,16 +321,16 @@ export default function TableAssignments() {
         // Caso 3: Número directo (IDs del backend)
         if (typeof estado === "number") {
             switch (estado) {
-                case 1: return "Pendiente";
-                case 2: return "Asignado";
-                case 3: return "En proceso";
-                case 4: return "Resuelto";
-                case 5: return "Cerrado";
-                default: return "Pendiente";
+                case 1: return "pending";
+                case 2: return "assigned";
+                case 3: return "inProgress";
+                case 4: return "resolved";
+                case 5: return "closed";
+                default: return "pending";
             }
         }
         
-        return "Pendiente"; // Fallback por defecto
+        return "pending"; // Fallback por defecto
     }
 
     // ========================================
@@ -377,7 +391,7 @@ export default function TableAssignments() {
 
                 // Actualizar estado solo si el componente sigue montado
                 if (mounted) setAssignments(enriched);
-                if (mounted && (!enriched || !enriched.length)) setError("No hay asignaciones disponibles");
+                if (mounted && (!enriched || !enriched.length)) setError(t('assignments.board.noAssignments'));
             } catch (e) {
                 if (mounted) {
                     setError(e?.message ?? String(e));
@@ -437,7 +451,7 @@ export default function TableAssignments() {
 
     // Agrupar asignaciones por día de la semana (Lunes-Domingo)
     function groupByWeekDay(assignmentsArray, weekStartDate) {
-        const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        const days = DAY_KEYS.map(key => t(`assignments.board.days.${key}`));
         const grouped = {};
         days.forEach(day => grouped[day] = []);
 
@@ -458,11 +472,26 @@ export default function TableAssignments() {
         return grouped;
     }
 
-    // Agrupar por estado (para Kanban)
+    // Obtener la fecha para un día específico de la semana actual
+    function getDateForWeekDay(weekStartDate, dayIndex) {
+        const s = startOfWeek(weekStartDate);
+        const date = new Date(s.getFullYear(), s.getMonth(), s.getDate() + dayIndex);
+        return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+    }
+
+    // Función auxiliar para traducir claves de estado
+    const translateStatus = (statusKey) => {
+        return t(`assignments.board.status.${statusKey}`);
+    };
+
+    // Agrupar por estado (para Kanban) - usar claves constantes
+    const statusKeys = ['assigned', 'inProgress', 'resolved', 'closed'];
+    const statuses = statusKeys.map(translateStatus);
+    
     const grouped = {};
-    statuses.forEach((s) => (grouped[s] = []));
+    statusKeys.forEach((key) => (grouped[key] = []));
     assignments.forEach((a) => {
-        const st = normalizeStatus(a.Estado || statuses[0]);
+        const st = a.Estado || 'pending'; // Estado ya está en formato de clave
         if (!grouped[st]) grouped[st] = [];
         grouped[st].push(a);
     });
@@ -481,7 +510,7 @@ export default function TableAssignments() {
     if (loading) {
         return (
             <div className="container mx-auto py-8 px-4 text-white">
-                <div className="text-sm text-zinc-300">Cargando asignaciones…</div>
+                <div className="text-sm text-zinc-300">{t('assignments.board.loading')}</div>
             </div>
         );
     }
@@ -493,11 +522,11 @@ export default function TableAssignments() {
         <div className="container mx-auto py-8 px-4 text-white">
             {/* CABECERA CON CONTROLES */}
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Tablero — Asignaciones</h2>
+                <h2 className="text-2xl font-bold">{t('assignments.board.title')}</h2>
 
                 {/* Selector de vista y controles semanales */}
                 <div className="flex items-center gap-3">
-                    <label className="text-sm text-zinc-300">Vista:</label>
+                    <label className="text-sm text-zinc-300">{t('assignments.board.viewLabel')}</label>
                     
                     {/* Select personalizado con estilo glassmorphism */}
                     <Select value={viewMode} onValueChange={(val) => setViewMode(val)}>
@@ -506,10 +535,10 @@ export default function TableAssignments() {
                         </SelectTrigger>
                         <SelectContent className="bg-[rgba(111,60,130,0.15)] backdrop-blur-md border-[#6f3c82] text-[#f7f4f3] focus-visible:ring-0 selection:bg-[#6f3c82] selection:text-[#f7f4f3]">
                             <SelectItem value="kanban" className="data-[highlighted]:bg-[#6f3c82] data-[highlighted]:text-[#f7f4f3] focus:bg-[#6f3c82] focus:text-[#f7f4f3]">
-                                Kanban
+                                {t('assignments.board.viewKanban')}
                             </SelectItem>
                             <SelectItem value="week" className="data-[highlighted]:bg-[#6f3c82] data-[highlighted]:text-[#f7f4f3] focus:bg-[#6f3c82] focus:text-[#f7f4f3]">
-                                Semana
+                                {t('assignments.board.viewWeek')}
                             </SelectItem>
                         </SelectContent>
                     </Select>
@@ -521,7 +550,7 @@ export default function TableAssignments() {
                             <Button 
                                 size="sm" 
                                 onClick={() => setWeekStart(prev => startOfWeek(new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() - 7)))} 
-                                aria-label="Semana anterior"
+                                aria-label={t('assignments.board.previousWeek')}
                                 className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-2 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md hover:bg-[rgba(111,60,130,0.25)] focus-visible:ring-[#6f3c82]/50"
                             >
                                 <ChevronLeft className="w-4 h-4" />
@@ -534,7 +563,7 @@ export default function TableAssignments() {
                             <Button 
                                 size="sm" 
                                 onClick={() => setWeekStart(prev => startOfWeek(new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + 7)))} 
-                                aria-label="Semana siguiente"
+                                aria-label={t('assignments.board.nextWeek')}
                                 className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-2 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md hover:bg-[rgba(111,60,130,0.25)] focus-visible:ring-[#6f3c82]/50"
                             >
                                 <ChevronRight className="w-4 h-4" />
@@ -546,7 +575,7 @@ export default function TableAssignments() {
                                 onClick={() => setWeekStart(startOfWeek(new Date()))}
                                 className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-3 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md hover:bg-[rgba(111,60,130,0.25)] focus-visible:ring-[#6f3c82]/50"
                             >
-                                Hoy
+                                {t('assignments.board.today')}
                             </Button>
                         </div>
                     )}
@@ -566,9 +595,9 @@ export default function TableAssignments() {
                 // VISTA KANBAN (COLUMNAS POR ESTADO)
                 // ========================================
                 <div className="flex gap-4 overflow-x-auto pb-4">
-                    {statuses.map((status) => (
+                    {statusKeys.map((statusKey) => (
                         <div
-                            key={status}
+                            key={statusKey}
                             className="min-w-[260px] rounded border-2 border-[#6f3c82] p-3 flex-shrink-0"
                             style={{
                                 background: 'rgba(111, 60, 130, 0.1)',
@@ -577,15 +606,15 @@ export default function TableAssignments() {
                             }}
                         >
                             <div className="flex items-center justify-between mb-3">
-                                <h3 className="font-semibold text-[#f7f4f3]">{status}</h3>
-                                <span className="text-xs text-[#f7f4f3]/70">{grouped[status].length}</span>
+                                <h3 className="font-semibold text-[#f7f4f3]">{translateStatus(statusKey)}</h3>
+                                <span className="text-xs text-[#f7f4f3]/70">{grouped[statusKey].length}</span>
                             </div>
 
                             <div className="space-y-3">
-                                {grouped[status].length === 0 && <div className="text-xs text-zinc-500">No hay asignaciones</div>}
+                                {grouped[statusKey].length === 0 && <div className="text-xs text-zinc-500">{t('assignments.board.noAssignments')}</div>}
 
                                 {/* Mapear cada asignación a una tarjeta */}
-                                {grouped[status].map((ticket) => (
+                                {grouped[statusKey].map((ticket) => (
                                     <div
                                         key={ticket.Id}
                                         className={`p-3 rounded shadow-sm ${!getCardColorByStatus(ticket.Estado) ? urgencyColor(ticket.Urgencia) : ''}`}
@@ -619,12 +648,12 @@ export default function TableAssignments() {
                                             </div>
                                             {/* Texto descriptivo del SLA */}
                                             <div className="text-xs mt-1">
-                                                {ticket.Estado === 'Resuelto' || ticket.Estado === 'Cerrado' ? (
-                                                    <span className="text-emerald-400">✓ Completado</span>
+                                                {ticket.Estado === 'resolved' || ticket.Estado === 'closed' ? (
+                                                    <span className="text-emerald-400">✓ {t('assignments.board.sla.completed')}</span>
                                                 ) : ticket.PercentSLA >= 100 && ticket.slaEnd ? (
                                                     <span className="text-red-400 font-medium">⚠️ {getOverdueMessage(ticket.slaEnd)}</span>
                                                 ) : (
-                                                    <span className="text-zinc-400">{ticket.PercentSLA}% SLA consumido</span>
+                                                    <span className="text-zinc-400">{ticket.PercentSLA}% {t('assignments.board.sla.consumed')}</span>
                                                 )}
                                             </div>
                                         </div>
@@ -636,30 +665,30 @@ export default function TableAssignments() {
                                                 <TooltipProvider>
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
-                                                            <Button size="sm" variant="ghost" onClick={() => navigate(`/Assignment/${ticket.Id}`)} aria-label={`Ver detalle ${ticket.Id}`}>
+                                                            <Button size="sm" variant="ghost" onClick={() => navigate(`/Assignment/${ticket.Id}`)} aria-label={`${t('assignments.board.tooltip.viewDetail')} ${ticket.Id}`}>
                                                                 <Eye className="w-4 h-4" />
                                                             </Button>
                                                         </TooltipTrigger>
-                                                        <TooltipContent>Abrir detalle</TooltipContent>
+                                                        <TooltipContent>{t('assignments.board.tooltip.viewDetail')}</TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
 
                                                 {/* Selector: Cambiar estado (solo local) */}
                                                 <Select
-                                                    value={normalizeStatus(ticket.Estado)}
+                                                    value={ticket.Estado}
                                                     onValueChange={(val) => changeState(ticket.Id, val)}
                                                 >
                                                     <SelectTrigger className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-3 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md focus-visible:ring-[#6f3c82]/50 focus-visible:border-[#6f3c82] selection:bg-[#6f3c82] selection:text-[#f7f4f3]">
-                                                        <SelectValue />
+                                                        <SelectValue>{translateStatus(ticket.Estado)}</SelectValue>
                                                     </SelectTrigger>
                                                     <SelectContent className="bg-[rgba(111,60,130,0.15)] backdrop-blur-md border-[#6f3c82] text-[#f7f4f3] focus-visible:ring-0 selection:bg-[#6f3c82] selection:text-[#f7f4f3]">
-                                                        {statuses.map((s) => (
+                                                        {statusKeys.map((key) => (
                                                             <SelectItem
-                                                                key={s}
-                                                                value={s}
+                                                                key={key}
+                                                                value={key}
                                                                 className="data-[highlighted]:bg-[#6f3c82] data-[highlighted]:text-[#f7f4f3] focus:bg-[#6f3c82] focus:text-[#f7f4f3]"
                                                             >
-                                                                {s}
+                                                                {translateStatus(key)}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
@@ -688,10 +717,10 @@ export default function TableAssignments() {
                 // ========================================
                 <div className="space-y-6">
                     {/* Mensaje si no hay asignaciones en la semana */}
-                    {weekAssignments.length === 0 && <div className="text-xs text-zinc-500">No hay asignaciones para la semana seleccionada</div>}
+                    {weekAssignments.length === 0 && <div className="text-xs text-zinc-500">{t('assignments.board.noAssignmentsWeek')}</div>}
                     
                     {/* Iterar por cada día de la semana */}
-                    {Object.entries(weekGroupedByDay).map(([dayName, dayAssignments]) => {
+                    {Object.entries(weekGroupedByDay).map(([dayName, dayAssignments], index) => {
                         // Ocultar días sin asignaciones
                         if (dayAssignments.length === 0) return null;
                         
@@ -699,7 +728,7 @@ export default function TableAssignments() {
                             <div key={dayName} className="space-y-3">
                                 {/* Encabezado del día */}
                                 <h3 className="text-lg font-semibold text-[#f7f4f3] border-b border-[#6f3c82]/40 pb-2">
-                                    {dayName}
+                                    {dayName} <span className="text-sm text-zinc-400 font-normal">({getDateForWeekDay(weekStart, index)})</span>
                                 </h3>
                                 
                                 {/* Tarjetas de asignaciones del día */}
@@ -711,19 +740,19 @@ export default function TableAssignments() {
                                                 <div>
                                                     <div className="text-sm font-medium text-zinc-100">{ticket.Titulo}</div>
                                                     <div className="text-xs text-zinc-400">#{ticket.Id} · {ticket.Categoria} · {ticket.Dia ? ticket.Dia + ' · ' : ''}{ticket.Tecnico ? ticket.Tecnico : ''}</div>
-                                                    <div className="text-xs text-zinc-400 mt-1">Fecha: {formatDateShort(ticket.slaStart || ticket.Fecha_AsignacionRaw)}</div>
+                                                    <div className="text-xs text-zinc-400 mt-1">{t('assignments.board.date')} {formatDateShort(ticket.slaStart || ticket.Fecha_AsignacionRaw)}</div>
                                                 </div>
                                                 
                                                 {/* Información derecha: Estado, SLA, botón ver */}
                                                 <div className="flex flex-col items-end">
-                                                    <div className="text-xs text-zinc-300">{ticket.Estado}</div>
+                                                    <div className="text-xs text-zinc-300">{translateStatus(ticket.Estado)}</div>
                                                     
                                                     {/* Barra de progreso SLA compacta */}
                                                     <div className="w-40 mt-2">
                                                         <div className="w-full h-2 bg-black/20 rounded">
-                                                            <div className={`h-2 rounded ${ticket.Estado === 'Resuelto' || ticket.Estado === 'Cerrado' ? 'bg-emerald-500' : ticket.PercentSLA >= 100 ? 'bg-red-500' : 'bg-gradient-to-r from-emerald-400 to-red-400'}`} style={{ width: `${ticket.PercentSLA}%` }} />
+                                                            <div className={`h-2 rounded ${ticket.Estado === 'resolved' || ticket.Estado === 'closed' ? 'bg-emerald-500' : ticket.PercentSLA >= 100 ? 'bg-red-500' : 'bg-gradient-to-r from-emerald-400 to-red-400'}`} style={{ width: `${ticket.PercentSLA}%` }} />
                                                         </div>
-                                                        <div className="text-xs text-zinc-400 mt-1">{ticket.PercentSLA}% SLA consumido</div>
+                                                        <div className="text-xs text-zinc-400 mt-1">{ticket.PercentSLA}% {t('assignments.board.sla.consumed')}</div>
                                                     </div>
                                                     
                                                     {/* Botón para ver detalles */}

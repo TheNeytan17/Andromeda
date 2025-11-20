@@ -18,9 +18,15 @@ export function getCurrentLang() {
 
 export function formatDate(date, options = {}) {
   const lang = getCurrentLang();
-  const fmt = new Intl.DateTimeFormat(lang, {
-    year: 'numeric', month: 'short', day: '2-digit', ...options
-  });
+  // Map common language codes to full locale codes
+  const localeMap = {
+    'es': 'es-ES',
+    'en': 'en-US'
+  };
+  const locale = localeMap[lang] || lang;
+  
+  const defaultOptions = { year: 'numeric', month: 'short', day: '2-digit' };
+  const fmt = new Intl.DateTimeFormat(locale, { ...defaultOptions, ...options });
   return fmt.format(date);
 }
 

@@ -3,6 +3,7 @@
 // ========================================
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useI18n } from '@/hooks/useI18n';
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
 // Shadcn UI Components
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +20,7 @@ import TechService from "@/services/TechnicianService";
 // COMPONENTE: Detalle de Técnico
 // ========================================
 export function DetailTechnician() {
+    const { t } = useI18n();
     const navigate = useNavigate();
     const { id } = useParams();
     // Estado de datos y UI
@@ -45,9 +47,9 @@ export function DetailTechnician() {
     }, [id]);
 
     if (loading) return <LoadingGrid count={1} type="grid" />;
-    if (error) return <ErrorAlert title="No se pudo cargar el técnico" message={error} />;
+    if (error) return <ErrorAlert title={t('details.technician.loadError')} message={error} />;
     if (!techResponse || !techResponse.data)
-        return <EmptyState message="No se encontraron datos para este técnico." />;
+        return <EmptyState message={t('details.technician.noData')} />;
 
     // Normalización y fallbacks
     const tech = techResponse.data; // Objeto del técnico
@@ -61,7 +63,7 @@ export function DetailTechnician() {
                 <div className="flex items-center gap-3">
                     <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">{tech.Nombre}</h1>
                     <Badge variant={disponible ? 'secondary' : 'destructive'}>
-                        {disponible ? 'Disponible' : 'No disponible'}
+                        {disponible ? t('details.technician.available') : t('details.technician.notAvailable')}
                     </Badge>
                 </div>
 
@@ -79,12 +81,12 @@ export function DetailTechnician() {
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-3">
                                         <Mail className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                        <span className="font-semibold" style={{ color: '#f7f4f3' }}>Correo:</span>
+                                        <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.technician.email')}:</span>
                                         <p className="text-muted-foreground">{tech.Correo}</p>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Clock className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                        <span className="font-semibold" style={{ color: '#f7f4f3' }}>Última sesión:</span>
+                                        <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.technician.lastSession')}:</span>
                                         <p className="text-muted-foreground">{tech.Ultima_Sesion || 'N/D'}</p>
                                     </div>
                                 </div>
@@ -92,7 +94,7 @@ export function DetailTechnician() {
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-3">
                                         <Briefcase className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                        <span className="font-semibold" style={{ color: '#f7f4f3' }}>Carga de trabajo:</span>
+                                        <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.technician.workload')}:</span>
                                         <p className="text-muted-foreground">{tech.CargaTrabajo ?? 0}</p>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -101,8 +103,8 @@ export function DetailTechnician() {
                                         ) : (
                                             <XCircle className="h-5 w-5 text-destructive" />
                                         )}
-                                        <span className="font-semibold">Disponibilidad:</span>
-                                        <p className="text-muted-foreground">{disponible ? 'Disponible' : 'No disponible'}</p>
+                                        <span className="font-semibold">{t('details.technician.availability')}:</span>
+                                        <p className="text-muted-foreground">{disponible ? t('details.technician.available') : t('details.technician.notAvailable')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -111,7 +113,7 @@ export function DetailTechnician() {
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
                                     <ChevronRight className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>Especialidades</span>
+                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.technician.specialties')}</span>
                                     <Badge variant="secondary">{especialidades.length}</Badge>
                                 </div>
                                 {especialidades.length > 0 ? (
@@ -124,7 +126,7 @@ export function DetailTechnician() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground">Este técnico no tiene especialidades registradas.</p>
+                                    <p className="text-muted-foreground">{t('details.technician.noSpecialties')}</p>
                                 )}
                             </div>
                         </CardContent>
@@ -137,7 +139,7 @@ export function DetailTechnician() {
                     className="flex items-center gap-2 bg-accent text-white hover:bg-accent/90 mt-6"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    Regresar
+                    {t('common.back')}
                 </Button>
             </div>
         </div>

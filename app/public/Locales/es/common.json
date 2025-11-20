@@ -101,5 +101,129 @@
     "tagline": "✨ Más que eventos,<br/> creamos constelaciones <br/>de recuerdos.",
     "contact": "CONTÁCTANOS",
     "rights": "Todos los derechos reservados"
+  },
+  "assignments": {
+    "board": {
+      "title": "Tablero — Asignaciones",
+      "viewLabel": "Vista:",
+      "viewKanban": "Kanban",
+      "viewWeek": "Semana",
+      "previousWeek": "Semana anterior",
+      "nextWeek": "Semana siguiente",
+      "today": "Hoy",
+      "loading": "Cargando asignaciones…",
+      "noAssignments": "No hay asignaciones disponibles",
+      "noAssignmentsWeek": "No hay asignaciones para la semana seleccionada",
+      "status": {
+        "assigned": "Asignado",
+        "inProgress": "En Proceso",
+        "resolved": "Resuelto",
+        "closed": "Cerrado",
+        "pending": "Pendiente"
+      },
+      "days": {
+        "monday": "Lunes",
+        "tuesday": "Martes",
+        "wednesday": "Miércoles",
+        "thursday": "Jueves",
+        "friday": "Viernes",
+        "saturday": "Sábado",
+        "sunday": "Domingo"
+      },
+      "sla": {
+        "completed": "Completado",
+        "consumed": "SLA consumido",
+        "overdueRecently": "Vencido recientemente",
+        "overdueDays": "Vencido hace {{count}} día",
+        "overdueDays_plural": "Vencido hace {{count}} días",
+        "overdueHours": "Vencido hace {{count}} hora",
+        "overdueHours_plural": "Vencido hace {{count}} horas"
+      },
+      "tooltip": {
+        "viewDetail": "Abrir detalle"
+      },
+      "date": "Fecha:"
+    }
+  },
+  "details": {
+    "category": {
+      "loadError": "No se pudo cargar la categoría",
+      "noData": "No se encontraron datos para esta categoría.",
+      "specialtyInCharge": "Especialidad encargada",
+      "sla": "SLA",
+      "responseTime": "Tiempo de respuesta",
+      "resolutionTime": "Tiempo de resolución",
+      "noSLA": "Sin información de SLA.",
+      "requiredSkills": "Especialidades requeridas",
+      "noSkills": "No hay especialidades asociadas.",
+      "tags": "Etiquetas",
+      "noTags": "Sin etiquetas asociadas."
+    },
+    "technician": {
+      "loadError": "No se pudo cargar el técnico",
+      "noData": "No se encontraron datos para este técnico.",
+      "available": "Disponible",
+      "notAvailable": "No disponible",
+      "email": "Correo",
+      "lastSession": "Última sesión",
+      "workload": "Carga de trabajo",
+      "availability": "Disponibilidad",
+      "specialties": "Especialidades",
+      "noSpecialties": "Este técnico no tiene especialidades registradas."
+    },
+    "ticket": {
+      "loadError": "El Id del ticket es incorrecto",
+      "noData": "No se encontró el ticket con ese Id.",
+      "userRequester": "Usuario Solicitante",
+      "category": "Categoría",
+      "priority": {
+        "label": "Prioridad",
+        "veryLow": "Muy Baja",
+        "low": "Baja",
+        "medium": "Media",
+        "high": "Alta",
+        "critical": "Crítica"
+      },
+      "status": "Estado",
+      "description": "Descripción",
+      "noDescription": "Sin descripción",
+      "creationDate": "Fecha de Creación",
+      "responseDeadline": "Fecha Límite Respuesta",
+      "resolutionDeadline": "Fecha Límite Resolución",
+      "closeDate": "Fecha de Cierre",
+      "slaResponseCompliance": "Cumplimiento SLA Respuesta",
+      "slaResolutionCompliance": "Cumplimiento SLA Resolución",
+      "met": "Cumplido",
+      "notMet": "No Cumplido",
+      "statusHistory": "Historial de Estados",
+      "responsible": "Responsable",
+      "userId": "Usuario ID",
+      "observations": "Observaciones",
+      "attachedImages": "Imágenes adjuntas",
+      "userRating": "Valoración del Usuario",
+      "user": "Usuario",
+      "score": "Puntaje",
+      "date": "Fecha",
+      "comment": "Comentario"
+    },
+    "assignment": {
+      "loadError": "No se pudo cargar las asignaciones",
+      "noData": "No se encontró la asignación solicitada.",
+      "title": "Asignación",
+      "technician": "Técnico",
+      "detailBadge": "Detalle",
+      "ticket": "Ticket",
+      "viewTicket": "Ver Ticket",
+      "assignmentDate": "Fecha de Asignación",
+      "assignmentMethodLabel": "Método de Asignación",
+      "assignmentMethod": {
+        "manual": "Manual",
+        "automatic": "Automático"
+      },
+      "autoTriageRule": "Regla de Autotriage",
+      "noRuleApplied": "No aplicada (asignación manual)",
+      "ticketInfo": "Información del Ticket",
+      "timeLimit": "Tiempo Límite"
+    }
   }
 }

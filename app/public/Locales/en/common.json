@@ -135,5 +135,129 @@
       "resolutionGreater": "Resolution time must be greater than response time",
       "slaRequired": "You must select an SLA"
     }
+  },
+  "assignments": {
+    "board": {
+      "title": "Board — Assignments",
+      "viewLabel": "View:",
+      "viewKanban": "Kanban",
+      "viewWeek": "Week",
+      "previousWeek": "Previous week",
+      "nextWeek": "Next week",
+      "today": "Today",
+      "loading": "Loading assignments…",
+      "noAssignments": "No assignments available",
+      "noAssignmentsWeek": "No assignments for the selected week",
+      "status": {
+        "assigned": "Assigned",
+        "inProgress": "In Progress",
+        "resolved": "Resolved",
+        "closed": "Closed",
+        "pending": "Pending"
+      },
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "sla": {
+        "completed": "Completed",
+        "consumed": "SLA consumed",
+        "overdueRecently": "Recently overdue",
+        "overdueDays": "Overdue {{count}} day ago",
+        "overdueDays_plural": "Overdue {{count}} days ago",
+        "overdueHours": "Overdue {{count}} hour ago",
+        "overdueHours_plural": "Overdue {{count}} hours ago"
+      },
+      "tooltip": {
+        "viewDetail": "View detail"
+      },
+      "date": "Date:"
+    }
+  },
+  "details": {
+    "category": {
+      "loadError": "Could not load category",
+      "noData": "No data found for this category.",
+      "specialtyInCharge": "Specialty in charge",
+      "sla": "SLA",
+      "responseTime": "Response time",
+      "resolutionTime": "Resolution time",
+      "noSLA": "No SLA information.",
+      "requiredSkills": "Required skills",
+      "noSkills": "No associated skills.",
+      "tags": "Tags",
+      "noTags": "No associated tags."
+    },
+    "technician": {
+      "loadError": "Could not load technician",
+      "noData": "No data found for this technician.",
+      "available": "Available",
+      "notAvailable": "Not available",
+      "email": "Email",
+      "lastSession": "Last session",
+      "workload": "Workload",
+      "availability": "Availability",
+      "specialties": "Specialties",
+      "noSpecialties": "This technician has no registered specialties."
+    },
+    "ticket": {
+      "loadError": "The ticket ID is incorrect",
+      "noData": "Ticket with that ID was not found.",
+      "userRequester": "Requesting User",
+      "category": "Category",
+      "priority": {
+        "label": "Priority",
+        "veryLow": "Very Low",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "critical": "Critical"
+      },
+      "status": "Status",
+      "description": "Description",
+      "noDescription": "No description",
+      "creationDate": "Creation Date",
+      "responseDeadline": "Response Deadline",
+      "resolutionDeadline": "Resolution Deadline",
+      "closeDate": "Close Date",
+      "slaResponseCompliance": "SLA Response Compliance",
+      "slaResolutionCompliance": "SLA Resolution Compliance",
+      "met": "Met",
+      "notMet": "Not Met",
+      "statusHistory": "Status History",
+      "responsible": "Responsible",
+      "userId": "User ID",
+      "observations": "Observations",
+      "attachedImages": "Attached images",
+      "userRating": "User Rating",
+      "user": "User",
+      "score": "Score",
+      "date": "Date",
+      "comment": "Comment"
+    },
+    "assignment": {
+      "loadError": "Could not load assignments",
+      "noData": "The requested assignment was not found.",
+      "title": "Assignment",
+      "technician": "Technician",
+      "detailBadge": "Detail",
+      "ticket": "Ticket",
+      "viewTicket": "View Ticket",
+      "assignmentDate": "Assignment Date",
+      "assignmentMethodLabel": "Assignment Method",
+      "assignmentMethod": {
+        "manual": "Manual",
+        "automatic": "Automatic"
+      },
+      "autoTriageRule": "Auto-Triage Rule",
+      "noRuleApplied": "Not applied (manual assignment)",
+      "ticketInfo": "Ticket Information",
+      "timeLimit": "Time Limit"
+    }
   }
 }

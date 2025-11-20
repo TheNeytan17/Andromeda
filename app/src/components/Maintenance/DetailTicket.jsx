@@ -3,6 +3,8 @@
 // ========================================
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useI18n } from '@/hooks/useI18n';
+import { formatDate } from '@/lib/utils';
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
 // Shadcn UI Components
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,28 +31,12 @@ import TicketService from "@/services/TicketService";
 // ========================================
 // MAPEOS / CONSTANTES
 // ========================================
-// Descripciones legibles para prioridad
-const PRIORIDAD_DESC = {
-    1: 'Muy Baja',
-    2: 'Baja',
-    3: 'Media',
-    4: 'Alta',
-    5: 'Crítica'
-};
-
-// Descripciones legibles para estado
-const ESTADO_DESC = {
-    1: 'Pendiente',
-    2: 'Asignado',
-    3: 'En Progreso',
-    4: 'Resuelto',
-    5: 'Cerrado',
-};
 
 // ========================================
 // COMPONENTE PRINCIPAL
 // ========================================
 export function DetailTicket() {
+    const { t } = useI18n();
     const navigate = useNavigate();
     const { id } = useParams();
     const [ticketResp, setData] = useState(null); // Respuesta cruda del API
@@ -58,6 +44,23 @@ export function DetailTicket() {
     const [loading, setLoading] = useState(true); // Flag de carga
     // Base URL para imágenes adjuntas al historial
     const BASE_URL = import.meta.env.VITE_BASE_URL + "uploads";
+
+    // Mapeos dinámicos con traducciones
+    const PRIORIDAD_DESC = {
+        1: t('details.ticket.priority.veryLow'),
+        2: t('details.ticket.priority.low'),
+        3: t('details.ticket.priority.medium'),
+        4: t('details.ticket.priority.high'),
+        5: t('details.ticket.priority.critical')
+    };
+
+    const ESTADO_DESC = {
+        1: t('tickets.status.pending'),
+        2: t('tickets.status.assigned'),
+        3: t('tickets.status.inProgress'),
+        4: t('tickets.status.resolved'),
+        5: t('tickets.status.closed'),
+    };
 
     // ========================================
     // EFECTO: CARGA DE TICKET POR ID
@@ -84,9 +87,9 @@ export function DetailTicket() {
     }, [id]);
 
     if (loading) return <LoadingGrid count={1} type="grid" />;
-    if (error) return <ErrorAlert title="El Id del ticket es incorrecto" message={error} />;
+    if (error) return <ErrorAlert title={t('details.ticket.loadError')} message={error} />;
     if (!ticketResp || !ticketResp.data)
-        return <EmptyState message="No se encontró el ticket con ese Id." />;
+        return <EmptyState message={t('details.ticket.noData')} />;
     // ========================================
     // FIN API
     // ========================================
@@ -119,7 +122,7 @@ export function DetailTicket() {
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3">
                                     <User className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>Usuario Solicitante:</span>
+                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.userRequester')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
                                     {ticket.UsuarioSolicitante?.Nombre || 'N/D'}
@@ -133,7 +136,7 @@ export function DetailTicket() {
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3">
                                     <FolderOpen className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>Categoría:</span>
+                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.category')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
                                     {ticket.Categoria || 'N/D'}
@@ -144,7 +147,7 @@ export function DetailTicket() {
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3">
                                     <Target className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>Prioridad:</span>
+                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.priority.label')}:</span>
                                     <Badge variant={ticket.Prioridad >= 4 ? 'destructive' : 'secondary'}>
                                         {ticket.Prioridad}
                                     </Badge>
@@ -158,7 +161,7 @@ export function DetailTicket() {
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3">
                                     <AlertCircle className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>Estado:</span>
+                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.status')}:</span>
                                 </div>
                                 <Badge variant="outline">
                                     {ESTADO_DESC[ticket.Estado] || ticket.Estado || 'N/D'}
@@ -170,10 +173,10 @@ export function DetailTicket() {
                         <div className="space-y-2 pt-4" style={{ borderTop: '1px solid #fc52af' }}>
                             <div className="flex items-center gap-3">
                                 <FileText className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                <span className="font-semibold text-lg" style={{ color: '#f7f4f3' }}>Descripción:</span>
+                                <span className="font-semibold text-lg" style={{ color: '#f7f4f3' }}>{t('details.ticket.description')}:</span>
                             </div>
                             <p className="text-muted-foreground whitespace-pre-wrap">
-                                {ticket.Descripcion || 'Sin descripción'}
+                                {ticket.Descripcion || t('details.ticket.noDescription')}
                             </p>
                         </div>
 
@@ -183,10 +186,10 @@ export function DetailTicket() {
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3">
                                     <Calendar className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>Fecha de Creación:</span>
+                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.creationDate')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {ticket.Fecha_Creacion ? new Date(ticket.Fecha_Creacion).toLocaleString('es-ES') : 'N/D'}
+                                    {ticket.Fecha_Creacion ? formatDate(new Date(ticket.Fecha_Creacion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/D'}
                                 </p>
                             </div>
 
@@ -194,10 +197,10 @@ export function DetailTicket() {
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3">
                                     <Clock className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>Fecha Límite Respuesta:</span>
+                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.responseDeadline')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {ticket.Fecha_Limite_Respuesta ? new Date(ticket.Fecha_Limite_Respuesta).toLocaleString('es-ES') : 'N/D'}
+                                    {ticket.Fecha_Limite_Respuesta ? formatDate(new Date(ticket.Fecha_Limite_Respuesta), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/D'}
                                 </p>
                             </div>
 
@@ -205,10 +208,10 @@ export function DetailTicket() {
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3">
                                     <Clock className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>Fecha Límite Resolución:</span>
+                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.resolutionDeadline')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {ticket.Fecha_Limite_Resolucion ? new Date(ticket.Fecha_Limite_Resolucion).toLocaleString('es-ES') : 'N/D'}
+                                    {ticket.Fecha_Limite_Resolucion ? formatDate(new Date(ticket.Fecha_Limite_Resolucion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/D'}
                                 </p>
                             </div>
 
@@ -217,10 +220,10 @@ export function DetailTicket() {
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-3">
                                         <Calendar className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                        <span className="font-semibold" style={{ color: '#f7f4f3' }}>Fecha de Cierre:</span>
+                                        <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.closeDate')}:</span>
                                     </div>
                                     <p className="text-muted-foreground">
-                                        {new Date(ticket.Fecha_Cierre).toLocaleString('es-ES')}
+                                        {formatDate(new Date(ticket.Fecha_Cierre), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                     </p>
                                 </div>
                             )}
@@ -235,9 +238,9 @@ export function DetailTicket() {
                                 ) : (
                                     <XCircle className="h-5 w-5 text-red-500" />
                                 )}
-                                <span className="font-semibold">Cumplimiento SLA Respuesta:</span>
+                                <span className="font-semibold">{t('details.ticket.slaResponseCompliance')}:</span>
                                 <Badge variant={ticket.cumplimiento_respuesta ? 'default' : 'destructive'}>
-                                    {ticket.cumplimiento_respuesta ? 'Cumplido' : 'No Cumplido'}
+                                    {ticket.cumplimiento_respuesta ? t('details.ticket.met') : t('details.ticket.notMet')}
                                 </Badge>
                             </div>
 
@@ -248,9 +251,9 @@ export function DetailTicket() {
                                 ) : (
                                     <XCircle className="h-5 w-5 text-red-500" />
                                 )}
-                                <span className="font-semibold">Cumplimiento SLA Resolución:</span>
+                                <span className="font-semibold">{t('details.ticket.slaResolutionCompliance')}:</span>
                                 <Badge variant={ticket.cumplimiento_resolucion ? 'default' : 'destructive'}>
-                                    {ticket.cumplimiento_resolucion ? 'Cumplido' : 'No Cumplido'}
+                                    {ticket.cumplimiento_resolucion ? t('details.ticket.met') : t('details.ticket.notMet')}
                                 </Badge>
                             </div>
                         </div>
@@ -260,7 +263,7 @@ export function DetailTicket() {
                             <div className="pt-4" style={{ borderTop: '1px solid #fc52af' }}>
                                 <div className="flex items-center gap-3 mb-3">
                                     <AlertCircle className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold text-lg" style={{ color: '#f7f4f3' }}>Historial de Estados:</span>
+                                    <span className="font-semibold text-lg" style={{ color: '#f7f4f3' }}>{t('details.ticket.statusHistory')}:</span>
                                 </div>
                                 <div className="space-y-3">
                                     {ticket.HistorialEstados.map((historial, index) => (
@@ -288,21 +291,21 @@ export function DetailTicket() {
                                             {/* Fecha del cambio */}
                                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                 <Calendar className="h-4 w-4" style={{ color: '#fbb25f' }} />
-                                                {historial.Fecha_Cambio ? new Date(historial.Fecha_Cambio).toLocaleString('es-ES') : 'N/D'}
+                                                {historial.Fecha_Cambio ? formatDate(new Date(historial.Fecha_Cambio), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/D'}
                                             </div>
 
                                             {/* Usuario responsable */}
                                             {(historial.Usuario_Responsable || historial.Id_Usuario_Responsable) && (
                                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                     <User className="h-4 w-4" style={{ color: '#fbb25f' }} />
-                                                    <span>Responsable: {historial.Usuario_Responsable || `Usuario ID: ${historial.Id_Usuario_Responsable}`}</span>
+                                                    <span>{t('details.ticket.responsible')}: {historial.Usuario_Responsable || `${t('details.ticket.userId')}: ${historial.Id_Usuario_Responsable}`}</span>
                                                 </div>
                                             )}
 
                                             {/* Observaciones */}
                                             {historial.Observaciones && (
                                                 <div className="text-sm mt-2">
-                                                    <span className="font-medium">Observaciones:</span>
+                                                    <span className="font-medium">{t('details.ticket.observations')}:</span>
                                                     <p className="text-muted-foreground mt-1">{historial.Observaciones}</p>
                                                 </div>
                                             )}
@@ -310,7 +313,7 @@ export function DetailTicket() {
                                             {/* Imágenes asociadas al historial */}
                                             {historial.Imagenes && historial.Imagenes.length > 0 && (
                                                 <div className="mt-3">
-                                                    <span className="text-sm font-medium">Imágenes adjuntas:</span>
+                                                    <span className="text-sm font-medium">{t('details.ticket.attachedImages')}:</span>
                                                     <div className="flex flex-wrap gap-2 mt-2">
                                                         {historial.Imagenes.map((imagen, imgIndex) => (
                                                             <div key={imgIndex} className="relative group">
@@ -338,17 +341,17 @@ export function DetailTicket() {
                                 <div className="pt-4" style={{ borderTop: '1px solid #fc52af' }}>
                                     <div className="flex items-center gap-3 mb-3">
                                         <Target className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                        <span className="font-semibold text-lg" style={{ color: '#f7f4f3' }}>Valoración del Usuario:</span>
+                                        <span className="font-semibold text-lg" style={{ color: '#f7f4f3' }}>{t('details.ticket.userRating')}:</span>
                                     </div>
                                     <div className="grid gap-6 md:grid-cols-2">
                                         {/* Columna Izquierda */}
                                         <div className="space-y-3">
                                             <div>
-                                                <span className="font-medium" style={{ color: '#f7f4f3' }}>Usuario:</span>
+                                                <span className="font-medium" style={{ color: '#f7f4f3' }}>{t('details.ticket.user')}:</span>
                                                 <p className="text-muted-foreground mt-1">{ticket.UsuarioSolicitante?.Nombre || 'N/D'}</p>
                                             </div>
                                             <div>
-                                                <span className="font-medium" style={{ color: '#f7f4f3' }}>Puntaje:</span>
+                                                <span className="font-medium" style={{ color: '#f7f4f3' }}>{t('details.ticket.score')}:</span>
                                                 <div className="mt-1">
                                                     <Badge 
                                                         style={{
@@ -365,9 +368,9 @@ export function DetailTicket() {
                                         {/* Columna Derecha */}
                                         <div className="space-y-3">
                                             <div>
-                                                <span className="font-medium" style={{ color: '#f7f4f3' }}>Fecha:</span>
+                                                <span className="font-medium" style={{ color: '#f7f4f3' }}>{t('details.ticket.date')}:</span>
                                                 <p className="text-muted-foreground mt-1">
-                                                    {val.Fecha_Valoracion ? new Date(val.Fecha_Valoracion).toLocaleString('es-ES') : 'N/D'}
+                                                    {val.Fecha_Valoracion ? formatDate(new Date(val.Fecha_Valoracion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/D'}
                                                 </p>
                                             </div>
                                         </div>
@@ -376,7 +379,7 @@ export function DetailTicket() {
                                     {/* Comentario - Ancho completo */}
                                     {val.Comentario && (
                                         <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(252, 82, 175, 0.3)' }}>
-                                            <span className="font-medium" style={{ color: '#f7f4f3' }}>Comentario:</span>
+                                            <span className="font-medium" style={{ color: '#f7f4f3' }}>{t('details.ticket.comment')}:</span>
                                             <p className="text-muted-foreground mt-2">{val.Comentario}</p>
                                         </div>
                                     )}
@@ -394,7 +397,7 @@ export function DetailTicket() {
                 className="flex items-center gap-2 bg-accent text-white hover:bg-accent/90 mt-6"
             >
                 <ArrowLeft className="w-4 h-4" />
-                Regresar
+                {t('common.back')}
             </Button>
         </div>
     );

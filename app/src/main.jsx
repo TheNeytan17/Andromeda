@@ -1,5 +1,5 @@
-import '../i18n'
-import { StrictMode } from 'react'
+import i18n from '../i18n'
+import { StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter } from 'react-router-dom'
@@ -40,8 +40,24 @@ const rutas = createBrowserRouter([
     ]
   }
 ])
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <RouterProvider router={rutas} />
-  </StrictMode>,
-)
+
+// Función para renderizar la app
+function renderApp() {
+  createRoot(document.getElementById('root')).render(
+    <StrictMode>
+      <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#fc52af' }}>Cargando...</div>}>
+        <RouterProvider router={rutas} />
+      </Suspense>
+    </StrictMode>,
+  )
+}
+
+// Si i18next ya está inicializado, renderizar inmediatamente
+if (i18n.isInitialized) {
+  renderApp();
+} else {
+  // Si no, esperar al evento de inicialización
+  i18n.on('initialized', () => {
+    renderApp();
+  });
+}

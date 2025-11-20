@@ -3,6 +3,7 @@
 // ========================================
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useI18n } from '@/hooks/useI18n';
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
 // Shadcn UI Components
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +20,7 @@ import CategoryService from "@/services/CategoryService";
 // COMPONENTE: Detalle de Categoría
 // ========================================
 export function DetailCategory() {
+    const { t } = useI18n();
     const navigate = useNavigate();
     const { id } = useParams();
     // Estado de datos y UI
@@ -45,9 +47,9 @@ export function DetailCategory() {
     }, [id]);
 
     if (loading) return <LoadingGrid count={1} type="grid" />;
-    if (error) return <ErrorAlert title="No se pudo cargar la categoría" message={error} />;
+    if (error) return <ErrorAlert title={t('details.category.loadError')} message={error} />;
     if (!catResp || !catResp.data)
-        return <EmptyState message="No se encontraron datos para esta categoría." />;
+        return <EmptyState message={t('details.category.noData')} />;
 
     // Normalización de datos y fallbacks seguros
     const categoria = catResp.data;
@@ -78,7 +80,7 @@ export function DetailCategory() {
                             <div className="space-y-3">
                                 <div className="flex items-center gap-3">
                                     <User className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>Especialidad encargada:</span>
+                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.category.specialtyInCharge')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
                                     {categoria.Nombre}
@@ -89,19 +91,19 @@ export function DetailCategory() {
                             <div className="space-y-3">
                                 <div className="flex items-center gap-3">
                                     <Clock className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>SLA:</span>
+                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.category.sla')}:</span>
                                     {sla && (
                                         <Badge variant="secondary">#{sla.Id}</Badge>
                                     )}
                                 </div>
                                 {sla ? (
                                     <div className="text-muted-foreground space-y-1">
-                                        <p>Tiempo de respuesta: <span className="font-semibold">{sla.Tiempo_Respuesta}</span> min</p>
-                                        <p>Tiempo de resolución: <span className="font-semibold">{sla.Tiempo_Resolucion}</span> min</p>
+                                        <p>{t('details.category.responseTime')}: <span className="font-semibold">{sla.Tiempo_Respuesta}</span> min</p>
+                                        <p>{t('details.category.resolutionTime')}: <span className="font-semibold">{sla.Tiempo_Resolucion}</span> min</p>
                                         <p className="mt-2">{sla.Descripcion}</p>
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground">Sin información de SLA.</p>
+                                    <p className="text-muted-foreground">{t('details.category.noSLA')}</p>
                                 )}
                             </div>
                         </div>
@@ -112,7 +114,7 @@ export function DetailCategory() {
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
                                     <ChevronRight className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>Especialidades requeridas</span>
+                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.category.requiredSkills')}</span>
                                     <Badge variant="secondary">{especialidades.length}</Badge>
                                 </div>
                                 {especialidades.length > 0 ? (
@@ -125,7 +127,7 @@ export function DetailCategory() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground">No hay especialidades asociadas.</p>
+                                    <p className="text-muted-foreground">{t('details.category.noSkills')}</p>
                                 )}
                             </div>
 
@@ -133,7 +135,7 @@ export function DetailCategory() {
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
                                     <Tag className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>Etiquetas</span>
+                                    <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.category.tags')}</span>
                                     <Badge variant="secondary">{etiquetas.length}</Badge>
                                 </div>
                                 {etiquetas.length > 0 ? (
@@ -143,7 +145,7 @@ export function DetailCategory() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-muted-foreground">Sin etiquetas asociadas.</p>
+                                    <p className="text-muted-foreground">{t('details.category.noTags')}</p>
                                 )}
                             </div>
                         </div>
@@ -158,7 +160,7 @@ export function DetailCategory() {
                 className="flex items-center gap-2 bg-accent text-white hover:bg-accent/90 mt-6"
             >
                 <ArrowLeft className="w-4 h-4" />
-                Regresar
+                {t('common.back')}
             </Button>
         </div>
     );
