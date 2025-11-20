@@ -108,7 +108,7 @@ export function DetailTicket() {
                                     <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.userRequester')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {ticket.UsuarioSolicitante?.Nombre || 'N/D'}
+                                    {ticket.UsuarioSolicitante?.Nombre || t('common.notAvailable')}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
                                     {ticket.UsuarioSolicitante?.Correo || ''}
@@ -122,7 +122,7 @@ export function DetailTicket() {
                                     <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.category')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {ticket.Categoria || 'N/D'}
+                                    {ticket.Categoria || t('common.notAvailable')}
                                 </p>
                             </div>
 
@@ -133,7 +133,7 @@ export function DetailTicket() {
                                     <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.priority.label')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {ticket.Prioridad || 'N/D'}
+                                    {ticket.Prioridad || t('common.notAvailable')}
                                 </p>
                             </div>
 
@@ -144,7 +144,7 @@ export function DetailTicket() {
                                     <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.status')}:</span>
                                 </div>
                                 <Badge variant="outline">
-                                    {ticket.Estado || 'N/D'}
+                                    {ticket.Estado || t('common.notAvailable')}
                                 </Badge>
                             </div>
                         </div>
@@ -169,7 +169,7 @@ export function DetailTicket() {
                                     <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.creationDate')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {ticket.Fecha_Creacion ? formatDate(new Date(ticket.Fecha_Creacion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : 'N/D'}
+                                    {ticket.Fecha_Creacion ? formatDate(new Date(ticket.Fecha_Creacion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : t('common.notAvailable')}
                                 </p>
                             </div>
 
@@ -180,7 +180,7 @@ export function DetailTicket() {
                                     <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.responseDeadline')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {ticket.Fecha_Limite_Respuesta ? formatDate(new Date(ticket.Fecha_Limite_Respuesta), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : 'N/D'}
+                                    {ticket.Fecha_Limite_Respuesta ? formatDate(new Date(ticket.Fecha_Limite_Respuesta), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : t('common.notAvailable')}
                                 </p>
                             </div>
 
@@ -191,7 +191,7 @@ export function DetailTicket() {
                                     <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.ticket.resolutionDeadline')}:</span>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    {ticket.Fecha_Limite_Resolucion ? formatDate(new Date(ticket.Fecha_Limite_Resolucion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : 'N/D'}
+                                    {ticket.Fecha_Limite_Resolucion ? formatDate(new Date(ticket.Fecha_Limite_Resolucion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : t('common.notAvailable')}
                                 </p>
                             </div>
 
@@ -260,18 +260,18 @@ export function DetailTicket() {
                                             {/* Línea de cambio de estado */}
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 <Badge variant="outline" className="bg-red-100 dark:bg-red-900">
-                                                    {historial.Estado_Anterior || 'N/D'}
+                                                    {historial.Estado_Anterior || t('common.notAvailable')}
                                                 </Badge>
                                                 <span className="text-sm">→</span>
                                                 <Badge variant="outline" className="bg-green-100 dark:bg-green-900">
-                                                    {historial.Estado_Nuevo || 'N/D'}
+                                                    {historial.Estado_Nuevo || t('common.notAvailable')}
                                                 </Badge>
                                             </div>
 
                                             {/* Fecha del cambio */}
                                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                 <Calendar className="h-4 w-4" style={{ color: '#fbb25f' }} />
-                                                {historial.Fecha_Cambio ? formatDate(new Date(historial.Fecha_Cambio), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : 'N/D'}
+                                                {historial.Fecha_Cambio ? formatDate(new Date(historial.Fecha_Cambio), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : t('common.notAvailable')}
                                             </div>
 
                                             {/* Usuario responsable */}
@@ -328,7 +328,7 @@ export function DetailTicket() {
                                         <div className="space-y-3">
                                             <div>
                                                 <span className="font-medium" style={{ color: '#f7f4f3' }}>{t('details.ticket.user')}:</span>
-                                                <p className="text-muted-foreground mt-1">{ticket.UsuarioSolicitante?.Nombre || 'N/D'}</p>
+                                                <p className="text-muted-foreground mt-1">{ticket.UsuarioSolicitante?.Nombre || t('common.notAvailable')}</p>
                                             </div>
                                             <div>
                                                 <span className="font-medium" style={{ color: '#f7f4f3' }}>{t('details.ticket.score')}:</span>
@@ -339,7 +339,7 @@ export function DetailTicket() {
                                                             color: 'white'
                                                         }}
                                                     >
-                                                        {val.Puntaje || 'N/D'} / 5
+                                                        {val.Puntaje || t('common.notAvailable')} / 5
                                                     </Badge>
                                                 </div>
                                             </div>
@@ -350,7 +350,7 @@ export function DetailTicket() {
                                             <div>
                                                 <span className="font-medium" style={{ color: '#f7f4f3' }}>{t('details.ticket.date')}:</span>
                                                 <p className="text-muted-foreground mt-1">
-                                                    {val.Fecha_Valoracion ? formatDate(new Date(val.Fecha_Valoracion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : 'N/D'}
+                                                    {val.Fecha_Valoracion ? formatDate(new Date(val.Fecha_Valoracion), { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }, lang) : t('common.notAvailable')}
                                                 </p>
                                             </div>
                                         </div>

@@ -87,7 +87,7 @@ export function DetailTechnician() {
                                     <div className="flex items-center gap-3">
                                         <Clock className="h-5 w-5" style={{ color: '#fbb25f' }} />
                                         <span className="font-semibold" style={{ color: '#f7f4f3' }}>{t('details.technician.lastSession')}:</span>
-                                        <p className="text-muted-foreground">{tech.Ultima_Sesion || 'N/D'}</p>
+                                        <p className="text-muted-foreground">{tech.Ultima_Sesion || t('common.notAvailable')}</p>
                                     </div>
                                 </div>
 

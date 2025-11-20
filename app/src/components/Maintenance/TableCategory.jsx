@@ -127,8 +127,8 @@ export default function TableCategories() {
                                 <TableCell className="text-muted-foreground">
                                     {row.SLA_Descripcion
                                         || (row.Tiempo_Respuesta != null && row.Tiempo_Resolucion != null
-                                                    ? `Resp: ${row.Tiempo_Respuesta}min · Res: ${row.Tiempo_Resolucion}min`
-                                                    : (SLA_DESCS[row.Id_SLA] ?? '-'))}
+                                                    ? `${t('tables.categories.slaShort.response')} ${row.Tiempo_Respuesta}${t('units.minShort')} · ${t('tables.categories.slaShort.resolution')} ${row.Tiempo_Resolucion}${t('units.minShort')}`
+                                                    : (SLA_DESCS[row.Id_SLA] ?? t('common.notAvailable')))}
                                 </TableCell>
                                 <TableCell className="flex justify-start items-center gap-1">
                                     <TooltipProvider>

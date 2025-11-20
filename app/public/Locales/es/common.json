@@ -280,7 +280,8 @@
   "common": {
     "saving": "Guardando...",
     "cancel": "Cancelar",
-    "back": "Volver"
+    "back": "Volver",
+    "notAvailable": "N/D"
   },
   "tables": {
     "common": {
@@ -298,6 +299,10 @@
         "columns": {
           "name": "Nombre",
           "sla": "SLA"
+      },
+      "slaShort": {
+        "response": "Resp:",
+        "resolution": "Res:"
       }
     },
     "technicians": {
@@ -308,7 +313,8 @@
         "columns": {
           "name": "Nombre",
           "skills": "Especialidades"
-      }
+      },
+      "noSkills": "Sin especialidades"
     },
     "tickets": {
         "title": "Tickets",
@@ -355,5 +361,8 @@
       "create": "Crear Ticket",
       "saveChanges": "Guardar Cambios"
     }
+  },
+  "units": {
+    "minShort": "min"
   }
 }

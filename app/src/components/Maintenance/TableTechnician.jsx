@@ -122,7 +122,7 @@ export default function TableTechnicians() {
                                 <TableCell className="text-muted-foreground">
                                     {Array.isArray(row.Especialidades) && row.Especialidades.length > 0
                                         ? row.Especialidades.map((e) => e.Nombre).join(", ")
-                                        : "Sin especialidades"}
+                                        : t('tables.technicians.noSkills')}
                                 </TableCell>
                                 <TableCell className="flex justify-start items-center gap-1">
                                     <TooltipProvider>
@@ -137,7 +137,7 @@ export default function TableTechnicians() {
                                                     <Eye className="h-4 w-4" style={{ color: '#fbb25f' }} />
                                                 </Button>
                                             </TooltipTrigger>
-                                            <TooltipContent>Ver detalle</TooltipContent>
+                                            <TooltipContent>{t('tables.common.viewDetail')}</TooltipContent>
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Button
@@ -149,7 +149,7 @@ export default function TableTechnicians() {
                                                         <Edit className="h-4 w-4" style={{ color: '#fc52af' }} />
                                                     </Button>
                                                 </TooltipTrigger>
-                                            <TooltipContent>Editar Técnico</TooltipContent>
+                                            <TooltipContent>{t('tables.common.edit')}</TooltipContent>
                                         </Tooltip>
                                         </Tooltip>
                                     </TooltipProvider>

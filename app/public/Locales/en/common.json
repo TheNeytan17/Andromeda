@@ -73,7 +73,7 @@
     "contact": "CONTACT US",
     "rights": "All rights reserved"
   },
-  "common": { "saving": "Saving...", "cancel": "Cancel", "back": "Back" },
+  "common": { "saving": "Saving...", "cancel": "Cancel", "back": "Back", "notAvailable": "N/A" },
   "tables": {
     "common": { "actions": "Actions", "viewDetail": "View detail", "viewDetails": "View details", "edit": "Edit" },
     "categories": {
@@ -82,14 +82,16 @@
       "edit": "Edit category",
       "loadError": "Error loading categories",
       "empty": "No categories found.",
-      "columns": { "name": "Name", "sla": "SLA" }
+      "columns": { "name": "Name", "sla": "SLA" },
+      "slaShort": { "response": "Resp:", "resolution": "Res:" }
     },
     "technicians": {
       "title": "Technicians List",
       "create": "Create technician",
       "loadError": "Error loading technicians",
       "empty": "No technicians found.",
-      "columns": { "name": "Name", "skills": "Skills" }
+      "columns": { "name": "Name", "skills": "Skills" },
+      "noSkills": "No specialties"
     },
     "tickets": {
       "title": "Tickets",
@@ -324,5 +326,6 @@
       "create": "Create Ticket",
       "saveChanges": "Save Changes"
     }
-  }
+  },
+  "units": { "minShort": "min" }
 }
