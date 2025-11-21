@@ -243,7 +243,7 @@
       "nameLabel": "Nombre del Técnico",
       "namePlaceholder": "Ingrese el nombre del técnico",
       "emailLabel": "Correo",
-      "emailPlaceholder": "Ingrese el correo del técnico",
+      "emailPlaceholder": "ejemplo@andromeda.com",
       "statusLabel": "Estado",
       "statusPlaceholder": "Seleccione un estado",
       "workloadLabel": "Carga de Trabajo",
@@ -262,7 +262,11 @@
     "validation": {
       "nameRequired": "El nombre de la categoría es requerido",
       "tagsRequired": "Debe seleccionar al menos una etiqueta",
-      "skillsRequired": "Debe seleccionar al menos una especialidad"
+      "skillsRequired": "Debe seleccionar al menos una especialidad",
+      "slaRequired": "Debe seleccionar un SLA",
+      "responseTimeMin": "El tiempo de respuesta debe ser mayor a 0",
+      "resolutionTimeMin": "El tiempo de resolución debe ser mayor a 0",
+      "resolutionGreater": "El tiempo de resolución debe ser mayor al tiempo de respuesta"
     },
     "form": {
       "nameLabel": "Nombre de la Categoría",
@@ -271,6 +275,15 @@
       "noTags": "No hay etiquetas disponibles",
       "requiredSkills": "Especialidades",
       "noSkills": "No hay especialidades disponibles"
+        ,"useExistingSLA": "Usar SLA existente"
+        ,"defineNewSLA": "Definir nuevo SLA"
+        ,"slaConfig": "Configuración de SLA"
+        ,"selectSLA": "Seleccione un SLA"
+        ,"selectedSLA": "SLA seleccionado"
+        ,"responseTimeLabel": "Tiempo de respuesta (minutos)"
+        ,"responseTimePlaceholder": "ej.: 30"
+        ,"resolutionTimeLabel": "Tiempo de resolución (minutos)"
+        ,"resolutionTimePlaceholder": "ej.: 120"
     },
     "actions": {
       "create": "Crear Categoría",
@@ -360,6 +373,12 @@
     "actions": {
       "create": "Crear Ticket",
       "saveChanges": "Guardar Cambios"
+    },
+    "messages": {
+      "createSuccess": "Ticket creado exitosamente",
+      "createError": "Error al crear el ticket",
+      "updateSuccess": "Ticket actualizado exitosamente",
+      "updateError": "Error al actualizar el ticket"
     }
   },
   "units": {

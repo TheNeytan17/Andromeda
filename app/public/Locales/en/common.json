@@ -133,10 +133,12 @@
     "actions": { "create": "Create Category", "saveChanges": "Save Changes" },
     "validation": {
       "nameRequired": "Category name is required",
-      "responseTimeMin": "Response time must be greater than or equal to 1",
-      "resolutionTimeMin": "Resolution time must be greater than or equal to 1",
-      "resolutionGreater": "Resolution time must be greater than response time",
-      "slaRequired": "You must select an SLA"
+      "tagsRequired": "You must select at least one tag",
+      "skillsRequired": "You must select at least one skill",
+      "slaRequired": "You must select an SLA",
+      "responseTimeMin": "Response time must be greater than 0",
+      "resolutionTimeMin": "Resolution time must be greater than 0",
+      "resolutionGreater": "Resolution time must be greater than response time"
     }
   },
   "assignments": {
@@ -280,7 +282,7 @@
       "nameLabel": "Technician Name",
       "namePlaceholder": "Enter technician name",
       "emailLabel": "Email",
-      "emailPlaceholder": "Enter technician email",
+      "emailPlaceholder": "example@andromeda.com",
       "statusLabel": "Status",
       "statusPlaceholder": "Select a status",
       "workloadLabel": "Workload",
@@ -325,6 +327,12 @@
     "actions": {
       "create": "Create Ticket",
       "saveChanges": "Save Changes"
+    },
+    "messages": {
+      "createSuccess": "Ticket created successfully",
+      "createError": "Error creating ticket",
+      "updateSuccess": "Ticket updated successfully",
+      "updateError": "Error updating ticket"
     }
   },
   "units": { "minShort": "min" }

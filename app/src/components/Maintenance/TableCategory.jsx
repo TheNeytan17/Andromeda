@@ -30,14 +30,6 @@ function useColumns(t) {
     ];
 }
 
-// Fallback local por si el backend aún no devuelve la descripción del SLA en el listado
-const SLA_DESCS = {
-    1: 'Emergencias que afectan la operación del evento en curso',
-    2: 'Problemas importantes que afectan funcionalidades principales',
-    3: 'Problemas moderados que requieren atención',
-    4: 'Problemas menores o consultas generales',
-};
-
 // ========================================
 // COMPONENTE: Tabla de Categorías
 // ========================================
@@ -128,7 +120,7 @@ export default function TableCategories() {
                                     {row.SLA_Descripcion
                                         || (row.Tiempo_Respuesta != null && row.Tiempo_Resolucion != null
                                                     ? `${t('tables.categories.slaShort.response')} ${row.Tiempo_Respuesta}${t('units.minShort')} · ${t('tables.categories.slaShort.resolution')} ${row.Tiempo_Resolucion}${t('units.minShort')}`
-                                                    : (SLA_DESCS[row.Id_SLA] ?? t('common.notAvailable')))}
+                                                    : t('common.notAvailable'))}
                                 </TableCell>
                                 <TableCell className="flex justify-start items-center gap-1">
                                     <TooltipProvider>

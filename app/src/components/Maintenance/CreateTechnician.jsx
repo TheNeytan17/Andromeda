@@ -108,19 +108,26 @@ export function CreateTechnician() {
     const validateForm = () => {
         let isValid = true;
         if (!formData.Nombre.trim()) {
-            toast.error(t('technician.validation.nameRequired'));
+            toast.error('El nombre del técnico es requerido');
+            isValid = false;
+        } else if (/\d/.test(formData.Nombre.trim())) {
+            toast.error('El nombre no puede contener números');
             isValid = false;
         }
         if (!formData.Correo.trim()) {
-            toast.error(t('technician.validation.emailRequired'));
+            toast.error('El correo del técnico es requerido');
+            isValid = false;
+        } else if (!formData.Correo.trim().endsWith('@andromeda.com')) {
+            // Email does not end with @andromeda.com
+            toast.error('El correo debe ser del dominio @andromeda.com');
             isValid = false;
         }
         if (!formData.Estado) {
-            toast.error(t('technician.validation.statusRequired'));
+            toast.error('El estado del técnico es requerido');
             isValid = false;
         }
-        if(!formData.Especialidades.length){
-            toast.error(t('technician.validation.skillsRequired'));
+        if (!formData.Especialidades.length) {
+            toast.error('Debe seleccionar al menos una especialidad');
             isValid = false;
         }
         return isValid;

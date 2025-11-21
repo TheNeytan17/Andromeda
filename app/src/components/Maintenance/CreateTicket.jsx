@@ -25,6 +25,7 @@ import EtiquetaService from '@/services/EtiquetaService';
 import TicketService from '@/services/TicketService';
 import PriorityService from '@/services/PriorityService';
 import SLAService from '@/services/SLAService';
+import { formatDate } from '@/lib/utils';
 
 //Id Solicitante
 const IdUser = 1;
@@ -33,7 +34,7 @@ const IdUser = 1;
 // COMPONENTE: Crear/Editar Ticket
 // ========================================
 export function CreateTicket() {
-    const { t } = useI18n();
+    const { t, lang } = useI18n();
     const [file, setFile] = useState(null);
     const [fileURL, setFileURL] = useState(null);
     const navigate = useNavigate();
@@ -130,23 +131,27 @@ export function CreateTicket() {
 
         if (!formData.Titulo.trim()) {
             console.log(formData.Titulo);
-            toast.error(t('ticket.validation.titleRequired'));
+            toast.error('El título del ticket es requerido');
             isValid = false;
         }
         if (!formData.Prioridad) {
-            toast.error(t('ticket.validation.priorityRequired'));
+            toast.error('La prioridad es requerida');
             isValid = false;
         }
         if (!formData.Descripcion.trim()) {
-            toast.error(t('ticket.validation.descriptionRequired'));
+            toast.error('La descripción es requerida');
             isValid = false;
         }
         if (!formData.Categoria) {
-            toast.error(t('ticket.validation.categoryRequired'));
+            toast.error('La categoría es requerida');
             isValid = false;
         }
         if (!formData.Etiqueta) {
-            toast.error(t('ticket.validation.tagRequired'));
+            toast.error('La etiqueta es requerida');
+            isValid = false;
+        }
+        if(!file){
+            toast.error('Debe agregar una imagen al ticket');
             isValid = false;
         }
         return isValid;
@@ -210,17 +215,17 @@ export function CreateTicket() {
             console.log('Respuesta del servidor:', response.data);
 
             if (response.data.success) {
-                toast.success(response.data.message);
+                toast.success(t('ticket.messages.createSuccess'));
                 setTimeout(() => {
                     navigate('/Ticket');
                 }, 1500);
             } else {
-                toast.error(response.data.message);
+                toast.error(t('ticket.messages.createError'));
             }
         } catch (err) {
             console.error('Error completo:', err);
             console.error('Respuesta del error:', err.response?.data);
-            toast.error(err.response?.data?.message || err.message);
+            toast.error(t('ticket.messages.createError'));
         } finally {
             setSaving(false);
         }
@@ -228,6 +233,20 @@ export function CreateTicket() {
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    // Selección de etiqueta (modo simple: una sola)
+    const toggleEtiqueta = (idEtiqueta) => {
+        setFormData(prev => {
+            const nueva = prev.Etiqueta === idEtiqueta ? '' : idEtiqueta;
+            // Si se selecciona una nueva etiqueta, actualizar categoría asociada
+            if (nueva) {
+                CambiarCategoria(nueva);
+            } else {
+                handleInputChange('Categoria', '');
+            }
+            return { ...prev, Etiqueta: nueva };
+        });
     };
 
     const CambiarCategoria = async (IdEtiqueta) => {
@@ -306,74 +325,112 @@ export function CreateTicket() {
                                     onChange={(e) => handleInputChange('UsuarioSolicitante', e.target.value)}
                                     readOnly
                                 />
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1em' }}>
-                                    <div> {/* Prioridad */}
-                                        <Label htmlFor="Prioridad" style={{ color: '#f7f4f3', marginBottom: '1em' }}>
-                                            {t('ticket.form.priorityLabel')} *
-                                        </Label>
-                                        <div className="space-y-2">
-                                            <Select
-                                                value={formData.Prioridad?.toString()}
-                                                onValueChange={(value) => handleInputChange('Prioridad', value)}
-                                            >
-                                                <SelectTrigger style={{ marginBottom: '2em' }}>
-                                                    <SelectValue placeholder={t('ticket.form.priorityPlaceholder')} />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {prioridadesDisponibles.map((estado) => (
-                                                        <SelectItem key={estado.value} value={estado.Id}>
-                                                            {estado.Nombre}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
+                                {/* Prioridad */}
+                                <div style={{ marginBottom: '2em' }}>
+                                    <Label htmlFor="Prioridad" style={{ color: '#f7f4f3', marginBottom: '1em' }}>
+                                        {t('ticket.form.priorityLabel')} *
+                                    </Label>
+                                    <div className="space-y-2">
+                                        <Select
+                                            value={formData.Prioridad?.toString()}
+                                            onValueChange={(value) => handleInputChange('Prioridad', value)}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder={t('ticket.form.priorityPlaceholder')} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {prioridadesDisponibles.map((estado) => (
+                                                    <SelectItem key={estado.value} value={estado.Id}>
+                                                        {estado.Nombre}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
-                                    <div> {/* Etiqueta */}
-                                        <Label htmlFor="Etiqueta" style={{ color: '#f7f4f3', marginBottom: '1em' }}>
+                                </div>
+
+                                {/* Etiquetas y Categorías en 2 columnas */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5em', marginBottom: '2em' }}>
+                                    <div> {/* Etiqueta (Badges) */}
+                                        <Label htmlFor="Etiqueta" style={{ color: '#f7f4f3', marginBottom: '0.25em', display: 'block' }}>
                                             {t('ticket.form.tagLabel')} *
                                         </Label>
-                                        <div className="space-y-2">
-                                            <Select
-                                                value={formData.Etiqueta?.toString()}
-                                                onValueChange={(value) => {
-                                                    handleInputChange('Etiqueta', value);
-                                                    CambiarCategoria(value);
-                                                }}
-                                            >
-                                                <SelectTrigger style={{ marginBottom: '0.5em' }}>
-                                                    <SelectValue placeholder={t('ticket.form.tagPlaceholder')} />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {etiquetasDisponibles.map((etiqueta) => (
-                                                        <SelectItem key={etiqueta.value} value={etiqueta.Id}>
-                                                            {etiqueta.Nombre}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                        <p style={{ color: '#9ca3af', marginBottom: '0.75em', fontSize: '0.75rem' }}>Solo puede elegir una etiqueta</p>
+                                        <div className="flex flex-wrap gap-2" style={{ marginBottom: '0.5em' }}>
+                                            {etiquetasDisponibles.map((etiqueta) => {
+                                                const selected = formData.Etiqueta === etiqueta.Id;
+                                                const locked = formData.Etiqueta && formData.Etiqueta !== etiqueta.Id;
+                                                return (
+                                                    <Badge
+                                                        key={etiqueta.Id}
+                                                        variant={selected ? 'default' : 'outline'}
+                                                        className="" // cursor handled inline to allow not-allowed state
+                                                        style={{
+                                                            backgroundColor: selected ? '#fc52af' : 'transparent',
+                                                            borderColor: selected ? '#fc52af' : 'rgba(156, 163, 175, 0.5)',
+                                                            color: selected ? '#fff' : '#f7f4f3',
+                                                            opacity: locked ? 0.4 : 1,
+                                                            cursor: locked ? 'not-allowed' : 'pointer'
+                                                        }}
+                                                        onClick={() => {
+                                                            if (locked) return;
+                                                            toggleEtiqueta(etiqueta.Id);
+                                                        }}
+                                                    >
+                                                        {etiqueta.Nombre}
+                                                        {selected && <X className="ml-1 h-3 w-3" />}
+                                                    </Badge>
+                                                );
+                                            })}
+                                            {etiquetasDisponibles.length === 0 && (
+                                                <p className="text-muted-foreground text-sm">
+                                                    {t('ticket.form.tagPlaceholder')}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                     <div> {/* Categoria */}
-                                        <Label htmlFor="Categoria" style={{ color: '#f7f4f3', marginBottom: '1em' }}>
+                                        <Label htmlFor="Categoria" style={{ color: '#f7f4f3', marginBottom: '0.25em', display: 'block' }}>
                                             {t('ticket.form.categoryLabel')} *
                                         </Label>
-                                        <Input style={{ marginBottom: '2em' }}
-                                            id="Categoria"
-                                            value={formData.Categoria?.Nombre || ''}
-                                            placeholder={t('ticket.form.categoryPlaceholder')}
-                                            readOnly
-                                        />
+                                        <p style={{ color: '#9ca3af', marginBottom: '0.75em', fontSize: '0.75rem', visibility: 'hidden' }}>Placeholder</p>
+                                        <div>
+                                            {formData.Categoria ? (
+                                                <Badge
+                                                    id="Categoria"
+                                                    className="px-3 py-1"
+                                                    style={{
+                                                        backgroundColor: '#fc52af',
+                                                        borderColor: '#fc52af',
+                                                        color: '#fff'
+                                                    }}
+                                                >
+                                                    {formData.Categoria.Nombre}
+                                                </Badge>
+                                            ) : (
+                                                <Badge
+                                                    id="Categoria"
+                                                    variant="outline"
+                                                    className="px-3 py-1"
+                                                    style={{
+                                                        borderColor: 'rgba(156, 163, 175, 0.5)',
+                                                        color: '#f7f4f3'
+                                                    }}
+                                                >
+                                                    {t('ticket.form.categoryPlaceholder')}
+                                                </Badge>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                                 <Label htmlFor="UsuarioSolicitante" style={{ color: '#f7f4f3' }}>
                                     {t('ticket.form.creationDateLabel')} *
                                 </Label>
-                                <h1>{new Date().toLocaleDateString()}</h1>
+                                <h1>{formatDate(new Date(), { month: 'long', day: 'numeric', year: 'numeric' }, lang)}</h1>
                                 <Label htmlFor="UsuarioSolicitante" style={{ color: '#f7f4f3' }}>
                                     {t('ticket.form.statusLabel')} *
                                 </Label>
-                                <h1>{t('tickets.status.pending')}</h1>
+                                <h1>Pendiente</h1>
 
                                 {/* Imagen */}
                                 <div className="mb-6">
