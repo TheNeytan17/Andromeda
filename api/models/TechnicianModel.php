@@ -46,6 +46,21 @@ class TechnicianModel
 		}
 	}
 
+	public function getByEtiqueta($id)
+	{
+		$vSql = "SELECT u.Id, u.Nombre, u.Correo, u.Estado, u.CargaTrabajo  
+				FROM Usuario u 
+				JOIN Tecnico t ON u.Id = t.Id_Usuario 
+				WHERE t.Id_Especialidad = '$id';";
+		$vResultado = $this->enlace->ExecuteSQL($vSql);
+
+		if (is_array($vResultado) && count($vResultado) > 0) {
+			return $vResultado;
+		} else {
+			return null;
+		}
+	}
+
 	public function create($data)
 	{
 		$passwordHash = password_hash('Andromeda1234', PASSWORD_DEFAULT);

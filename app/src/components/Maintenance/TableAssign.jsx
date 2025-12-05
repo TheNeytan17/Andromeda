@@ -7,7 +7,7 @@ import { useI18n } from "@/hooks/useI18n";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Eye, Tag, Clock, MessageCircle, CheckCircle, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, Tag, Clock, MessageCircle, CheckCircle, AlertTriangle, ChevronLeft, ChevronRight, Edit } from "lucide-react";
 import AssignmentService from "../../services/AssignmentService";
 import TicketService from "../../services/TicketService";
 
@@ -94,14 +94,14 @@ export default function TableAssignments() {
     // ========================================
     const navigate = useNavigate(); // Para navegación entre rutas
     const { t } = useI18n(); // Hook de internacionalización
-    
+
     // Estado para almacenar todas las asignaciones desde la API
     const [assignments, setAssignments] = useState([]);
-    
+
     // Estados de UI
     const [loading, setLoading] = useState(true);      // Indica si está cargando datos
     const [error, setError] = useState("");            // Mensaje de error si falla la carga
-    
+
     // Estados para control de vistas
     const [viewMode, setViewMode] = useState('kanban'); // 'kanban' o 'week'
     const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date())); // Inicio de semana para vista semanal
@@ -109,7 +109,7 @@ export default function TableAssignments() {
     // ========================================
     // FUNCIONES AUXILIARES DE FECHAS
     // ========================================
-    
+
     /**
      * Convierte un valor a objeto Date válido o null
      * @param {*} val - Valor a convertir
@@ -181,7 +181,7 @@ export default function TableAssignments() {
     // ========================================
     // FUNCIONES DE CÁLCULO SLA
     // ========================================
-    
+
     /**
      * Calcula el porcentaje de tiempo SLA consumido
      * SLA = Service Level Agreement (tiempo acordado para resolver)
@@ -194,7 +194,7 @@ export default function TableAssignments() {
         const now = new Date();
         const total = endDate.getTime() - startDate.getTime();
         if (total <= 0) return 0; // Configuración inválida
-        
+
         const elapsed = now.getTime() - startDate.getTime();
         // Limitar entre 0 y 100% (no exceder aunque esté vencido)
         const clampedElapsed = Math.max(0, Math.min(total, elapsed));
@@ -218,7 +218,7 @@ export default function TableAssignments() {
 
         // Priorizar días sobre horas para mensajes más significativos
         if (days > 0) {
-            return days > 1 
+            return days > 1
                 ? t('assignments.board.sla.overdueDays_plural', { count: days })
                 : t('assignments.board.sla.overdueDays', { count: days });
         } else if (hours > 0) {
@@ -233,7 +233,7 @@ export default function TableAssignments() {
     // ========================================
     // FUNCIONES DE MAPEO Y NORMALIZACIÓN
     // ========================================
-    
+
     /**
      * Mapea un objeto de asignación desde la API a formato uniforme
      * Soporta múltiples formatos de respuesta del backend (camelCase, snake_case, etc.)
@@ -294,16 +294,16 @@ export default function TableAssignments() {
             if (typeof maybe === "number") return mapTicketEstadoToColumn(maybe);
             if (typeof maybe === "string") return mapTicketEstadoToColumn(maybe);
             return "pending";
-    
-        /**
-         * Filtra asignaciones que pertenecen a una semana específica
-         * Una asignación se incluye si:
-         * - Su fecha de inicio (slaStart) cae en la semana
-         * - Su fecha límite (slaEnd) cae en la semana
-         * - Su rango SLA envuelve toda la semana
-         * @param {Date} start - Inicio de la semana a filtrar
-         * @returns {Array} Asignaciones dentro del rango semanal
-         */
+
+            /**
+             * Filtra asignaciones que pertenecen a una semana específica
+             * Una asignación se incluye si:
+             * - Su fecha de inicio (slaStart) cae en la semana
+             * - Su fecha límite (slaEnd) cae en la semana
+             * - Su rango SLA envuelve toda la semana
+             * @param {Date} start - Inicio de la semana a filtrar
+             * @returns {Array} Asignaciones dentro del rango semanal
+             */
         }
 
         // Caso 2: String que puede ser número ("2") o nombre ("En Progreso")
@@ -329,7 +329,7 @@ export default function TableAssignments() {
                 default: return "pending";
             }
         }
-        
+
         return "pending"; // Fallback por defecto
     }
 
@@ -344,7 +344,7 @@ export default function TableAssignments() {
      */
     useEffect(() => {
         let mounted = true;
-        
+
         const fetchData = async () => {
             try {
                 // Paso 1: Obtener asignaciones base
@@ -355,7 +355,7 @@ export default function TableAssignments() {
                 // Paso 2: Obtener IDs únicos de tickets para consultas
                 const uniqueTicketIds = Array.from(new Set(base.map(a => a.Id_Ticket).filter(Boolean)));
                 const ticketStateMap = new Map();
-                
+
                 // Paso 3: Consultar cada ticket para obtener estado y fechas SLA
                 await Promise.all(uniqueTicketIds.map(async (tid) => {
                     try {
@@ -364,7 +364,8 @@ export default function TableAssignments() {
                         const estadoVal = tData?.Estado ?? tData?.estado ?? tData?.Id_Estado;
                         const fechaCreacion = tData?.Fecha_Creacion ?? tData?.fecha_creacion ?? tData?.FechaCreacion;
                         const fechaLimite = tData?.Fecha_Limite_Resolucion ?? tData?.fecha_limite_resolucion ?? tData?.FechaLimiteResolucion ?? tData?.Fecha_Limite;
-                        ticketStateMap.set(tid, { estado: estadoVal, slaStart: fechaCreacion, slaEnd: fechaLimite });
+                        const puntaje = tData?.Puntaje ?? tData?.puntaje ?? null;
+                        ticketStateMap.set(tid, { estado: estadoVal, slaStart: fechaCreacion, slaEnd: fechaLimite, puntaje });
                     } catch {
                         ticketStateMap.set(tid, null);
                     }
@@ -376,6 +377,7 @@ export default function TableAssignments() {
                     const estadoTicket = (info && typeof info === 'object') ? info.estado : info;
                     const slaStart = (info && info.slaStart) ? toDate(info.slaStart) : (a.slaStart || null);
                     const slaEnd = (info && info.slaEnd) ? toDate(info.slaEnd) : null;
+                    const puntaje = (info && info.puntaje) ? info.puntaje : null;
                     const percent = computeSlaPercent(slaStart, slaEnd);
 
                     return {
@@ -384,6 +386,7 @@ export default function TableAssignments() {
                         Estado: estadoTicket !== undefined ? mapTicketEstadoToColumn(estadoTicket) : a.Estado,
                         slaStart,
                         slaEnd,
+                        Puntaje: puntaje,
                         // Recalcular porcentaje SLA con fechas reales
                         PercentSLA: Number.isFinite(percent) ? percent : a.PercentSLA,
                     };
@@ -416,7 +419,7 @@ export default function TableAssignments() {
      */
     useEffect(() => {
         if (!assignments || assignments.length === 0) return;
-        
+
         // Configurar intervalo de actualización
         const id = setInterval(() => {
             setAssignments(prev => prev.map(a => {
@@ -426,7 +429,7 @@ export default function TableAssignments() {
                 return { ...a, PercentSLA: p };
             }));
         }, 60000); // 60000ms = 1 minuto
-        
+
         // Cleanup: limpiar intervalo al desmontar
         return () => clearInterval(id);
     }, [assignments]);
@@ -456,11 +459,11 @@ export default function TableAssignments() {
         days.forEach(day => grouped[day] = []);
 
         const s = startOfWeek(weekStartDate);
-        
+
         assignmentsArray.forEach(a => {
             const aStart = a.slaStart || toDate(a.Fecha_AsignacionRaw) || null;
             if (!aStart) return;
-            
+
             // Calcular el día de la semana relativo al inicio (lunes = 0, domingo = 6)
             const diffDays = Math.floor((aStart.getTime() - s.getTime()) / (1000 * 60 * 60 * 24));
             if (diffDays >= 0 && diffDays < 7) {
@@ -468,7 +471,6 @@ export default function TableAssignments() {
                 grouped[dayName].push(a);
             }
         });
-
         return grouped;
     }
 
@@ -486,8 +488,7 @@ export default function TableAssignments() {
 
     // Agrupar por estado (para Kanban) - usar claves constantes
     const statusKeys = ['assigned', 'inProgress', 'resolved', 'closed'];
-    const statuses = statusKeys.map(translateStatus);
-    
+
     const grouped = {};
     statusKeys.forEach((key) => (grouped[key] = []));
     assignments.forEach((a) => {
@@ -500,9 +501,6 @@ export default function TableAssignments() {
     const weekAssignments = assignmentsInWeek(weekStart);
     const weekGroupedByDay = groupByWeekDay(weekAssignments, weekStart);
 
-    function changeState(id, newState) {
-        setAssignments((prev) => prev.map((p) => (p.Id === id ? { ...p, Estado: newState } : p)));
-    }
 
     // ========================================
     // RENDERIZADO - ESTADO DE CARGA
@@ -527,7 +525,7 @@ export default function TableAssignments() {
                 {/* Selector de vista y controles semanales */}
                 <div className="flex items-center gap-3">
                     <label className="text-sm text-zinc-300">{t('assignments.board.viewLabel')}</label>
-                    
+
                     {/* Select personalizado con estilo glassmorphism */}
                     <Select value={viewMode} onValueChange={(val) => setViewMode(val)}>
                         <SelectTrigger className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-3 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md focus-visible:ring-[#6f3c82]/50 focus-visible:border-[#6f3c82] selection:bg-[#6f3c82] selection:text-[#f7f4f3] w-[120px]">
@@ -547,31 +545,31 @@ export default function TableAssignments() {
                     {viewMode === 'week' && (
                         <div className="flex items-center gap-2">
                             {/* Botón: Semana anterior */}
-                            <Button 
-                                size="sm" 
-                                onClick={() => setWeekStart(prev => startOfWeek(new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() - 7)))} 
+                            <Button
+                                size="sm"
+                                onClick={() => setWeekStart(prev => startOfWeek(new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() - 7)))}
                                 aria-label={t('assignments.board.previousWeek')}
                                 className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-2 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md hover:bg-[rgba(111,60,130,0.25)] focus-visible:ring-[#6f3c82]/50"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </Button>
-                            
+
                             {/* Mostrar rango semanal actual */}
                             <div className="text-sm text-zinc-200 min-w-[200px] text-center">{formatWeekRange(weekStart)}</div>
-                            
+
                             {/* Botón: Semana siguiente */}
-                            <Button 
-                                size="sm" 
-                                onClick={() => setWeekStart(prev => startOfWeek(new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + 7)))} 
+                            <Button
+                                size="sm"
+                                onClick={() => setWeekStart(prev => startOfWeek(new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + 7)))}
                                 aria-label={t('assignments.board.nextWeek')}
                                 className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-2 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md hover:bg-[rgba(111,60,130,0.25)] focus-visible:ring-[#6f3c82]/50"
                             >
                                 <ChevronRight className="w-4 h-4" />
                             </Button>
-                            
+
                             {/* Botón: Volver a semana actual */}
-                            <Button 
-                                size="sm" 
+                            <Button
+                                size="sm"
                                 onClick={() => setWeekStart(startOfWeek(new Date()))}
                                 className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-3 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md hover:bg-[rgba(111,60,130,0.25)] focus-visible:ring-[#6f3c82]/50"
                             >
@@ -626,7 +624,10 @@ export default function TableAssignments() {
                                                 <div className="p-1 bg-white/5 rounded-md">{categoryIcon(ticket.Categoria)}</div>
                                                 <div>
                                                     <div className="text-sm font-medium text-zinc-100">{ticket.Titulo}</div>
-                                                    <div className="text-xs text-zinc-400">#{ticket.Id} · {ticket.Categoria}{ticket.Dia ? ` · ${ticket.Dia}` : ""}</div>
+                                                    <div className="text-xs text-zinc-400">
+                                                        #{ticket.Id} · {ticket.Categoria}{ticket.Dia ? ` · ${ticket.Dia}` : ""}
+                                                        {ticket.Puntaje && <span className="ml-1.5 px-2 py-0.5 bg-purple-500/20 border border-purple-400/50 text-purple-300 rounded text-[10px] font-semibold">★ {Math.round(ticket.Puntaje)}</span>}
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -637,11 +638,12 @@ export default function TableAssignments() {
                                             <div className="w-full h-2 bg-black/20 rounded">
                                                 {/* Barra interior: verde si completado, rojo si vencido, gradiente si en progreso */}
                                                 <div
+                                                    
                                                     className={`h-2 rounded ${ticket.Estado === 'Resuelto' || ticket.Estado === 'Cerrado'
-                                                            ? 'bg-emerald-500'
-                                                            : ticket.PercentSLA >= 100
-                                                                ? 'bg-red-500'
-                                                                : 'bg-gradient-to-r from-emerald-400 to-red-400'
+                                                        ? 'bg-emerald-500'
+                                                        : ticket.PercentSLA >= 100
+                                                            ? 'bg-red-500'
+                                                            : 'bg-gradient-to-r from-emerald-400 to-red-400'
                                                         }`}
                                                     style={{ width: `${ticket.PercentSLA}%` }}
                                                 />
@@ -673,36 +675,39 @@ export default function TableAssignments() {
                                                     </Tooltip>
                                                 </TooltipProvider>
 
-                                                {/* Selector: Cambiar estado (solo local) */}
-                                                <Select
-                                                    value={ticket.Estado}
-                                                    onValueChange={(val) => changeState(ticket.Id, val)}
-                                                >
-                                                    <SelectTrigger className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-3 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md focus-visible:ring-[#6f3c82]/50 focus-visible:border-[#6f3c82] selection:bg-[#6f3c82] selection:text-[#f7f4f3]">
-                                                        <SelectValue>{translateStatus(ticket.Estado)}</SelectValue>
-                                                    </SelectTrigger>
-                                                    <SelectContent className="bg-[rgba(111,60,130,0.15)] backdrop-blur-md border-[#6f3c82] text-[#f7f4f3] focus-visible:ring-0 selection:bg-[#6f3c82] selection:text-[#f7f4f3]">
-                                                        {statusKeys.map((key) => (
-                                                            <SelectItem
-                                                                key={key}
-                                                                value={key}
-                                                                className="data-[highlighted]:bg-[#6f3c82] data-[highlighted]:text-[#f7f4f3] focus:bg-[#6f3c82] focus:text-[#f7f4f3]"
-                                                            >
-                                                                {translateStatus(key)}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                                {/* Badge de Estado Mejorado */}
+                                                <div className={`px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm border transition-all duration-200 ${ticket.Estado === 'assigned'
+                                                        ? 'bg-blue-500/20 border-blue-400/50 text-blue-300'
+                                                        : ticket.Estado === 'inProgress'
+                                                            ? 'bg-orange-500/20 border-orange-400/50 text-orange-300'
+                                                            : ticket.Estado === 'resolved'
+                                                                ? 'bg-green-500/20 border-green-400/50 text-green-300'
+                                                                : ticket.Estado === 'closed'
+                                                                    ? 'bg-gray-500/20 border-gray-400/50 text-gray-300'
+                                                                    : 'bg-purple-500/20 border-purple-400/50 text-purple-300'
+                                                    }`}>
+                                                    {translateStatus(ticket.Estado)}
+                                                </div>
                                             </div>
 
                                             {/* Botones adicionales (sin funcionalidad aún) */}
                                             <div className="flex items-center gap-2">
-                                                <Button size="sm" variant="link" className="text-zinc-300" onClick={() => { /* UI-only: abrir cuadro de comentarios */ }}>
-                                                    <MessageCircle className="w-4 h-4" />
-                                                </Button>
-                                                <Button size="sm" variant="ghost" onClick={() => { /* UI-only */ }}>
-                                                    <CheckCircle className="w-4 h-4" />
-                                                </Button>
+                                                {/* Botón para modificar estado*/}
+                                                {ticket.Estado !== 'closed' && ticket.Estado !== 'resolved' && (
+                                                    <Tooltip Tooltip >
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => navigate(`/ChangeState/${ticket.Id}`)}
+                                                                aria-label={`Cambiar Estado ${ticket.Id}`}
+                                                            >
+                                                                <Edit className="h-4 w-4" style={{ color: '#fc52af' }} />
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>{t('Cambiar Estado')}</TooltipContent>
+                                                    </Tooltip>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -718,35 +723,50 @@ export default function TableAssignments() {
                 <div className="space-y-6">
                     {/* Mensaje si no hay asignaciones en la semana */}
                     {weekAssignments.length === 0 && <div className="text-xs text-zinc-500">{t('assignments.board.noAssignmentsWeek')}</div>}
-                    
+
                     {/* Iterar por cada día de la semana */}
                     {Object.entries(weekGroupedByDay).map(([dayName, dayAssignments], index) => {
                         // Ocultar días sin asignaciones
                         if (dayAssignments.length === 0) return null;
-                        
+
                         return (
                             <div key={dayName} className="space-y-3">
                                 {/* Encabezado del día */}
                                 <h3 className="text-lg font-semibold text-[#f7f4f3] border-b border-[#6f3c82]/40 pb-2">
                                     {dayName} <span className="text-sm text-zinc-400 font-normal">({getDateForWeekDay(weekStart, index)})</span>
                                 </h3>
-                                
+
                                 {/* Tarjetas de asignaciones del día */}
                                 <div className="space-y-2">
                                     {dayAssignments.map((ticket) => (
-                                        <div key={ticket.Id} className={`p-3 rounded border-2 border-[#ff95b5]/50 bg-[rgba(255,255,255,0.02)]`}> 
+                                        <div key={ticket.Id} className={`p-3 rounded border-2 border-[#ff95b5]/50 bg-[rgba(255,255,255,0.02)]`}>
                                             <div className="flex items-start justify-between">
                                                 {/* Información izquierda: Título, categoría, técnico */}
                                                 <div>
                                                     <div className="text-sm font-medium text-zinc-100">{ticket.Titulo}</div>
-                                                    <div className="text-xs text-zinc-400">#{ticket.Id} · {ticket.Categoria} · {ticket.Dia ? ticket.Dia + ' · ' : ''}{ticket.Tecnico ? ticket.Tecnico : ''}</div>
+                                                    <div className="text-xs text-zinc-400">
+                                                        #{ticket.Id} · {ticket.Categoria} · {ticket.Dia ? ticket.Dia + ' · ' : ''}{ticket.Tecnico ? ticket.Tecnico : ''}
+                                                        {ticket.Puntaje && <span className="ml-1.5 px-2 py-0.5 bg-purple-500/20 border border-purple-400/50 text-purple-300 rounded text-[10px] font-semibold">★ {Math.round(ticket.Puntaje)}</span>}
+                                                    </div>
                                                     <div className="text-xs text-zinc-400 mt-1">{t('assignments.board.date')} {formatDateShort(ticket.slaStart || ticket.Fecha_AsignacionRaw)}</div>
                                                 </div>
-                                                
+
                                                 {/* Información derecha: Estado, SLA, botón ver */}
                                                 <div className="flex flex-col items-end">
-                                                    <div className="text-xs text-zinc-300">{translateStatus(ticket.Estado)}</div>
-                                                    
+                                                    {/* Badge de Estado Mejorado */}
+                                                    <div className={`px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm border shadow-sm transition-all duration-200 ${ticket.Estado === 'assigned'
+                                                            ? 'bg-blue-500/20 border-blue-400/50 text-blue-300'
+                                                            : ticket.Estado === 'inProgress'
+                                                                ? 'bg-orange-500/20 border-orange-400/50 text-orange-300'
+                                                                : ticket.Estado === 'resolved'
+                                                                    ? 'bg-green-500/20 border-green-400/50 text-green-300'
+                                                                    : ticket.Estado === 'closed'
+                                                                        ? 'bg-gray-500/20 border-gray-400/50 text-gray-300'
+                                                                        : 'bg-purple-500/20 border-purple-400/50 text-purple-300'
+                                                        }`}>
+                                                        {translateStatus(ticket.Estado)}
+                                                    </div>
+
                                                     {/* Barra de progreso SLA compacta */}
                                                     <div className="w-40 mt-2">
                                                         <div className="w-full h-2 bg-black/20 rounded">
@@ -754,12 +774,31 @@ export default function TableAssignments() {
                                                         </div>
                                                         <div className="text-xs text-zinc-400 mt-1">{ticket.PercentSLA}% {t('assignments.board.sla.consumed')}</div>
                                                     </div>
-                                                    
-                                                    {/* Botón para ver detalles */}
-                                                    <div className="mt-2">
-                                                        <Button size="sm" variant="ghost" onClick={() => navigate(`/Assignment/${ticket.Id}`)}>
-                                                            <Eye className="w-4 h-4" />
-                                                        </Button>
+
+                                                    <div className="flex flex-row items-end mt-2 gap-2">
+
+                                                        {/* Botón para modificar estado*/}
+                                                        {ticket.Estado !== 'closed' && ticket.Estado !== 'resolved' && (
+                                                            <Tooltip Tooltip >
+                                                                <TooltipTrigger asChild>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => navigate(`/ChangeState/${ticket.Id}`)}
+                                                                        aria-label={`Cambiar Estado ${ticket.Id}`}
+                                                                    >
+                                                                        <Edit className="h-4 w-4" style={{ color: '#fc52af' }} />
+                                                                    </Button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>{t('Cambiar Estado')}</TooltipContent>
+                                                            </Tooltip>
+                                                        )}
+                                                        {/* Botón para ver detalles */}
+                                                        <div className="mt-2">
+                                                            <Button size="sm" variant="ghost" onClick={() => navigate(`/Assignment/${ticket.Id}`)}>
+                                                                <Eye className="w-4 h-4" />
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -770,7 +809,8 @@ export default function TableAssignments() {
                         );
                     })}
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }

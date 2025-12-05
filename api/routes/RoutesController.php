@@ -94,11 +94,15 @@ class RoutesController
         $action     = $routesArray[1] ?? null;
         $param1     = $routesArray[2] ?? null;
         $param2     = $routesArray[3] ?? null;
+        
+        // Convertir controller a PascalCase para que coincida con los nombres de clase
+        $controllerClass = ucfirst(strtolower($controller));
+        
         // echo "Controller: " . $controller . ", acción: " . $action . ", param1: " . $param1 . ", param2: " . $param2;
 
         try {
-            if ($controller && class_exists($controller)) {
-                $response = new $controller();
+            if ($controllerClass && class_exists($controllerClass)) {
+                $response = new $controllerClass();
 
                 switch ($_SERVER['REQUEST_METHOD']) {
                     case 'GET':
@@ -143,10 +147,15 @@ class RoutesController
                         if ($action && is_numeric($action)) {
                             // URL del tipo /Category/5
                             $response->update($action);
+                        } elseif ($action && method_exists($response, $action)) {
+                            // URL del tipo /notification/read/33
+                            if ($param1) {
+                                $response->$action($param1);
+                            } else {
+                                $response->$action();
+                            }
                         } elseif ($param1) {
                             $response->update($param1);
-                        } elseif ($action && method_exists($response, $action)) {
-                            $response->$action();
                         } else {
                             $response->update();
                         }

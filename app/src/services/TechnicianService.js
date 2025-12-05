@@ -8,6 +8,9 @@ class TechnicianService {
   getTechnicianById(Id) {
     return axios.get(BASE_URL + '/' + Id);
   }
+  getTechniciansByEtiqueta(Id) {
+    return axios.get(BASE_URL + '/Etiqueta' + '/' + Id);
+  }
   createTechnician(data) {
     return axios.post(BASE_URL, data);
   }

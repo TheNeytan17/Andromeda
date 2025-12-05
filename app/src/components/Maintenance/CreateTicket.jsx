@@ -131,27 +131,27 @@ export function CreateTicket() {
 
         if (!formData.Titulo.trim()) {
             console.log(formData.Titulo);
-            toast.error('El título del ticket es requerido');
+            toast.error(t('ticket.validation.titleRequired'));
             isValid = false;
         }
         if (!formData.Prioridad) {
-            toast.error('La prioridad es requerida');
+            toast.error(t('ticket.validation.priorityRequired'));
             isValid = false;
         }
         if (!formData.Descripcion.trim()) {
-            toast.error('La descripción es requerida');
+            toast.error(t('ticket.validation.descriptionRequired'));
             isValid = false;
         }
         if (!formData.Categoria) {
-            toast.error('La categoría es requerida');
+            toast.error(t('ticket.validation.categoryRequired'));
             isValid = false;
         }
         if (!formData.Etiqueta) {
-            toast.error('La etiqueta es requerida');
+            toast.error(t('ticket.validation.tagRequired'));
             isValid = false;
         }
         if(!file){
-            toast.error('Debe agregar una imagen al ticket');
+            toast.error(t('ticket.validation.imageRequired'));
             isValid = false;
         }
         return isValid;
@@ -182,20 +182,38 @@ export function CreateTicket() {
             //Campos Calculados
             dataToSend.Archivo = file;
             dataToSend.Id_Usuario = IdUser;
-            dataToSend.Fecha_Creacion = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            
+            // Función para convertir fecha a formato MySQL en zona horaria Costa Rica (UTC-6)
+            const formatToCostaRica = (date) => {
+                const costaRicaDate = new Date(date.toLocaleString('en-US', { timeZone: 'America/Costa_Rica' }));
+                const year = costaRicaDate.getFullYear();
+                const month = String(costaRicaDate.getMonth() + 1).padStart(2, '0');
+                const day = String(costaRicaDate.getDate()).padStart(2, '0');
+                const hours = String(costaRicaDate.getHours()).padStart(2, '0');
+                const minutes = String(costaRicaDate.getMinutes()).padStart(2, '0');
+                const seconds = String(costaRicaDate.getSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            };
+            
+            // Fecha actual en Costa Rica
+            const fechaActual = new Date();
+            dataToSend.Fecha_Creacion = formatToCostaRica(fechaActual);
+            
             //SLA
             const slaResponse = await SLAService.getSLAById(formData.Categoria.Id_SLA);
 
             dataToSend.Categoria = formData.Categoria.Id;
-            //Resolución
-            const FechaResolucion = new Date();
-            FechaResolucion.setHours(FechaResolucion.getHours() + slaResponse.data.data[0].Tiempo_Resolucion);
-            //Respuesta
-            const FechaRespuesta = new Date();
-            FechaRespuesta.setHours(FechaRespuesta.getHours() + slaResponse.data.data[0].Tiempo_Respuesta);
             
-            dataToSend.Fecha_Limite_Resolucion = FechaResolucion.toISOString().slice(0, 19).replace('T', ' ');
-            dataToSend.Fecha_Limite_Respuesta = FechaRespuesta.toISOString().slice(0, 19).replace('T', ' ');
+            //Resolución - Sumar horas correctamente usando milisegundos
+            const horasResolucion = slaResponse.data.data[0].Tiempo_Resolucion;
+            const FechaResolucion = new Date(fechaActual.getTime() + (horasResolucion * 60 * 60 * 1000));
+            
+            //Respuesta - Sumar horas correctamente usando milisegundos
+            const horasRespuesta = slaResponse.data.data[0].Tiempo_Respuesta;
+            const FechaRespuesta = new Date(fechaActual.getTime() + (horasRespuesta * 60 * 60 * 1000));
+            
+            dataToSend.Fecha_Limite_Resolucion = formatToCostaRica(FechaResolucion);
+            dataToSend.Fecha_Limite_Respuesta = formatToCostaRica(FechaRespuesta);
 
             console.log('Datos a enviar:', dataToSend);
 
@@ -215,17 +233,17 @@ export function CreateTicket() {
             console.log('Respuesta del servidor:', response.data);
 
             if (response.data.success) {
-                toast.success(t('ticket.messages.createSuccess'));
+                toast.success(isCreateMode ? t('ticket.messages.createSuccess') : t('ticket.messages.updateSuccess'));
                 setTimeout(() => {
                     navigate('/Ticket');
                 }, 1500);
             } else {
-                toast.error(t('ticket.messages.createError'));
+                toast.error(isCreateMode ? t('ticket.messages.createError') : t('ticket.messages.updateError'));
             }
         } catch (err) {
             console.error('Error completo:', err);
             console.error('Respuesta del error:', err.response?.data);
-            toast.error(t('ticket.messages.createError'));
+            toast.error(isCreateMode ? t('ticket.messages.createError') : t('ticket.messages.updateError'));
         } finally {
             setSaving(false);
         }

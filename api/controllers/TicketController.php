@@ -26,6 +26,15 @@ class Ticket
         $response->toJSON($result);
     }
 
+    public function assigment($param)
+    {
+        $response = new Response();
+        $Ticket = new TicketModel();
+        $result = $Ticket->getTicketAssigment($param);
+        //Dar respuesta
+        $response->toJSON($result);
+    }
+
     public function technician($param)
     {
         $response = new Response();
@@ -61,6 +70,29 @@ class Ticket
 
         $Ticket = new TicketModel();
         $result = $Ticket->create($data);
+
+        if ($result['success']) {
+            $response->status(201);
+        } else {
+            $response->status(400);
+        }
+        $response->toJSON($result);
+    }
+
+    public function createHistory(){
+        $response = new Response();
+        $request = new Request();
+        
+        // Manejar FormData (multipart) o JSON
+        if (!empty($_FILES)) {
+            $data = $_POST;
+            $data['Archivo'] = $_FILES;
+        } else {
+            $data = (array) $request->getJSON();
+        }
+
+        $Ticket = new TicketModel();
+        $result = $Ticket->createHistory($data);
 
         if ($result['success']) {
             $response->status(201);

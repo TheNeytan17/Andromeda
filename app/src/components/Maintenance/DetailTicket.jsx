@@ -135,7 +135,7 @@ export function DetailTicket() {
                                 <p className="text-muted-foreground">
                                     {ticket.Prioridad || t('common.notAvailable')}
                                 </p>
-                            </div>
+                            </div>  
 
                             {/* Estado */}
                             <div className="space-y-2">
@@ -213,14 +213,14 @@ export function DetailTicket() {
                         <div className="grid gap-4 md:grid-cols-2 pt-4" style={{ borderTop: '1px solid #fc52af' }}>
                             {/* Cumplimiento Respuesta */}
                             <div className="flex items-center gap-3">
-                                {ticket.cumplimiento_respuesta ? (
+                                {ticket.cumplimiento_respuesta == 1 ? (
                                     <CheckCircle className="h-5 w-5 text-green-500" />
                                 ) : (
                                     <XCircle className="h-5 w-5 text-red-500" />
                                 )}
                                 <span className="font-semibold">{t('details.ticket.slaResponseCompliance')}:</span>
                                 <Badge variant={ticket.cumplimiento_respuesta ? 'default' : 'destructive'}>
-                                    {ticket.cumplimiento_respuesta ? t('details.ticket.met') : t('details.ticket.notMet')}
+                                    {ticket.cumplimiento_respuesta == 1 ? t('details.ticket.met') : t('details.ticket.notMet')}
                                 </Badge>
                             </div>
 
@@ -233,7 +233,7 @@ export function DetailTicket() {
                                 )}
                                 <span className="font-semibold">{t('details.ticket.slaResolutionCompliance')}:</span>
                                 <Badge variant={ticket.cumplimiento_resolucion ? 'default' : 'destructive'}>
-                                    {ticket.cumplimiento_resolucion ? t('details.ticket.met') : t('details.ticket.notMet')}
+                                    {ticket.cumplimiento_resolucion == 1 ? t('details.ticket.met') : t('details.ticket.notMet')}
                                 </Badge>
                             </div>
                         </div>

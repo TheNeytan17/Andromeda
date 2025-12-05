@@ -34,4 +34,21 @@ class Assignment
         $result = $AssignmentM->getById($param);
         $response->toJSON($result);
     }
+
+    public function create()
+    {
+        $response = new Response();
+        $request = new Request();
+        $data = (array) $request->getJSON();
+
+        $AssignmentM = new AssignmentModel();
+        $result = $AssignmentM->createAssignment($data);
+
+        if ($result['success']) {
+            $response->status(201);
+        } else {
+            $response->status(400);
+        }
+        $response->toJSON($result);
+    }
 }

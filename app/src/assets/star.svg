@@ -1,0 +1,24 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glossy" cx="30%" cy="30%">
+      <stop offset="0%" stop-color="#fff8e8" />
+      <stop offset="40%" stop-color="#ffe39f" />
+      <stop offset="100%" stop-color="#ffbd59" />
+    </radialGradient>
+  </defs>
+  
+  <path d="M100 10 
+           L125 70 
+           L190 75 
+           L140 115 
+           L155 180 
+           L100 145 
+           L45 180 
+           L60 115 
+           L10 75 
+           L75 70 Z"
+        fill="url(#glossy)"
+        stroke="#f7a93c"
+        stroke-width="5"
+        stroke-linejoin="round" />
+</svg>

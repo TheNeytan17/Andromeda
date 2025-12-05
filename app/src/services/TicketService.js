@@ -11,11 +11,21 @@ class TicketService {
   getTicketTechnician(Id) {
     return axios.get(BASE_URL + '/technician/' + Id);
   }
+  getTicketAssigment(Id) {
+    return axios.get(BASE_URL + '/assigment/' + Id);
+  }
   getTicketClient(Id) {
     return axios.get(BASE_URL + '/client/' + Id);
   }
   createTicket(data) {
     return axios.post(BASE_URL, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  }
+  createHistory(data) {
+    return axios.post(BASE_URL + '/createHistory', data, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

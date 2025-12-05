@@ -26,6 +26,15 @@ class Tech
         $response->toJSON($result);
     }
 
+    public function Etiqueta($param)
+    {
+        $response = new Response();
+        $Tech = new TechnicianModel();
+        $result = $Tech->getByEtiqueta($param);
+        //Dar respuesta
+        $response->toJSON($result);
+    }
+
     public function create()
     {
         $response = new Response();

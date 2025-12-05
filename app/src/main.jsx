@@ -18,10 +18,18 @@ import { CreateCategory } from './components/Maintenance/CreateCategory'
 import ListTickets from './components/Maintenance/TableTicket'
 import { DetailTicket } from './components/Maintenance/DetailTicket'
 import { CreateTicket } from './components/Maintenance/CreateTicket'
+import { ChangeState } from './components/Maintenance/ChangeState'
+import { AssingTicket } from './components/Maintenance/AssignTicket'
 import TableAssignments from './components/Maintenance/TableAssign'
 import { DetailAssignment } from './components/Maintenance/DetailAssign'
+import NotificationHistory from './components/Home/NotificationHistory'
+import Login from './Login'
+import SignIn from './SignIn'
 
 const rutas = createBrowserRouter([
+  // Rutas de autenticación sin Layout
+  { path: "login", element: <Login /> },
+  { path: "signin", element: <SignIn /> },
   {
     element: <Layout />,
     children: [
@@ -41,6 +49,9 @@ const rutas = createBrowserRouter([
       { path: "CreateTicket/:id", element: <CreateTicket /> }, // Crear/Editar Ticket
       { path: "Assignment", element: <TableAssignments /> }, // Lista Asignaciones
       { path: "Assignment/:id", element: <DetailAssignment /> }, // Detalle Asignación
+      { path: "ChangeState/:id", element: <ChangeState /> }, // Cambiar Estado
+      { path: "AssignTicket/:id", element: <AssingTicket /> }, // Asignar Ticket
+      { path: "notifications", element: <NotificationHistory /> }, // Historial de Notificaciones
     ]
   }
 ])

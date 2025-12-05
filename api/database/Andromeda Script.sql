@@ -72,6 +72,11 @@ Create Table Estado_Ticket(
     Nombre Varchar(50) Not null
 );
 
+Create Table Prioridad(
+	Id INT Primary Key,
+    Nombre varchar(50)
+);
+
 CREATE TABLE Ticket (
     Id INT AUTO_INCREMENT PRIMARY KEY,
     Id_Usuario INT,
@@ -84,11 +89,13 @@ CREATE TABLE Ticket (
     Estado Int Not null,
     Id_Categoria INT NOT NULL,
     Fecha_Cierre DATETIME NULL,
+    Puntaje double Null,
     cumplimiento_respuesta BOOLEAN DEFAULT FALSE,
     cumplimiento_resolucion BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (Id_Categoria) REFERENCES Categoria(Id),
     FOREIGN KEY (Estado) REFERENCES Estado_Ticket(Id),
-    FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id)
+    FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id),
+    FOREIGN KEY (Prioridad) REFERENCES Prioridad(Id)
 );
 
 CREATE TABLE Historial_Estado (
@@ -98,7 +105,7 @@ CREATE TABLE Historial_Estado (
     Estado_Anterior Int Not Null,
     Estado_Nuevo Int Not Null,
     Observaciones VARCHAR(250),
-    Id_Usuario_Responsable INT,
+    Id_Usuario_Responsable INT Null,
     FOREIGN KEY (Id_Ticket) REFERENCES Ticket(Id),
     FOREIGN KEY (Estado_Anterior) REFERENCES Estado_Ticket(Id),
     FOREIGN KEY (Estado_Nuevo) REFERENCES Estado_Ticket(Id),
@@ -114,14 +121,10 @@ CREATE TABLE Imagen (
 
 CREATE TABLE Regla_Autotriage (
     Id INT AUTO_INCREMENT PRIMARY KEY,
-    Nombre VARCHAR(100) NOT NULL,
-    Prioridad_Ticket INT Not null,
-    Prioridad_Sla Decimal Not null,
-    Peso_Carga_Trabajo BOOLEAN DEFAULT TRUE,
-    Criterio_especialidad BOOLEAN DEFAULT TRUE,
-    Peso_Especialidad DECIMAL not null,
-    Puntaje_Prioridad Decimal Not Null,
-    Estado BOOLEAN DEFAULT TRUE
+    Horas_Faltantes int Not null,
+    Peso_Prioridad_Ticket INT Not null,
+    Peso_Carga_Trabajo INT Not null,
+    Estado Int DEFAULT TRUE
 );
 
 Create Table Metodo_Asignacion(
@@ -171,32 +174,6 @@ CREATE TABLE Valoracion (
     CHECK (Puntaje BETWEEN 1 AND 5)
 );
 
--- =============================================
--- TRIGGER: Calcular SLA al crear el ticket
--- =============================================
-
-DELIMITER $$
-
-CREATE TRIGGER before_ticket_insert
-BEFORE INSERT ON Ticket
-FOR EACH ROW
-BEGIN
-    DECLARE v_tiempo_respuesta INT;
-    DECLARE v_tiempo_resolucion INT;
-    
-    -- Obtener tiempos de SLA de la categoría
-    SELECT s.Tiempo_Respuesta, s.Tiempo_Resolucion
-    INTO v_tiempo_respuesta, v_tiempo_resolucion
-    FROM Categoria c
-    INNER JOIN SLA s ON c.Id_SLA = s.Id
-    WHERE c.Id = NEW.Id_Categoria;
-    
-    -- Calcular fechas límite
-    SET NEW.Fecha_Limite_Respuesta = DATE_ADD(NEW.Fecha_Creacion, INTERVAL v_tiempo_respuesta HOUR);
-    SET NEW.Fecha_Limite_Resolucion = DATE_ADD(NEW.Fecha_Creacion, INTERVAL v_tiempo_resolucion HOUR);
-END$$
-
-DELIMITER ;
 
 
 -- =============================================
@@ -662,6 +639,16 @@ INSERT INTO Tipo_Notificacion (Id, Nombre) VALUES
 (4, 'Inicio de sesión');
 
 -- =============================================
+-- Prioridades
+-- =============================================
+INSERT INTO Prioridad (Id, Nombre) VALUES
+(1, 'Muy baja'),
+(2, 'Baja'),
+(3, 'Media'),
+(4, 'Alta'),
+(5, 'Crítica');
+
+-- =============================================
 -- TICKETS 
 -- =============================================
 
@@ -837,17 +824,30 @@ INSERT INTO Imagen (Imagen, Id_Historial) VALUES
 ('pelea2.jpg', 13),
 ('lampara.png', 6);
 
--- =============================================
--- RESUMEN DE DATOS INSERTADOS
--- =============================================rolestado_ticketestado_ticket
--- Roles: 3 (Administrador, Técnico, Usuario Final)
--- Especialidades: 12 (3 Audio, 3 Visual, 3 Seguridad, 3 Médicas)
--- Usuarios: 17 (2 Admin, 11 Técnicos, 4 Usuarios Finales)
--- Técnicos con Especialidades: 11 técnicos con 22 asignaciones
--- 
--- Distribución por Área:
---   - Audio: 2 técnicos
---   - Iluminación/Visual: 3 técnicos
---   - Seguridad: 3 técnicos
---   - Médica: 3 técnicos
--- =============================================
+-- Inserts para tabla Regla_Autotriage
+-- Reglas ordenadas por urgencia (menor tiempo restante = mayor penalización por carga)
+
+-- Regla 1: CRÍTICO - Menos de 1 hora restante
+-- Alta penalización por carga para forzar distribución
+INSERT INTO Regla_Autotriage (Horas_Faltantes, Peso_Prioridad_Ticket, Peso_Carga_Trabajo, Estado) 
+VALUES (2, 4000, 10, 1);
+
+-- Regla 2: ALTA Prioridad - Entre 1 y 4 horas
+-- Penalización alta para priorizar técnicos disponibles
+INSERT INTO Regla_Autotriage (Horas_Faltantes, Peso_Prioridad_Ticket, Peso_Carga_Trabajo, Estado) 
+VALUES (4, 3000, 8, 1);
+
+-- Regla 3: MEDIA PRIORIDAD - Entre 4 y 8 horas
+-- Penalización media-alta
+INSERT INTO Regla_Autotriage (Horas_Faltantes, Peso_Prioridad_Ticket, Peso_Carga_Trabajo, Estado) 
+VALUES (8, 2000, 6, 1);
+
+-- Regla 4: BAJA PRIORIDAD - Entre 8 y 24 horas
+-- Penalización media para balance
+INSERT INTO Regla_Autotriage (Horas_Faltantes, Peso_Prioridad_Ticket, Peso_Carga_Trabajo, Estado) 
+VALUES (24, 1000, 4, 1);
+
+-- Regla 5: MUY BAJA PRIORIDAD - Más de 24 horas
+-- Penalización baja, permite acumular tickets
+INSERT INTO Regla_Autotriage (Horas_Faltantes, Peso_Prioridad_Ticket , Peso_Carga_Trabajo, Estado) 
+VALUES (48, 500, 2, 1);

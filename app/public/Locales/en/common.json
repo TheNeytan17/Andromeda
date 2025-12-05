@@ -30,7 +30,7 @@
     "tickets": "Tickets",
     "assignments": "Assignments"
   },
-  "login": { "signin": "SIGN IN" },
+  "login": { "signin": "SIGN IN", "logout": "SIGN OUT" },
   "lang": { "label": "Language" },
   "home": {
     "hero": {
@@ -274,7 +274,9 @@
     },
     "validation": {
       "nameRequired": "Technician name is required",
+      "nameNoNumbers": "Name cannot contain numbers",
       "emailRequired": "Technician email is required",
+      "emailDomain": "Email must be in the @andromeda.com domain",
       "statusRequired": "Technician status is required",
       "skillsRequired": "You must select at least one skill"
     },
@@ -293,6 +295,12 @@
     "actions": {
       "create": "Create Technician",
       "saveChanges": "Save Changes"
+    },
+    "messages": {
+      "createSuccess": "Technician created successfully",
+      "createError": "Error creating technician",
+      "updateSuccess": "Technician updated successfully",
+      "updateError": "Error updating technician"
     }
   },
   "ticket": {
@@ -303,7 +311,8 @@
       "priorityRequired": "Priority is required",
       "descriptionRequired": "Description is required",
       "categoryRequired": "Category is required",
-      "tagRequired": "Tag is required"
+      "tagRequired": "Tag is required",
+      "imageRequired": "You must add an image to the ticket"
     },
     "form": {
       "titleLabel": "Title",

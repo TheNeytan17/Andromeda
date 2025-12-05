@@ -108,26 +108,25 @@ export function CreateTechnician() {
     const validateForm = () => {
         let isValid = true;
         if (!formData.Nombre.trim()) {
-            toast.error('El nombre del técnico es requerido');
+            toast.error(t('technician.validation.nameRequired'));
             isValid = false;
         } else if (/\d/.test(formData.Nombre.trim())) {
-            toast.error('El nombre no puede contener números');
+            toast.error(t('technician.validation.nameNoNumbers'));
             isValid = false;
         }
         if (!formData.Correo.trim()) {
-            toast.error('El correo del técnico es requerido');
+            toast.error(t('technician.validation.emailRequired'));
             isValid = false;
         } else if (!formData.Correo.trim().endsWith('@andromeda.com')) {
-            // Email does not end with @andromeda.com
-            toast.error('El correo debe ser del dominio @andromeda.com');
+            toast.error(t('technician.validation.emailDomain'));
             isValid = false;
         }
         if (!formData.Estado) {
-            toast.error('El estado del técnico es requerido');
+            toast.error(t('technician.validation.statusRequired'));
             isValid = false;
         }
         if (!formData.Especialidades.length) {
-            toast.error('Debe seleccionar al menos una especialidad');
+            toast.error(t('technician.validation.skillsRequired'));
             isValid = false;
         }
         return isValid;
@@ -165,17 +164,17 @@ export function CreateTechnician() {
             console.log('Respuesta del servidor:', response.data);
 
             if (response.data.success) {
-                toast.success(response.data.message);
+                toast.success(isCreateMode ? t('technician.messages.createSuccess') : t('technician.messages.updateSuccess'));
                 setTimeout(() => {
                     navigate('/Technician');
                 }, 1500);
             } else {
-                toast.error(response.data.message);
+                toast.error(isCreateMode ? t('technician.messages.createError') : t('technician.messages.updateError'));
             }
         } catch (err) {
             console.error('Error completo:', err);
             console.error('Respuesta del error:', err.response?.data);
-            toast.error(err.response?.data?.message || err.message);
+            toast.error(isCreateMode ? t('technician.messages.createError') : t('technician.messages.updateError'));
         } finally {
             setSaving(false);
         }

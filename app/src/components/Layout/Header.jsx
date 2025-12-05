@@ -1,19 +1,36 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import sello from "@/assets/sello.png";
 import name from "@/assets/name.png";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, LogOut } from "lucide-react";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import "./sparkle-button.css";
 import { useI18n } from "@/hooks/useI18n";
+import NotificationPanel from "@/components/Home/NotificationPanel";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileMaintOpen, setMobileMaintOpen] = useState(false);
   const [maintenanceOpen, setMaintenanceOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { t, lang, changeLanguage } = useI18n();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+
+    // Escuchar cambios en el storage (para actualizar cuando se inicia/cierra sesión en otra pestaña)
+    const handleStorageChange = () => {
+      const newToken = localStorage.getItem('token');
+      setIsLoggedIn(!!newToken);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const handleChangeLang = async (value) => {
     try {
@@ -21,6 +38,14 @@ export default function Header() {
     } catch (err) {
       console.error("Error changing language:", err);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    setMobileOpen(false);
+    navigate('/');
   };
 
   return (
@@ -72,8 +97,11 @@ export default function Header() {
           </Popover>
         </nav>
 
-        {/* Selector de idioma y botón iniciar sesión */}
+        {/* Selector de idioma, notificaciones y botón iniciar sesión */}
         <div className="hidden md:flex items-center gap-4">
+          {/* Panel de notificaciones */}
+          <NotificationPanel />
+          
           {/* Selector de idioma (estilo como en TableAssign) */}
           <label htmlFor="lang-select" className="sr-only">{t('lang.label')}</label>
           <Select value={lang} onValueChange={handleChangeLang}>
@@ -95,18 +123,34 @@ export default function Header() {
               <div className="sparkle-layer-2">
                 <div className="sparkle-layer-3">
                   <div className="sparkle-layer-4">
-                    <Link
-                      to="/login"
-                      className="font-semibold text-xs px-5 py-1.5 rounded-full transition btn-sparkle"
-                      style={{
-                        background: 'rgba(247, 244, 243, 0.15)',
-                        backdropFilter: 'blur(12px)',
-                        border: '2px solid rgba(247, 244, 243, 0.3)',
-                        color: '#f7f4f3'
-                      }}
-                    >
-                      {t('login.signin')}
-                    </Link>
+                    {isLoggedIn ? (
+                      <button
+                        onClick={handleLogout}
+                        className="font-semibold text-xs px-5 py-1.5 rounded-full transition btn-sparkle flex items-center gap-2"
+                        style={{
+                          background: 'rgba(247, 244, 243, 0.15)',
+                          backdropFilter: 'blur(12px)',
+                          border: '2px solid rgba(247, 244, 243, 0.3)',
+                          color: '#f7f4f3'
+                        }}
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        {t('login.logout') || 'CERRAR SESIÓN'}
+                      </button>
+                    ) : (
+                      <Link
+                        to="/login"
+                        className="font-semibold text-xs px-5 py-1.5 rounded-full transition btn-sparkle"
+                        style={{
+                          background: 'rgba(247, 244, 243, 0.15)',
+                          backdropFilter: 'blur(12px)',
+                          border: '2px solid rgba(247, 244, 243, 0.3)',
+                          color: '#f7f4f3'
+                        }}
+                      >
+                        {t('login.signin')}
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
@@ -174,19 +218,35 @@ export default function Header() {
                 </Select>
               </div>
 
-              <Link
-                to="/login"
-                onClick={() => setMobileOpen(false)}
-                className="rounded-full px-4 py-2 text-center font-semibold btn-sparkle"
-                style={{
-                  background: 'rgba(247, 244, 243, 0.15)',
-                  backdropFilter: 'blur(12px)',
-                  border: '2px solid rgba(247, 244, 243, 0.3)',
-                  color: '#f7f4f3'
-                }}
-              >
-                {t('login.signin')}
-              </Link>
+              {isLoggedIn ? (
+                <button
+                  onClick={handleLogout}
+                  className="rounded-full px-4 py-2 text-center font-semibold btn-sparkle flex items-center justify-center gap-2 w-full"
+                  style={{
+                    background: 'rgba(247, 244, 243, 0.15)',
+                    backdropFilter: 'blur(12px)',
+                    border: '2px solid rgba(247, 244, 243, 0.3)',
+                    color: '#f7f4f3'
+                  }}
+                >
+                  <LogOut className="w-4 h-4" />
+                  {t('login.logout') || 'CERRAR SESIÓN'}
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-full px-4 py-2 text-center font-semibold btn-sparkle"
+                  style={{
+                    background: 'rgba(247, 244, 243, 0.15)',
+                    backdropFilter: 'blur(12px)',
+                    border: '2px solid rgba(247, 244, 243, 0.3)',
+                    color: '#f7f4f3'
+                  }}
+                >
+                  {t('login.signin')}
+                </Link>
+              )}
             </nav>
           </SheetContent>
         </Sheet>

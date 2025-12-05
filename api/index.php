@@ -32,6 +32,9 @@ require_once "models/ImageModel.php";
 require_once "models/ValoracionModel.php";
 require_once "models/AssignmentModel.php";
 require_once "models/PriorityModel.php";
+require_once "models/StateModel.php";
+require_once "models/AutoTriageModel.php";
+require_once "models/NotificationModel.php";
 
 /***--- Agregar todos los controladores*/
 require_once "controllers/UserController.php";
@@ -43,6 +46,10 @@ require_once "controllers/TicketController.php";
 require_once "controllers/AssignmentController.php";
 require_once "controllers/SLAController.php";
 require_once "controllers/PriorityController.php";
+require_once "controllers/StateController.php";
+require_once "controllers/AutoTriageController.php";
+require_once "controllers/NotificationController.php";
+require_once "controllers/AuthController.php";
 
 
 //Enrutador

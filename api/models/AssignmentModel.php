@@ -81,4 +81,84 @@ class AssignmentModel
 		}
 		return null;
 	}
+
+	public function createAssignment($data)
+	{
+		if (($data['Id_Ticket'])) {
+			//Historial Estado
+			if (!empty($data['Id_Usuario_Responsable'])) {
+				$vHistorial = "INSERT Into Historial_Estado (Id_Ticket, Fecha_Cambio, Estado_Anterior, Estado_Nuevo, Observaciones, Id_Usuario_Responsable) 
+							VALUES ({$data['Id_Ticket']}, '{$data['Fecha_Cambio']}', '{$data['Estado_Anterior']}' , '{$data['Estado_Nuevo']}', '{$data['Observaciones']}', '{$data['Id_Usuario_Responsable']}');";
+			} else {
+				$vHistorial = "INSERT Into Historial_Estado (Id_Ticket, Fecha_Cambio, Estado_Anterior, Estado_Nuevo, Observaciones) 
+				VALUES ({$data['Id_Ticket']}, '{$data['Fecha_Cambio']}', '{$data['Estado_Anterior']}' , '{$data['Estado_Nuevo']}', '{$data['Observaciones']}');";
+			}
+
+			$idHistorialEstado = $this->enlace->ExecuteSQL_DML_last($vHistorial);
+			$this->updateStateTicket($data['Id_Ticket'], $data);
+
+			if (!empty($data['Puntaje'])) {
+				$vTickerSQL = "UPDATE Ticket SET 
+				Puntaje = $data[Puntaje]
+				WHERE Id = '{$data['Id_Ticket']}';";
+				$this->enlace->ExecuteSQL_DML($vTickerSQL);
+			}
+			//Asiganación
+			if (!empty($data['Id_ReglaAutobriage'])) {
+				$vAsignacionSQL = "INSERT Into Asignacion (Id_Ticket, Id_Tecnico, Id_ReglaAutobriage ,  Metodo_Asignacion, Prioridad, Fecha_Asignacion) 
+							VALUES ({$data['Id_Ticket']}, '{$data['Id_Tecnico']}', '{$data['Id_ReglaAutobriage']}' , '{$data['Metodo_Asignacion']}', '{$data['Prioridad']}', '{$data['Fecha_Cambio']}');";
+			} else {
+				$vAsignacionSQL = "INSERT Into Asignacion (Id_Ticket, Id_Tecnico ,  Metodo_Asignacion, Prioridad, Fecha_Asignacion) 
+							VALUES ({$data['Id_Ticket']}, '{$data['Id_Tecnico']}', '{$data['Metodo_Asignacion']}', '{$data['Prioridad']}', '{$data['Fecha_Cambio']}');";
+			}
+			$this->enlace->ExecuteSQL_DML($vAsignacionSQL);
+			
+			// Crear notificaciones usando NotificationModel
+			$notificationModel = new NotificationModel();
+			
+			// Obtener título del ticket
+			$vSqlTicket = "SELECT Titulo FROM Ticket WHERE Id = '{$data['Id_Ticket']}';";
+			$ticket = $this->enlace->ExecuteSQL($vSqlTicket);
+			$titulo = $ticket ? $ticket[0]->Titulo : "Ticket #{$data['Id_Ticket']}";
+			
+			// Notificación al técnico asignado
+			$notificationModel->createTicketAssignmentNotification(
+				$data['Id_Ticket'], 
+				$data['Id_Tecnico'], 
+				$titulo
+			);
+			
+			// Notificación al usuario creador del ticket
+			$mensaje = "Su ticket #{$data['Id_Ticket']}: $titulo ha sido asignado a un técnico";
+			$notificationModel->create([
+				'Id_Usuario_Destino' => $data['Id_Usuario_Ticket'],
+				'Tipo_Notificacion' => 3, // Nueva observación/actualización
+				'Mensaje' => $mensaje
+			]);
+
+			//Subir Carga Trabajo al Técnico
+			$UserModel = "Update Usuario SET CargaTrabajo = CargaTrabajo + 1 WHERE Id = '{$data['Id_Tecnico']}';";
+			$this->enlace->ExecuteSQL_DML($UserModel);
+			
+			return ['success' => true, 'message' => 'Usuario creado exitosamente', 'id' => $idHistorialEstado];
+		} else {
+			return ['success' => false, 'message' => 'Error al crear el usuario'];
+		}
+	}
+
+	public function updateStateTicket($id, $data)
+	{
+		//Actualizar Ticket
+		$vTicketSQL = "UPDATE Ticket SET 
+						Estado = '{$data['Estado_Nuevo']}' 
+						WHERE Id = '$id';";
+
+		$result = $this->enlace->ExecuteSQL_DML($vTicketSQL);
+
+		if ($result) {
+			return ['success' => true, 'message' => 'Usuario actualizado exitosamente'];
+		} else {
+			return ['success' => false, 'message' => 'Error al actualizar el usuario'];
+		}
+	}
 }

@@ -334,4 +334,21 @@
   100% { background-position: 200% 50%; }
 }
 
+/* Animación suave para notificaciones no leídas */
+@keyframes softPulse {
+  0% {
+    box-shadow: 0 0 0px rgba(255, 200, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 200, 0, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0px rgba(255, 200, 0, 0.1);
+  }
+}
+
+.animate-softPulse {
+  animation: softPulse 2s ease-in-out infinite;
+}
+
 /* Eliminado: animación de eventos al hacer scroll */

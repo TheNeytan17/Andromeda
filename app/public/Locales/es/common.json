@@ -31,7 +31,8 @@
     "assignments": "Asignaciones"
   },
   "login": {
-    "signin": "INICIAR SESIÓN"
+    "signin": "INICIAR SESIÓN",
+    "logout": "CERRAR SESIÓN"
   },
   "lang": {
     "label": "Idioma"
@@ -235,7 +236,9 @@
     },
     "validation": {
       "nameRequired": "El nombre del técnico es requerido",
+      "nameNoNumbers": "El nombre no puede contener números",
       "emailRequired": "El correo del técnico es requerido",
+      "emailDomain": "El correo debe ser del dominio @andromeda.com",
       "statusRequired": "El estado del técnico es requerido",
       "skillsRequired": "Debe seleccionar al menos una especialidad"
     },
@@ -254,6 +257,12 @@
     "actions": {
       "create": "Crear Técnico",
       "saveChanges": "Guardar Cambios"
+    },
+    "messages": {
+      "createSuccess": "Técnico creado exitosamente",
+      "createError": "Error al crear el técnico",
+      "updateSuccess": "Técnico actualizado exitosamente",
+      "updateError": "Error al actualizar el técnico"
     }
   },
   "category": {
@@ -349,7 +358,8 @@
       "priorityRequired": "La prioridad es requerida",
       "descriptionRequired": "La descripción es requerida",
       "categoryRequired": "La categoría es requerida",
-      "tagRequired": "La etiqueta es requerida"
+      "tagRequired": "La etiqueta es requerida",
+      "imageRequired": "Debe agregar una imagen al ticket"
     },
     "form": {
       "titleLabel": "Título",

@@ -44,7 +44,7 @@ class MySqlConnect {
 		try {
 			$this->connect();	
 			if ($result = $this->link->query ( $sql )) {
-				for($num_fila = $result->num_rows - 1; $num_fila >= 0; $num_fila --) {
+				for($num_fila = 0; $num_fila < $result->num_rows; $num_fila ++) {
 					$result->data_seek ( $num_fila );
 					switch ($resultType){
 						case "obj":

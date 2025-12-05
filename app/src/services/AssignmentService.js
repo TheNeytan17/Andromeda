@@ -12,6 +12,9 @@ class AssignmentService {
   getAssignmentSingle(Id) {
     return axios.get(BASE_URL + '/single/' + Id);
   }
+  createAssignment(data) {
+    return axios.post(BASE_URL, data);
+  }
 }
 
 export default new AssignmentService();
