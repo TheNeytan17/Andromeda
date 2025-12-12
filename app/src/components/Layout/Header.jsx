@@ -13,7 +13,11 @@ import NotificationPanel from "@/components/Home/NotificationPanel";
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileMaintOpen, setMobileMaintOpen] = useState(false);
+  const [mobileAdminOpen, setMobileAdminOpen] = useState(false);
+  const [mobileIncidentsOpen, setMobileIncidentsOpen] = useState(false);
   const [maintenanceOpen, setMaintenanceOpen] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(false);
+  const [incidentsOpen, setIncidentsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { t, lang, changeLanguage } = useI18n();
   const navigate = useNavigate();
@@ -62,19 +66,41 @@ export default function Header() {
         </Link>
 
         {/* Navegación centrada */}
-        <nav className="hidden md:flex items-center gap-10 text-white text-xs font-semibold tracking-wide">
-          <Link
-            to="/incidents"
-            className="hover:text-[#ff95b5] transition-colors"
-          >
-            {t('nav.incidents')}
-          </Link>
-          <Link to="/admin" className="hover:text-[#ff95b5] transition-colors">
-            {t('nav.admin')}
-          </Link>
-          <Link to="/support" className="hover:text-[#ff95b5] transition-colors">
-            {t('nav.support')}
-          </Link>
+        <nav className="hidden md:flex items-center gap-6 text-white text-xs font-semibold tracking-wide">
+          {/* Dropdown Gestión de Incidentes */}
+          <Popover open={incidentsOpen} onOpenChange={setIncidentsOpen}>
+            <PopoverTrigger asChild>
+              <button className="inline-flex items-center gap-1 hover:text-[#ff95b5] transition-colors">
+                {t('nav.incidents')} <ChevronDown className="w-4 h-4" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="start"
+              className="w-56 bg-[#2b2143]/95 text-white border-white/20 backdrop-blur-md rounded-xl"
+            >
+              <div className="flex flex-col gap-2 text-sm">
+                <Link to="/Ticket" className="hover:text-[#ff95b5] transition-colors" onClick={() => setIncidentsOpen(false)}>{t('maint.tickets')}</Link>
+                <Link to="/Assignment" className="hover:text-[#ff95b5] transition-colors" onClick={() => setIncidentsOpen(false)}>{t('maint.assignments')}</Link>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Dropdown Administración */}
+          <Popover open={adminOpen} onOpenChange={setAdminOpen}>
+            <PopoverTrigger asChild>
+              <button className="inline-flex items-center gap-1 hover:text-[#ff95b5] transition-colors">
+                {t('nav.admin')} <ChevronDown className="w-4 h-4" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="start"
+              className="w-56 bg-[#2b2143]/95 text-white border-white/20 backdrop-blur-md rounded-xl"
+            >
+              <div className="flex flex-col gap-2 text-sm">
+                <Link to="/Users" className="hover:text-[#ff95b5] transition-colors" onClick={() => setAdminOpen(false)}>Gestión de Usuarios</Link>
+              </div>
+            </PopoverContent>
+          </Popover>
 
           {/* Dropdown Mantenimientos */}
           <Popover open={maintenanceOpen} onOpenChange={setMaintenanceOpen}>
@@ -90,8 +116,6 @@ export default function Header() {
               <div className="flex flex-col gap-2 text-sm">
                 <Link to="/Technician" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>{t('maint.technicians')}</Link>
                 <Link to="/TableCategory" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>{t('maint.categories')}</Link>
-                <Link to="/Ticket" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>{t('maint.tickets')}</Link>
-                <Link to="/Assignment" className="hover:text-[#ff95b5] transition-colors" onClick={() => setMaintenanceOpen(false)}>{t('maint.assignments')}</Link>
               </div>
             </PopoverContent>
           </Popover>
@@ -168,12 +192,47 @@ export default function Header() {
 
           <SheetContent side="left" className="bg-[#2b2143]/95 text-white backdrop-blur-md">
             <nav className="mt-10 flex flex-col gap-6 text-sm font-medium">
-              <Link to="/incidents" onClick={() => setMobileOpen(false)}>
-                {t('nav.incidents')}
-              </Link>
-              <Link to="/admin" onClick={() => setMobileOpen(false)}>
-                {t('nav.admin')}
-              </Link>
+              {/* Gestión de Incidentes (desplegable) */}
+              <button
+                type="button"
+                className="flex items-center justify-between w-full text-left hover:text-[#ff95b5] transition-colors"
+                onClick={() => setMobileIncidentsOpen((v) => !v)}
+              >
+                <span>{t('nav.incidents')}</span>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${
+                    mobileIncidentsOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {mobileIncidentsOpen && (
+                <div className="ml-4 flex flex-col gap-4 text-sm">
+                  <Link to="/Ticket" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">{t('maint.tickets')}</Link>
+                  <Link to="/Assignment" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">{t('maint.assignments')}</Link>
+                </div>
+              )}
+
+              {/* Administración (desplegable) */}
+              <button
+                type="button"
+                className="flex items-center justify-between w-full text-left hover:text-[#ff95b5] transition-colors"
+                onClick={() => setMobileAdminOpen((v) => !v)}
+              >
+                <span>{t('nav.admin')}</span>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${
+                    mobileAdminOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {mobileAdminOpen && (
+                <div className="ml-4 flex flex-col gap-4 text-sm">
+                  <Link to="/Users" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">Gestión de Usuarios</Link>
+                </div>
+              )}
+
               <Link to="/support" onClick={() => setMobileOpen(false)}>
                 {t('nav.support')}
               </Link>
@@ -196,8 +255,6 @@ export default function Header() {
                 <div className="ml-4 flex flex-col gap-4 text-sm">
                     <Link to="/Technician" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">{t('maint.technicians')}</Link>
                     <Link to="/TableCategory" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">{t('maint.categories')}</Link>
-                    <Link to="/Ticket" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">{t('maint.tickets')}</Link>
-                    <Link to="/Assignment" onClick={() => setMobileOpen(false)} className="hover:text-[#ff95b5]">{t('maint.assignments')}</Link>
                 </div>
               )}
 

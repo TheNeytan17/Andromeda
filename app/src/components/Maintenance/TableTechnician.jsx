@@ -44,8 +44,22 @@ export default function TableTechnicians() {
     const [data, setData] = useState(null);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
+    const [unauthorized, setUnauthorized] = useState(false);
 
-    // Cargar técnicos al montar
+    useEffect(() => {
+        const userSession = localStorage.getItem('user');
+        if (!userSession) {
+            setUnauthorized(true);
+            return;
+        }
+        const currentUser = JSON.parse(userSession);
+        const rol = currentUser.Rol || currentUser.rol || currentUser.role;
+        if (rol !== 1 && rol !== '1') {
+            setUnauthorized(true);
+            return;
+        }
+    }, []);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -67,6 +81,20 @@ export default function TableTechnicians() {
     if (error) return <ErrorAlert title={t('tables.technicians.loadError')} message={error} />;
     if (!data || !data.data || data.data.length === 0)
         return <EmptyState message={t('tables.technicians.empty')} />;
+    if (unauthorized) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                <div className="text-6xl text-pink-500 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-20 h-20 mx-auto">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h2 className="text-3xl font-bold text-pink-400 mb-2">Acceso Denegado</h2>
+                <p className="text-lg text-zinc-300 mb-6 text-center">No tienes permisos para acceder a la gestión de usuarios. Esta sección está disponible solo para administradores.</p>
+                <button onClick={() => window.location.href = '/'} className="px-6 py-3 rounded bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold shadow-lg hover:from-pink-600 hover:to-purple-600 transition-all">Volver al Inicio</button>
+            </div>
+        );
+    }
 
     // Interfaz
     return (

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { useI18n } from "@/hooks/useI18n";
 import { CalendarDays, MapPin } from "lucide-react";
 import mascot from "../../assets/mascot.png";
@@ -34,7 +35,9 @@ export function Home() {
           <p className="text-sm tracking-wide text-[#f7f4f3] mt-4">{t('home.hero.ctaText')}</p>
 
           <div className="mt-8 flex items-center gap-4">
-            <button className="btn-ghost-neon font-medium">{t('home.hero.register')}</button>
+            <Link to="/signin">
+              <button className="btn-ghost-neon font-medium">{t('home.hero.register')}</button>
+            </Link>
             <span className="text-4xl text-orange-300 rotate-[-30deg]">→</span>
           </div>
         </div>

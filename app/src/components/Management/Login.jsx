@@ -8,8 +8,8 @@ import name from "@/assets/name.png";
 import cloud1 from "@/assets/Cloud1.png";
 import cloud2 from "@/assets/Cloud2.png";
 import cloud3 from "@/assets/Cloud3.png";
-import AuthService from "./services/AuthService";
-import "./components/Layout/sparkle-button.css";
+import AuthService from "../../services/AuthService";
+import "../Layout/sparkle-button.css";
 
 const Login = () => {
   const [correo, setCorreo] = useState("");
@@ -128,9 +128,12 @@ const Login = () => {
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
+        <form onSubmit={handleSubmit} className="space-y-4 relative z-10 backdrop-blur-sm bg-white/5 p-8 rounded-3xl border border-white/10">
           <h2
             className="text-2xl font-bold text-center text-white mb-6"
+            style={{
+              textShadow: "2px 2px 8px rgba(0,0,0,0.3)",
+            }}
           >
             Iniciar Sesión
           </h2>
@@ -262,4 +265,3 @@ const Login = () => {
 };
 
 export default Login;
-

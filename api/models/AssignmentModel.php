@@ -95,7 +95,6 @@ class AssignmentModel
 			}
 
 			$idHistorialEstado = $this->enlace->ExecuteSQL_DML_last($vHistorial);
-			$this->updateStateTicket($data['Id_Ticket'], $data);
 
 			if (!empty($data['Puntaje'])) {
 				$vTickerSQL = "UPDATE Ticket SET 
@@ -103,7 +102,7 @@ class AssignmentModel
 				WHERE Id = '{$data['Id_Ticket']}';";
 				$this->enlace->ExecuteSQL_DML($vTickerSQL);
 			}
-			//Asiganación
+			//Asiganación - INSERTAR PRIMERO antes de updateStateTicket
 			if (!empty($data['Id_ReglaAutobriage'])) {
 				$vAsignacionSQL = "INSERT Into Asignacion (Id_Ticket, Id_Tecnico, Id_ReglaAutobriage ,  Metodo_Asignacion, Prioridad, Fecha_Asignacion) 
 							VALUES ({$data['Id_Ticket']}, '{$data['Id_Tecnico']}', '{$data['Id_ReglaAutobriage']}' , '{$data['Metodo_Asignacion']}', '{$data['Prioridad']}', '{$data['Fecha_Cambio']}');";
@@ -112,6 +111,9 @@ class AssignmentModel
 							VALUES ({$data['Id_Ticket']}, '{$data['Id_Tecnico']}', '{$data['Metodo_Asignacion']}', '{$data['Prioridad']}', '{$data['Fecha_Cambio']}');";
 			}
 			$this->enlace->ExecuteSQL_DML($vAsignacionSQL);
+			
+			// Actualizar estado del ticket DESPUÉS de crear la asignación
+			$this->updateStateTicket($data['Id_Ticket'], $data);
 			
 			// Crear notificaciones usando NotificationModel
 			$notificationModel = new NotificationModel();
@@ -136,9 +138,12 @@ class AssignmentModel
 				'Mensaje' => $mensaje
 			]);
 
-			//Subir Carga Trabajo al Técnico
-			$UserModel = "Update Usuario SET CargaTrabajo = CargaTrabajo + 1 WHERE Id = '{$data['Id_Tecnico']}';";
+			//Subir Carga Trabajo al Técnico (+1 cuando se asigna)
+			$UserModel = "UPDATE Usuario SET CargaTrabajo = CargaTrabajo + 1 WHERE Id = '{$data['Id_Tecnico']}';";
 			$this->enlace->ExecuteSQL_DML($UserModel);
+			
+			// Log
+			file_put_contents(__DIR__ . '/../Log/cargaTrabajo.log', date('Y-m-d H:i:s') . " - ASIGNACIÓN: Técnico {$data['Id_Tecnico']} +1 por Ticket {$data['Id_Ticket']}\n", FILE_APPEND);
 			
 			return ['success' => true, 'message' => 'Usuario creado exitosamente', 'id' => $idHistorialEstado];
 		} else {
@@ -150,10 +155,66 @@ class AssignmentModel
 	{
 		//Actualizar Ticket
 		$vTicketSQL = "UPDATE Ticket SET 
-						Estado = '{$data['Estado_Nuevo']}' 
-						WHERE Id = '$id';";
+					Estado = '{$data['Estado_Nuevo']}' 
+					WHERE Id = '$id';";
 
 		$result = $this->enlace->ExecuteSQL_DML($vTicketSQL);
+
+		// Log completo para debugging
+		file_put_contents(__DIR__ . '/../Log/updateStateTicket.log', date('Y-m-d H:i:s') . "\nSQL: $vTicketSQL\nResult: " . var_export($result, true) . "\nData: " . var_export($data, true) . "\n\n", FILE_APPEND);
+
+		// Log del estado para ver qué valor llega
+		$estadoNuevo = isset($data['Estado_Nuevo']) ? $data['Estado_Nuevo'] : 'NO_DEFINIDO';
+		file_put_contents(__DIR__ . '/../Log/cargaTrabajo.log', date('Y-m-d H:i:s') . " - DEBUG: Estado_Nuevo = '$estadoNuevo' (tipo: " . gettype($estadoNuevo) . ") para Ticket $id\n", FILE_APPEND);
+
+		// Verificar si el ticket está siendo cerrado - Verificación más amplia
+		$estadoCerrado = false;
+		if (isset($data['Estado_Nuevo'])) {
+			$estadoStr = strtolower(trim($data['Estado_Nuevo']));
+			$estadoNum = intval($data['Estado_Nuevo']);
+			
+			// Verificar diferentes posibles valores para "cerrado"
+			if ($estadoStr === 'cerrado' || $estadoStr === '5' || $estadoNum === 5 || $estadoNum == 5) {
+				$estadoCerrado = true;
+			}
+		}
+		
+		file_put_contents(__DIR__ . '/../Log/cargaTrabajo.log', date('Y-m-d H:i:s') . " - DEBUG: ¿Está cerrado? " . ($estadoCerrado ? 'SÍ' : 'NO') . "\n", FILE_APPEND);
+		
+		if ($estadoCerrado) {
+			// Obtener el Id_Tecnico de la asignación si no viene en $data
+			$idTecnico = null;
+			
+			if (isset($data['Id_Tecnico']) && !empty($data['Id_Tecnico'])) {
+				$idTecnico = $data['Id_Tecnico'];
+				file_put_contents(__DIR__ . '/../Log/cargaTrabajo.log', date('Y-m-d H:i:s') . " - DEBUG: Id_Tecnico tomado de data: $idTecnico\n", FILE_APPEND);
+			} else {
+				// Buscar el técnico asignado al ticket
+				$vSqlTecnico = "SELECT Id_Tecnico FROM Asignacion WHERE Id_Ticket = '$id' ORDER BY Fecha_Asignacion DESC LIMIT 1;";
+				$resultTecnico = $this->enlace->ExecuteSQL($vSqlTecnico);
+				
+				file_put_contents(__DIR__ . '/../Log/cargaTrabajo.log', date('Y-m-d H:i:s') . " - DEBUG: Query técnico: $vSqlTecnico\n", FILE_APPEND);
+				file_put_contents(__DIR__ . '/../Log/cargaTrabajo.log', date('Y-m-d H:i:s') . " - DEBUG: Resultado query: " . var_export($resultTecnico, true) . "\n", FILE_APPEND);
+				
+				if (is_array($resultTecnico) && count($resultTecnico) > 0) {
+					$idTecnico = $resultTecnico[0]->Id_Tecnico;
+					file_put_contents(__DIR__ . '/../Log/cargaTrabajo.log', date('Y-m-d H:i:s') . " - DEBUG: Id_Tecnico encontrado en BD: $idTecnico\n", FILE_APPEND);
+				}
+			}
+			
+			// Si encontramos un técnico, reducir su carga de trabajo
+			if ($idTecnico) {
+				$UserModel = "UPDATE Usuario SET CargaTrabajo = GREATEST(0, CargaTrabajo - 1) WHERE Id = '$idTecnico';";
+				$resultUpdate = $this->enlace->ExecuteSQL_DML($UserModel);
+				
+				// Log CargaTrabajo SQL
+				file_put_contents(__DIR__ . '/../Log/cargaTrabajo.log', date('Y-m-d H:i:s') . " - CIERRE: Técnico $idTecnico -1 por Ticket $id (resultado: " . var_export($resultUpdate, true) . ")\n", FILE_APPEND);
+				file_put_contents(__DIR__ . '/../Log/updateStateTicket.log', date('Y-m-d H:i:s') . "\nCargaTrabajo SQL: $UserModel\n\n", FILE_APPEND);
+			} else {
+				// Log de advertencia si no se encuentra técnico
+				file_put_contents(__DIR__ . '/../Log/cargaTrabajo.log', date('Y-m-d H:i:s') . " - ADVERTENCIA: No se encontró técnico para Ticket $id al cerrar\n", FILE_APPEND);
+			}
+		}
 
 		if ($result) {
 			return ['success' => true, 'message' => 'Usuario actualizado exitosamente'];

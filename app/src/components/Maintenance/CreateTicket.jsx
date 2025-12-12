@@ -27,9 +27,6 @@ import PriorityService from '@/services/PriorityService';
 import SLAService from '@/services/SLAService';
 import { formatDate } from '@/lib/utils';
 
-//Id Solicitante
-const IdUser = 1;
-
 // ========================================
 // COMPONENTE: Crear/Editar Ticket
 // ========================================
@@ -49,6 +46,7 @@ export function CreateTicket() {
     const [prioridadesDisponibles, setPrioridadesDisponibles] = useState([]);
     const [etiquetasDisponibles, setEtiquetasDisponibles] = useState([]);
     const [user, setUsuarioSolicitante] = useState(null);
+    const [userId, setUserId] = useState(null);
 
     // Estados del formulario
     const [formData, setFormData] = useState({
@@ -69,6 +67,25 @@ export function CreateTicket() {
             setFileURL(URL.createObjectURL(selectedFile));
         }
     };
+
+    // Obtener ID del usuario logueado
+    useEffect(() => {
+        const userSession = localStorage.getItem('user');
+        if (userSession) {
+            try {
+                const parsedUser = JSON.parse(userSession);
+                const id = parsedUser?.Id || parsedUser?.id || parsedUser?.ID;
+                setUserId(id);
+            } catch (e) {
+                console.error('Error al parsear usuario:', e);
+                toast.error('Error al obtener información del usuario');
+                navigate('/login');
+            }
+        } else {
+            toast.error('Debe iniciar sesión para crear un ticket');
+            navigate('/login');
+        }
+    }, [navigate]);
 
     // Cargar catálogos al montar el componente
     useEffect(() => {
@@ -110,21 +127,24 @@ export function CreateTicket() {
 
     useEffect(() => {
         const fetchUsuario = async () => {
+            if (!userId) return;
+            
             try {
                 const [Usuariosres] = await Promise.all([
-                    UserService.getUserById(IdUser)
+                    UserService.getUserById(userId)
                 ]);
                 if (Usuariosres.data.success) {
                     setUsuarioSolicitante(Usuariosres.data.data || null);
                 }
             } catch (err) {
-                console.error('Error al cargar catálogos:', err);
+                console.error('Error al cargar usuario:', err);
+                toast.error('Error al cargar información del usuario');
             } finally {
                 setLoading(false);
             }
         };
         fetchUsuario();
-    }, []);
+    }, [userId]);
 
     const validateForm = () => {
         let isValid = true;
@@ -181,7 +201,7 @@ export function CreateTicket() {
 
             //Campos Calculados
             dataToSend.Archivo = file;
-            dataToSend.Id_Usuario = IdUser;
+            dataToSend.Id_Usuario = userId;
             
             // Función para convertir fecha a formato MySQL en zona horaria Costa Rica (UTC-6)
             const formatToCostaRica = (date) => {
@@ -489,43 +509,17 @@ export function CreateTicket() {
                                 <Button
                                     type="submit"
                                     disabled={saving}
-                                    className="flex items-center gap-2 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                                    style={{
-                                        background: 'rgba(247, 244, 243, 0.15)',
-                                        backdropFilter: 'blur(12px)',
-                                        border: '2px solid rgba(247, 244, 243, 0.3)',
-                                        color: '#f7f4f3'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.background = 'rgba(247, 244, 243, 0.25)';
-                                        e.currentTarget.style.borderColor = 'rgba(247, 244, 243, 0.5)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.background = 'rgba(247, 244, 243, 0.15)';
-                                        e.currentTarget.style.borderColor = 'rgba(247, 244, 243, 0.3)';
-                                    }}
+                                    className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <Save className="w-4 h-4" />
                                     {saving ? t('common.saving') : isCreateMode ? t('ticket.actions.create') : t('ticket.actions.saveChanges')}
                                 </Button>
                                 <Button
                                     type="button"
+                                    variant="outline"
                                     onClick={() => navigate('/Ticket')}
                                     disabled={saving}
-                                    className="flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                                    style={{
-                                        background: 'transparent',
-                                        border: '2px solid #f7f4f3',
-                                        color: '#f7f4f3'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.background = 'rgba(247, 244, 243, 0.1)';
-                                        e.currentTarget.style.borderColor = '#fc52af';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.background = 'transparent';
-                                        e.currentTarget.style.borderColor = '#f7f4f3';
-                                    }}
+                                    className="flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer"
                                 >
                                     <ArrowLeft className="w-4 h-4" />
                                     {t('common.cancel')}

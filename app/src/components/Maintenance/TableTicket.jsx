@@ -32,7 +32,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Plus, ArrowLeft, UserPlus, Sparkles } from "lucide-react";
+import { Plus, ArrowLeft, UserPlus, Sparkles, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 
 // Servicio a llamar
@@ -42,6 +42,7 @@ import CategoryService from "@/services/CategoryService";
 import TechnicianService from "@/services/TechnicianService";
 import AutoTriageService from "@/services/AutoTriageService";
 import AssignmentService from "@/services/AssignmentService";
+import ValoracionService from "@/services/ValoracionService";
 
 // ========================================
 // CONFIGURACIÓN DE TABLA
@@ -71,18 +72,44 @@ export default function TableTickets() {
     const [error, setError] = useState('');
     // Booleano para establecer si se ha recibido respuesta
     const [loaded, setLoaded] = useState(true);
-    // Variable temporal (ejemplo) para seleccionar usuario
-    const id = 1;
     const [user, setUser] = useState({});
     const [autoTriage, setAutoTriage] = useState(null);
+    const [valoraciones, setValoraciones] = useState({});
 
     // Estado de datos y UI
     let dataToSend = {};
 
+    // Función para recargar valoraciones
+    const recargarValoraciones = async () => {
+        try {
+            const valResponse = await ValoracionService.getAllValoraciones();
+            if (valResponse.data.success && valResponse.data.data) {
+                const valMap = {};
+                valResponse.data.data.forEach(val => {
+                    valMap[val.Id_Ticket] = true;
+                });
+                setValoraciones(valMap);
+            }
+        } catch (valErr) {
+            console.log('No se pudieron cargar valoraciones:', valErr);
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // Obtener usuario actual desde localStorage
+                const userSession = localStorage.getItem('user');
+                if (!userSession) {
+                    toast.error('Sesión no iniciada');
+                    navigate('/login');
+                    return;
+                }
+
+                const currentUser = JSON.parse(userSession);
+                const id = currentUser.Id || currentUser.id;
                 let rol = null;
+                
                 const [userData] = await Promise.all([
                     UserService.getUserById(id),
                 ]);
@@ -111,6 +138,9 @@ export default function TableTickets() {
                 if (autoTriageResponse.data.success) {
                     setAutoTriage(autoTriageResponse.data.data);
                 }
+
+                // Cargar valoraciones
+                await recargarValoraciones();
             } catch (err) {
                 // Si el error no es por cancelación, se registra 
                 if (err.name !== "AbortError") setError(err.message);
@@ -120,6 +150,30 @@ export default function TableTickets() {
             }
         };
         fetchData()
+    }, [navigate]);
+
+    // Efecto para recargar cuando el componente se vuelve visible (navegación)
+    useEffect(() => {
+        const handleFocus = () => {
+            // Recargar valoraciones cuando la ventana vuelve a tener foco
+            recargarValoraciones();
+        };
+
+        window.addEventListener('focus', handleFocus);
+        
+        // Listener para cuando se vuelve a esta página
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                recargarValoraciones();
+            }
+        };
+        
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, []);
 
     //Asignar Auto
@@ -288,50 +342,80 @@ export default function TableTickets() {
                 <h1 className="text-3xl font-bold font-shrikhand tracking-wider" style={{ fontFamily: "Shrikhand" }}>{t('tables.tickets.title')}</h1>
 
                 <div className="flex items-center gap-3">
-                    {/* Botón de Asignación Automática */}
+                    {/* Botón de Asignación Automática solo para rol 1 */}
+                    {user.Rol == 1 || user.Rol == '1' ? (
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="default"
+                                        onClick={() => { AsignarAuto() }}
+                                        className="cursor-pointer gap-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 hover:from-purple-500/30 hover:to-blue-500/30 transition-all duration-300 shadow-lg hover:shadow-purple-500/50 relative overflow-hidden"
+                                        style={{
+                                            border: '2px solid transparent',
+                                            backgroundImage: 'linear-gradient(rgba(17, 24, 39, 1), rgba(17, 24, 39, 1)), linear-gradient(90deg, #a855f7, #3b82f6, #a855f7)',
+                                            backgroundOrigin: 'border-box',
+                                            backgroundClip: 'padding-box, border-box',
+                                            animation: 'border-spin 3s linear infinite',
+                                        }}
+                                    >
+                                        <Sparkles className="h-5 w-5 text-purple-400 animate-pulse" />
+                                        <span className="font-semibold">
+                                            {t('Asignación Automática')}
+                                        </span>
+                                        <style>{`
+                                            @keyframes border-spin {
+                                                0% {
+                                                    background-image: linear-gradient(rgba(17, 24, 39, 1), rgba(17, 24, 39, 1)), linear-gradient(0deg, #a855f7, #3b82f6, #a855f7);
+                                                }
+                                                25% {
+                                                    background-image: linear-gradient(rgba(17, 24, 39, 1), rgba(17, 24, 39, 1)), linear-gradient(90deg, #a855f7, #3b82f6, #a855f7);
+                                                }
+                                                50% {
+                                                    background-image: linear-gradient(rgba(17, 24, 39, 1), rgba(17, 24, 39, 1)), linear-gradient(180deg, #a855f7, #3b82f6, #a855f7);
+                                                }
+                                                75% {
+                                                    background-image: linear-gradient(rgba(17, 24, 39, 1), rgba(17, 24, 39, 1)), linear-gradient(270deg, #a855f7, #3b82f6, #a855f7);
+                                                }
+                                                100% {
+                                                    background-image: linear-gradient(rgba(17, 24, 39, 1), rgba(17, 24, 39, 1)), linear-gradient(360deg, #a855f7, #3b82f6, #a855f7);
+                                                }
+                                            }
+                                        `}</style>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{t('Asignar automáticamente tickets')}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    ) : null}
+
+                    {/* Botón Ver Valoraciones - Todos los roles */}
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
                                     variant="outline"
                                     size="default"
-                                    onClick={() => { AsignarAuto() }}
-                                    className="cursor-pointer gap-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 hover:from-purple-500/30 hover:to-blue-500/30 transition-all duration-300 shadow-lg hover:shadow-purple-500/50 relative overflow-hidden"
-                                    style={{
-                                        border: '2px solid transparent',
-                                        backgroundImage: 'linear-gradient(rgba(17, 24, 39, 1), rgba(17, 24, 39, 1)), linear-gradient(90deg, #a855f7, #3b82f6, #a855f7)',
-                                        backgroundOrigin: 'border-box',
-                                        backgroundClip: 'padding-box, border-box',
-                                        animation: 'border-spin 3s linear infinite',
-                                    }}
+                                    onClick={() => navigate('/Review')}
+                                    className="cursor-pointer gap-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 hover:from-yellow-500/30 hover:to-orange-500/30 border-yellow-500/50 hover:border-yellow-500 transition-all duration-200"
                                 >
-                                    <Sparkles className="h-5 w-5 text-purple-400 animate-pulse" />
+                                    <Star className="h-5 w-5 text-yellow-400" />
                                     <span className="font-semibold">
-                                        {t('Asignación Automática')}
+                                        {user.Rol == '1' ? t('Dashboard de Valoraciones') : 
+                                         user.Rol == '2' ? t('Mis Valoraciones') : 
+                                         t('Ver Valoraciones')}
                                     </span>
-                                    <style>{`
-                                        @keyframes border-spin {
-                                            0% {
-                                                background-image: linear-gradient(rgba(17, 24, 39, 1), rgba(17, 24, 39, 1)), linear-gradient(0deg, #a855f7, #3b82f6, #a855f7);
-                                            }
-                                            25% {
-                                                background-image: linear-gradient(rgba(17, 24, 39, 1), rgba(17, 24, 39, 1)), linear-gradient(90deg, #a855f7, #3b82f6, #a855f7);
-                                            }
-                                            50% {
-                                                background-image: linear-gradient(rgba(17, 24, 39, 1), rgba(17, 24, 39, 1)), linear-gradient(180deg, #a855f7, #3b82f6, #a855f7);
-                                            }
-                                            75% {
-                                                background-image: linear-gradient(rgba(17, 24, 39, 1), rgba(17, 24, 39, 1)), linear-gradient(270deg, #a855f7, #3b82f6, #a855f7);
-                                            }
-                                            100% {
-                                                background-image: linear-gradient(rgba(17, 24, 39, 1), rgba(17, 24, 39, 1)), linear-gradient(360deg, #a855f7, #3b82f6, #a855f7);
-                                            }
-                                        }
-                                    `}</style>
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>{t('Asignar tickets pendientes automáticamente')}</p>
+                                <p>
+                                    {user.Rol == '1' ? t('Ver todas las valoraciones de servicio') : 
+                                     user.Rol == '2' ? t('Ver valoraciones de tus tickets') : 
+                                     t('Ver tus valoraciones de servicio')}
+                                </p>
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -414,6 +498,61 @@ export default function TableTickets() {
                                                 <TooltipContent>{t('Asignar Ticket a Técnico')}</TooltipContent>
                                             </Tooltip>
                                         )}
+                                        {row.Estado == 'Resuelto' && (user.Rol == '1' || user.Rol == '3') && (
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            toast.info(`Cerrando ticket #${row.Id}`);
+                                                            navigate(`/ChangeState/${row.Id}`);
+                                                        }}
+                  ñ                                      aria-label={`Cerrar Ticket ${row.Id}`}
+                                                        className="cursor-pointer gap-2 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500/50 hover:bg-green-500/20 hover:border-green-500 transition-all duration-200"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                        </svg>
+                                                        <span className="text-xs font-semibold">
+                                                            {t('Cerrar')}
+                                                        </span>
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>{t('Cerrar Ticket')}</TooltipContent>
+                                            </Tooltip>
+                                        )}
+                                        {(() => {
+                                            // Verificar condiciones para mostrar botón de valorar
+                                            const estaCerrado = row.Estado === 'Cerrado' || row.Estado === 'cerrado';
+                                            const esCliente = user.Rol == 3 || user.Rol == '3';
+                                            const esDueno = String(row.Id_Usuario) === String(user.Id);
+                                            const yaValorado = valoraciones[row.Id] === true;
+                                            
+                                            // Solo mostrar si: está cerrado, es cliente, es dueño, y NO ha sido valorado
+                                            return estaCerrado && esCliente && esDueno && !yaValorado && (
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                toast.info(`Valorando ticket #${row.Id}`);
+                                                                navigate(`/Ticket/${row.Id}`);
+                                                            }}
+                                                            aria-label={`Valorar Ticket ${row.Id}`}
+                                                            className="cursor-pointer gap-2 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/50 hover:bg-yellow-500/20 hover:border-yellow-500 transition-all duration-200"
+                                                        >
+                                                            <Star className="h-4 w-4" />
+                                                            <span className="text-xs font-semibold">
+                                                                {t('Valorar')}
+                                                            </span>
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>{t('Valorar Servicio')}</TooltipContent>
+                                                </Tooltip>
+                                            );
+                                        })()}
                                     </TooltipProvider>
                                 </TableCell>
                             </TableRow>

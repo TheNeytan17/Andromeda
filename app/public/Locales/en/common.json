@@ -263,6 +263,67 @@
       "noRuleApplied": "Not applied (manual assignment)",
       "ticketInfo": "Ticket Information",
       "timeLimit": "Time Limit"
+    },
+    "assignments": {
+      "board": {
+        "title": "Assignments Board",
+        "loading": "Loading assignments...",
+        "noAssignments": "No assignments available",
+        "noAssignmentsWeek": "No assignments in this week",
+        "viewLabel": "View",
+        "viewKanban": "Kanban",
+        "viewWeek": "Weekly",
+        "filterLabel": "Filter by",
+        "filterAll": "All technicians",
+        "roleAdmin": "Administrator",
+        "roleTech": "Technician",
+        "backToHome": "Back to Home",
+        "goToLogin": "Go to Login",
+        "previousWeek": "Previous week",
+        "nextWeek": "Next week",
+        "today": "Today",
+        "date": "Date",
+        "status": {
+          "pending": "Pending",
+          "assigned": "Assigned",
+          "inProgress": "In Progress",
+          "resolved": "Resolved",
+          "closed": "Closed"
+        },
+        "days": {
+          "monday": "Monday",
+          "tuesday": "Tuesday",
+          "wednesday": "Wednesday",
+          "thursday": "Thursday",
+          "friday": "Friday",
+          "saturday": "Saturday",
+          "sunday": "Sunday"
+        },
+        "sla": {
+          "consumed": "consumed",
+          "completed": "Completed",
+          "overdueDays": "Overdue {{count}} day ago",
+          "overdueDays_plural": "Overdue {{count}} days ago",
+          "overdueHours": "Overdue {{count}} hour ago",
+          "overdueHours_plural": "Overdue {{count}} hours ago",
+          "overdueRecently": "Overdue recently"
+        },
+        "tooltip": {
+          "viewDetail": "View detail"
+        },
+        "errors": {
+          "userNotFound": "Could not load user information",
+          "noSession": "No Active Session",
+          "noSessionMessage": "You must log in to access the assignments board. Please sign in with your Andromeda account.",
+          "invalidSession": "Session is invalid or has expired",
+          "accessDenied": "Access Denied",
+          "accessDeniedMessage": "You don't have permission to access the assignments board. This section is available only for administrators and technicians.",
+          "loadFailed": "Error loading assignments"
+        },
+        "messages": {
+          "loadSuccess": "Assignments loaded successfully"
+        }
+      }
     }
   },
   "technician": {

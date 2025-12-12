@@ -20,13 +20,11 @@ import UserService from '@/services/UserService';
 import TicketService from '@/services/TicketService';
 import SLAService from '@/services/SLAService';
 import StateService from '@/services/StateService';
+import TechnicianService from '@/services/TechnicianService';
 import { formatDate } from '@/lib/utils';
 
-//Id Solicitante
-const IdUser = 1;
-
 // ========================================
-// COMPONENTE: Crear/Editar Ticket
+// COMPONENTE: Cambiar Estado del Ticket
 // ========================================
 export function ChangeState() {
     const { t, lang } = useI18n();
@@ -34,7 +32,6 @@ export function ChangeState() {
     const [fileURL, setFileURL] = useState(null);
     const navigate = useNavigate();
     const { id } = useParams();
-    const isCreateMode = !id || id === 'new';
 
     // Estado de datos y UI
     const [loading, setLoading] = useState(true);
@@ -64,8 +61,6 @@ export function ChangeState() {
         }
     };
 
-
-
     // Cargar datos del usuario solicitante
     useEffect(() => {
         const fetchUsuario = async () => {
@@ -91,8 +86,6 @@ export function ChangeState() {
         fetchUsuario();
     }, [id]);
 
-
-
     const validateForm = () => {
         let isValid = true;
         if (!formData.Observaciones.trim()) {
@@ -116,14 +109,47 @@ export function ChangeState() {
         setSaving(true);
 
         try {
+            // Obtener usuario logueado
+            const userSession = localStorage.getItem('user');
+            let loggedUserId = null;
+            
+            if (userSession) {
+                const parsedUser = JSON.parse(userSession);
+                loggedUserId = parsedUser?.Id || parsedUser?.id || parsedUser?.ID || parsedUser?.userId || parsedUser?.UserId;
+            }
+
+            if (!loggedUserId) {
+                toast.error(t('Sesión no válida. Por favor, inicia sesión nuevamente.'));
+                setSaving(false);
+                return;
+            }
+
+            // Obtener el estado actual y calcular el nuevo
+            const estadoActual = Number(ticket.Estado) || 0;
+            let estadoNuevo = estadoActual + 1;
+            
+            // Si viene del botón "Cerrar Ticket" en tickets Resueltos, forzar estado 5 (Cerrado)
+            if (estadoActual === 4 || ticket.Estado === 'Resuelto' || ticket.Estado === 'resuelto') {
+                estadoNuevo = 5; // Cerrado
+            }
+            
+            console.log('Estado Debug:', {
+                estadoActual,
+                estadoNuevo,
+                ticketEstado: ticket.Estado,
+                ticketEstadoNombre: ticket.NombreEstado,
+                idTecnico: ticket.Id_Tecnico
+            });
+            
             const dataToSend = {
                 Id_Ticket: ticket.Id,
                 Observaciones: formData.Observaciones,
-                Estado_Anterior: Number(ticket.Estado),
-                Estado_Nuevo: Number(ticket.Estado) + 1,
+                Estado_Anterior: estadoActual || 4, // Si es 0, asumir que viene de Resuelto
+                Estado_Nuevo: estadoNuevo,
                 Archivo: file,
                 Fecha_Cambio: new Date().toISOString().slice(0, 19).replace('T', ' '),
-                Id_Usuario_Responsable: IdUser
+                Id_Usuario_Responsable: loggedUserId,
+                Id_Tecnico: ticket.Id_Tecnico // Pasar el ID del técnico al backend
             };
 
             console.log('Datos a enviar:', dataToSend);
@@ -141,20 +167,23 @@ export function ChangeState() {
             let response;
             response = await TicketService.createHistory(formDataToSend);
 
+            // NO manejar CargaTrabajo aquí - el backend lo hace automáticamente
+            // en updateStateTicket() cuando detecta que el ticket se cerró
+
             console.log('Respuesta del servidor:', response.data);
 
             if (response.data.success) {
-                toast.success(isCreateMode ? t('ticket.messages.createSuccess') : t('ticket.messages.updateSuccess'));
+                toast.success(t('ticket.messages.updateSuccess') || 'Estado actualizado exitosamente');
                 setTimeout(() => {
-                    navigate('/Assignment');
+                    navigate('/'); // Ir a home en lugar de Assignment
                 }, 1500);
             } else {
-                toast.error(isCreateMode ? t('ticket.messages.createError') : t('ticket.messages.updateError'));
+                toast.error(t('ticket.messages.updateError') || 'Error al actualizar el estado');
             }
         } catch (err) {
             console.error('Error completo:', err);
             console.error('Respuesta del error:', err.response?.data);
-            toast.error(isCreateMode ? t('ticket.messages.createError') : t('ticket.messages.updateError'));
+            toast.error(t('ticket.messages.updateError') || 'Error al actualizar el estado');
         } finally {
             setSaving(false);
         }
@@ -171,7 +200,7 @@ export function ChangeState() {
         <div className="max-w-5xl mx-auto py-12 px-6 md:px-10 lg:px-16">
             <div className="space-y-6">
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-                    {isCreateMode ? t('ticket.titleCreate') : t('Actualizar Estado del Ticket')}
+                    {t('Actualizar Estado del Ticket')}
                 </h1>
 
                 <ToastContainer
@@ -425,11 +454,11 @@ export function ChangeState() {
                                     }}
                                 >
                                     <Save className="w-4 h-4" />
-                                    {saving ? t('common.saving') : isCreateMode ? t('ticket.actions.create') : t('Actualizar')}
+                                    {saving ? t('common.saving') : t('Actualizar')}
                                 </Button>
                                 <Button
                                     type="button"
-                                    onClick={() => navigate('/Assignment')}
+                                    onClick={() => navigate('/')}
                                     disabled={saving}
                                     className="flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg"
                                     style={{

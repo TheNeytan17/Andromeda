@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import error from "../../assets/error.jpg";
+import error from "../../assets/error.png";
 
 export function PageNotFound() {
    const navigate = useNavigate();
@@ -17,18 +17,7 @@ export function PageNotFound() {
             alt="404 Error"
             className="rounded-lg w-full h-auto max-w-xs"
           />
-        </div>
-
-        {/* Texto */}
-        <div className="md:col-span-8 text-center md:text-left">
-          <h1 className="text-3xl font-bold text-foreground mb-4">
-            Recurso no encontrado
-          </h1>
-          <p className="text-lg text-muted-foreground mb-6">
-            La página que está buscando podría haber sido eliminada, cambió su
-            nombre o no está disponible temporalmente.
-          </p>
-
+          
           {/* Botón volver */}
           <Button
             onClick={() => navigate(-1)}
@@ -38,6 +27,7 @@ export function PageNotFound() {
             Volver
           </Button>
         </div>
+
       </div>
     </main>
   );

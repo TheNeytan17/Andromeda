@@ -42,9 +42,24 @@ export default function TableCategories() {
     const [data, setData] = useState(null);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
+    const [unauthorized, setUnauthorized] = useState(false);
 
-    // Cargar categorías al montar
     useEffect(() => {
+        const userSession = localStorage.getItem('user');
+        if (!userSession) {
+            setUnauthorized(true);
+            return;
+        }
+        const currentUser = JSON.parse(userSession);
+        const rol = currentUser.Rol || currentUser.rol || currentUser.role;
+        if (rol !== 1 && rol !== '1') {
+            setUnauthorized(true);
+            return;
+        }
+    }, []);
+
+    useEffect(() => {
+        if (unauthorized) return;
         const fetchData = async () => {
             try {
                 const response = await CategoryService.getCategories();
@@ -59,7 +74,22 @@ export default function TableCategories() {
             }
         };
         fetchData();
-    }, []);
+    }, [unauthorized]);
+
+    if (unauthorized) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                <div className="text-6xl text-pink-500 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-20 h-20 mx-auto">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h2 className="text-3xl font-bold text-pink-400 mb-2">Acceso Denegado</h2>
+                <p className="text-lg text-zinc-300 mb-6 text-center">No tienes permisos para acceder a la gestión de categorías. Esta sección está disponible solo para administradores.</p>
+                <button onClick={() => window.location.href = '/'} className="px-6 py-3 rounded bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold shadow-lg hover:from-pink-600 hover:to-purple-600 transition-all">Volver al Inicio</button>
+            </div>
+        );
+    }
 
     if (loading) return <LoadingGrid type="grid" />;
     if (error) return <ErrorAlert title={t('tables.categories.loadError')} message={error} />;
@@ -87,42 +117,22 @@ export default function TableCategories() {
 
             <div 
                 className="rounded-lg border-2 border-[#fc52af] backdrop-blur-lg overflow-hidden"
-                style={{
-                    backgroundColor: 'rgba(252, 82, 175, 0.05)',
-                    boxShadow: '0 8px 32px 0 rgba(252, 82, 175, 0.15)'
-                }}
+                style={{ background: 'rgba(252, 82, 175, 0.04)' }}
             >
                 <Table>
-                    <TableHeader 
-                        style={{
-                            backgroundColor: 'rgba(255, 143, 87, 0.2)',
-                            borderBottom: '2px solid #fc52af'
-                        }}
-                    >
+                    <TableHeader>
                         <TableRow>
-                            {categoryColumns.map((column) => (
-                                <TableHead key={column.key} className="text-left font-semibold" style={{ color: '#f7f4f3' }}>
-                                    {column.label}
-                                </TableHead>
+                            {categoryColumns.map((col) => (
+                                <TableHead key={col.key}>{col.label}</TableHead>
                             ))}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.data.map((row, index) => (
-                            <TableRow 
-                                key={row.Id}
-                                style={{
-                                    borderBottom: index < data.data.length - 1 ? '1px solid rgba(252, 82, 175, 0.2)' : 'none'
-                                }}
-                            >
-                                <TableCell className="font-medium" style={{ color: '#f7f4f3' }}>{row.Nombre}</TableCell>
-                                <TableCell className="text-muted-foreground">
-                                    {row.SLA_Descripcion
-                                        || (row.Tiempo_Respuesta != null && row.Tiempo_Resolucion != null
-                                                    ? `${t('tables.categories.slaShort.response')} ${row.Tiempo_Respuesta}${t('units.minShort')} · ${t('tables.categories.slaShort.resolution')} ${row.Tiempo_Resolucion}${t('units.minShort')}`
-                                                    : t('common.notAvailable'))}
-                                </TableCell>
-                                <TableCell className="flex justify-start items-center gap-1">
+                        {data.data.map((row) => (
+                            <TableRow key={row.Id}>
+                                <TableCell>{row.Nombre}</TableCell>
+                                <TableCell>{row.SLA}</TableCell>
+                                <TableCell>
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>

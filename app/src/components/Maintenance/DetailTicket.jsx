@@ -20,13 +20,19 @@ import {
     XCircle,
     Target,
     FolderOpen,
-    ArrowLeft
+    ArrowLeft,
+    Star
 } from "lucide-react";
 import { LoadingGrid } from '../ui/custom/LoadingGrid';
 import { EmptyState } from '../ui/custom/EmptyState';
+import { toast } from 'react-toastify';
 
-// Servicio a llamar
+// Servicios
 import TicketService from "@/services/TicketService";
+import ValoracionService from "@/services/ValoracionService";
+
+// Componentes
+import RateTicket from './RateTicket';
 
 // ========================================
 // MAPEOS / CONSTANTES
@@ -42,13 +48,26 @@ export function DetailTicket() {
     const [ticketResp, setData] = useState(null); // Respuesta cruda del API
     const [error, setError] = useState(null);     // Error de carga
     const [loading, setLoading] = useState(true); // Flag de carga
+    const [showRateModal, setShowRateModal] = useState(false); // Modal de valoración
+    const [currentUser, setCurrentUser] = useState(null); // Usuario actual
     // Base URL para imágenes adjuntas al historial
     const BASE_URL = import.meta.env.VITE_BASE_URL + "uploads";
 
     // ========================================
-    // EFECTO: CARGA DE TICKET POR ID
+    // EFECTO: CARGA DE TICKET POR ID Y USUARIO
     // ========================================
-    useEffect(() => { 
+    useEffect(() => {
+        // Obtener usuario actual
+        const userSession = localStorage.getItem('user');
+        if (userSession) {
+            try {
+                const parsedUser = JSON.parse(userSession);
+                setCurrentUser(parsedUser);
+            } catch (e) {
+                console.error('Error al parsear usuario:', e);
+            }
+        }
+
         const fetchData = async () => { 
             try { 
                 const response = await TicketService.getTicketById(id); 
@@ -316,30 +335,34 @@ export function DetailTicket() {
                         {/* Valoración */}
                         {ticket.Valoracion && (() => {
                             const val = Array.isArray(ticket.Valoracion) ? ticket.Valoracion[0] : ticket.Valoracion;
-                            if (!val) return null;
+                            // Solo mostrar si hay un puntaje válido (no null, no undefined, no N/D)
+                            if (!val || !val.Puntaje || val.Puntaje === 'N/D') return null;
+                            
                             return (
                                 <div className="pt-4" style={{ borderTop: '1px solid #fc52af' }}>
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <Target className="h-5 w-5" style={{ color: '#fbb25f' }} />
-                                        <span className="font-semibold text-lg" style={{ color: '#f7f4f3' }}>{t('details.ticket.userRating')}:</span>
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center gap-3">
+                                            <Target className="h-5 w-5" style={{ color: '#fbb25f' }} />
+                                            <span className="font-semibold text-lg" style={{ color: '#f7f4f3' }}>{t('details.ticket.userRating')}:</span>
+                                        </div>
                                     </div>
                                     <div className="grid gap-6 md:grid-cols-2">
                                         {/* Columna Izquierda */}
                                         <div className="space-y-3">
                                             <div>
                                                 <span className="font-medium" style={{ color: '#f7f4f3' }}>{t('details.ticket.user')}:</span>
-                                                <p className="text-muted-foreground mt-1">{ticket.UsuarioSolicitante?.Nombre || t('common.notAvailable')}</p>
+                                                <p className="text-muted-foreground mt-1">{val.NombreUsuario || ticket.UsuarioSolicitante?.Nombre || t('common.notAvailable')}</p>
                                             </div>
                                             <div>
                                                 <span className="font-medium" style={{ color: '#f7f4f3' }}>{t('details.ticket.score')}:</span>
                                                 <div className="mt-1">
                                                     <Badge 
                                                         style={{
-                                                            backgroundColor: val.Puntaje >= 4 ? '#22c55e' : val.Puntaje >= 3 ? '#eab308' : '#ef4444',
+                                                            backgroundColor: Number(val.Puntaje) >= 4 ? '#22c55e' : Number(val.Puntaje) >= 3 ? '#eab308' : '#ef4444',
                                                             color: 'white'
                                                         }}
                                                     >
-                                                        {val.Puntaje || t('common.notAvailable')} / 5
+                                                        {val.Puntaje} / 5
                                                     </Badge>
                                                 </div>
                                             </div>
@@ -366,9 +389,100 @@ export function DetailTicket() {
                                 </div>
                             );
                         })()}
+
+                        {/* Botón para valorar (solo si está cerrado, no tiene valoración, y es cliente) */}
+                        {(() => {
+                            const tieneValoracion = ticket.Valoracion && (Array.isArray(ticket.Valoracion) ? ticket.Valoracion.length > 0 && ticket.Valoracion[0]?.Puntaje : ticket.Valoracion?.Puntaje);
+                            
+                            // Verificar múltiples formas en que puede venir el estado
+                            const estadoId = ticket.Estado?.Id || ticket.Estado?.id || ticket.Id_Estado || ticket.id_estado || ticket.estado?.Id || ticket.estado?.id;
+                            const estadoString = typeof ticket.Estado === 'string' ? ticket.Estado : (ticket.Estado?.Nombre || ticket.Estado?.nombre || ticket.NombreEstado || ticket.estado?.Nombre);
+                            
+                            // Ticket está cerrado si: ID es 5 O el nombre incluye "cerrado" o "closed"
+                            const estaCerrado = estadoId === 5 || estadoId === '5' || 
+                                               estadoString?.toLowerCase().includes('cerrado') || 
+                                               estadoString?.toLowerCase().includes('closed');
+                            
+                            // Solo permitir a clientes (Rol = 3) y que sean dueños del ticket
+                            const esCliente = currentUser && (currentUser.Rol === 3 || currentUser.Rol === '3');
+                            const esDuenoTicket = currentUser && ticket.Id_Usuario && 
+                                                 (currentUser.Id === ticket.Id_Usuario || currentUser.id === ticket.Id_Usuario);
+                            
+                            // Debug logs
+                            console.log('Valoración Debug:', {
+                                tieneValoracion,
+                                estaCerrado,
+                                esCliente,
+                                esDuenoTicket,
+                                rolUsuario: currentUser?.Rol,
+                                idUsuario: currentUser?.Id || currentUser?.id,
+                                idUsuarioTicket: ticket.Id_Usuario
+                            });
+
+                            if (!tieneValoracion && estaCerrado && esCliente && esDuenoTicket) {
+                                return (
+                                    <div className="pt-4" style={{ borderTop: '1px solid #fc52af' }}>
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center gap-3">
+                                                <Star className="h-5 w-5" style={{ color: '#fbb25f' }} />
+                                                <span className="font-semibold text-lg" style={{ color: '#f7f4f3' }}>Valorar Servicio</span>
+                                            </div>
+                                        </div>
+                                        <p className="text-muted-foreground mb-4">
+                                            Como cliente de este ticket cerrado, puedes compartir tu experiencia con el servicio recibido.
+                                        </p>
+                                        <Button
+                                            onClick={() => setShowRateModal(true)}
+                                            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
+                                        >
+                                            <Star className="w-4 h-4 mr-2" />
+                                            Valorar Servicio Recibido
+                                        </Button>
+                                    </div>
+                                );
+                            }
+                            return null;
+                        })()}
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Modal de valoración */}
+            {showRateModal && currentUser && (
+                <RateTicket
+                    ticketId={parseInt(id)}
+                    userId={currentUser.Id || currentUser.id}
+                    ticketTitle={ticket?.Titulo}
+                    onClose={() => setShowRateModal(false)}
+                    onSuccess={(newValoracion) => {
+                        console.log('Valoración creada exitosamente, actualizando ticket:', newValoracion);
+                        
+                        // Actualizar el ticket con la nueva valoración
+                        setData(prev => {
+                            const updated = {
+                                ...prev,
+                                data: {
+                                    ...prev.data,
+                                    Valoracion: Array.isArray(newValoracion) ? newValoracion : [newValoracion]
+                                }
+                            };
+                            console.log('Estado actualizado:', updated);
+                            return updated;
+                        });
+                        
+                        // Cerrar modal después de actualizar
+                        setShowRateModal(false);
+                        
+                        // Mostrar toast de confirmación
+                        toast.success('¡Valoración guardada! La página se actualizará.');
+                        
+                        // Recargar la página después de 2 segundos para mostrar la valoración
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    }}
+                />
+            )}
 
             {/* Botón para volver */}
             <Button

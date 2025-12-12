@@ -35,6 +35,7 @@ require_once "models/PriorityModel.php";
 require_once "models/StateModel.php";
 require_once "models/AutoTriageModel.php";
 require_once "models/NotificationModel.php";
+require_once "models/IAModel.php";
 
 /***--- Agregar todos los controladores*/
 require_once "controllers/UserController.php";
@@ -50,6 +51,8 @@ require_once "controllers/StateController.php";
 require_once "controllers/AutoTriageController.php";
 require_once "controllers/NotificationController.php";
 require_once "controllers/AuthController.php";
+require_once "controllers/IAController.php";
+require_once "controllers/ValoracionController.php";
 
 
 //Enrutador

@@ -352,3 +352,61 @@
 }
 
 /* Eliminado: animación de eventos al hacer scroll */
+
+/* Estilos para tablas de IA en el chat */
+.ai-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.ai-table-container table {
+  width: 100%;
+  font-size: 0.75rem;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+}
+
+.ai-table-container th {
+  background-color: rgba(111, 60, 130, 0.2);
+  border: 1px solid rgba(111, 60, 130, 0.3);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: #f7f4f3;
+  white-space: nowrap;
+}
+
+.ai-table-container td {
+  border: 1px solid rgba(111, 60, 130, 0.3);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.7rem;
+  color: #f7f4f3;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-table-container tbody tr:nth-child(even) {
+  background-color: rgba(42, 21, 51, 0.3);
+}
+
+.ai-table-container tbody tr:nth-child(odd) {
+  background-color: rgba(61, 35, 71, 0.2);
+}
+
+.ai-table-container tbody tr:hover {
+  background-color: rgba(111, 60, 130, 0.1);
+}
+
+.ai-table-container p {
+  margin: 0.5rem 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.ai-table-container .text-xs {
+  font-size: 0.65rem;
+  opacity: 0.6;
+  margin-top: 0.5rem;
+}

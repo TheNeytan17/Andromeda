@@ -42,4 +42,35 @@ class User
         }
         $response->toJSON($result);
     }
+
+    public function update($id)
+    {
+        $response = new Response();
+        $request = new Request();
+        $data = (array) $request->getJSON();
+
+        $User = new UserModel();
+        $result = $User->update($id, $data);
+
+        if ($result['success']) {
+            $response->status(200);
+        } else {
+            $response->status(400);
+        }
+        $response->toJSON($result);
+    }
+
+    public function delete($id)
+    {
+        $response = new Response();
+        $User = new UserModel();
+        $result = $User->delete($id);
+
+        if ($result['success']) {
+            $response->status(200);
+        } else {
+            $response->status(400);
+        }
+        $response->toJSON($result);
+    }
 }

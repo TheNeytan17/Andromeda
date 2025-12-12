@@ -459,43 +459,17 @@ export function CreateCategory() {
                                 <Button
                                     type="submit"
                                     disabled={saving}
-                                    className="flex items-center gap-2 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                                    style={{
-                                        background: 'rgba(247, 244, 243, 0.15)',
-                                        backdropFilter: 'blur(12px)',
-                                        border: '2px solid rgba(247, 244, 243, 0.3)',
-                                        color: '#f7f4f3'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.background = 'rgba(247, 244, 243, 0.25)';
-                                        e.currentTarget.style.borderColor = 'rgba(247, 244, 243, 0.5)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.background = 'rgba(247, 244, 243, 0.15)';
-                                        e.currentTarget.style.borderColor = 'rgba(247, 244, 243, 0.3)';
-                                    }}
+                                    className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <Save className="w-4 h-4" />
                                     {saving ? t('common.saving') : isCreateMode ? t('category.actions.create') : t('category.actions.saveChanges')}
                                 </Button>
                                 <Button
                                     type="button"
+                                    variant="outline"
                                     onClick={() => navigate('/TableCategory')}
                                     disabled={saving}
-                                    className="flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                                    style={{
-                                        background: 'transparent',
-                                        border: '2px solid #f7f4f3',
-                                        color: '#f7f4f3'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.background = 'rgba(247, 244, 243, 0.1)';
-                                        e.currentTarget.style.borderColor = '#fc52af';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.background = 'transparent';
-                                        e.currentTarget.style.borderColor = '#f7f4f3';
-                                    }}
+                                    className="flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer"
                                 >
                                     <ArrowLeft className="w-4 h-4" />
                                     {t('common.cancel')}

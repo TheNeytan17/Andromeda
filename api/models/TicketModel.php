@@ -55,6 +55,7 @@ class TicketModel
 					t.Fecha_Limite_Respuesta,
 					t.Fecha_Limite_Resolucion,
 					t.Prioridad,
+					t.Estado AS Id_Estado,
 					e.Nombre AS Estado,
 					t.Id_Categoria,
 					c.Nombre AS Categoria,
@@ -242,6 +243,13 @@ class TicketModel
 					'file' => $data['Archivo']['Archivo']
 				];
 				$ImageM->uploadFile($fileData, $idHistorialEstado);
+			}
+			if($data['Estado_Nuevo'] == 4){
+				//Bajar carga trabajo del tecnico
+				$vSqlTecnico = "Update Usuario u
+								SET u.CargaTrabajo = u.CargaTrabajo - 1
+								WHERE u.Id = '{$data['Id_Usuario_Responsable']}';";
+				$this->enlace->ExecuteSQL_DML($vSqlTecnico);
 			}
 
 			$this->updateStateTicket($data['Id_Ticket'], $data);

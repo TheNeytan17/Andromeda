@@ -22,9 +22,16 @@ import { ChangeState } from './components/Maintenance/ChangeState'
 import { AssingTicket } from './components/Maintenance/AssignTicket'
 import TableAssignments from './components/Maintenance/TableAssign'
 import { DetailAssignment } from './components/Maintenance/DetailAssign'
+import TableReview from './components/Maintenance/TableReview'
 import NotificationHistory from './components/Home/NotificationHistory'
-import Login from './Login'
-import SignIn from './SignIn'
+
+//Componentes Management (Gestión de Usuarios)
+import Login from './components/Management/Login'
+import SignIn from './components/Management/SignIn'
+import TableUser from './components/Management/TableUser'
+import { DetailUser } from './components/Management/DetailUser'
+import { CreateUser } from './components/Management/CreateUser'
+import { ResetPassword } from './components/Management/ResetPassword'
 
 const rutas = createBrowserRouter([
   // Rutas de autenticación sin Layout
@@ -51,7 +58,13 @@ const rutas = createBrowserRouter([
       { path: "Assignment/:id", element: <DetailAssignment /> }, // Detalle Asignación
       { path: "ChangeState/:id", element: <ChangeState /> }, // Cambiar Estado
       { path: "AssignTicket/:id", element: <AssingTicket /> }, // Asignar Ticket
+      { path: "Review", element: <TableReview /> }, // Valoraciones de Servicio
       { path: "notifications", element: <NotificationHistory /> }, // Historial de Notificaciones
+      // Rutas Gestión de Usuarios
+      { path: "Users", element: <TableUser /> }, // Lista Usuarios
+      { path: "User/:id", element: <DetailUser /> }, // Detalle Usuario
+      { path: "CreateUser/:id", element: <CreateUser /> }, // Crear/Editar Usuario
+      { path: "ResetPassword/:id", element: <ResetPassword /> }, // Restablecer Contraseña
     ]
   }
 ])

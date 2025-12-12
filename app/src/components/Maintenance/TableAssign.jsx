@@ -4,12 +4,16 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useI18n } from "@/hooks/useI18n";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Eye, Tag, Clock, MessageCircle, CheckCircle, AlertTriangle, ChevronLeft, ChevronRight, Edit } from "lucide-react";
+import { Eye, Tag, Clock, MessageCircle, CheckCircle, AlertTriangle, ChevronLeft, ChevronRight, Edit, Filter } from "lucide-react";
 import AssignmentService from "../../services/AssignmentService";
 import TicketService from "../../services/TicketService";
+import UserService from "../../services/UserService";
+import TechnicianService from "../../services/TechnicianService";
 
 // ========================================
 // CONSTANTES
@@ -102,9 +106,18 @@ export default function TableAssignments() {
     const [loading, setLoading] = useState(true);      // Indica si está cargando datos
     const [error, setError] = useState("");            // Mensaje de error si falla la carga
 
+    // Estados de usuario y permisos
+    const [_user, setUser] = useState(null);            // Usuario actual (guardado para uso futuro)
+    const [userRole, setUserRole] = useState(null);    // Rol del usuario (1=Admin, 2=Técnico, 3=Cliente)
+    const [accessDenied, setAccessDenied] = useState(false); // Control de acceso
+
     // Estados para control de vistas
     const [viewMode, setViewMode] = useState('kanban'); // 'kanban' o 'week'
     const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date())); // Inicio de semana para vista semanal
+    
+    // Estados para filtros
+    const [selectedTechnician, setSelectedTechnician] = useState('all'); // Filtro por técnico
+    const [availableTechnicians, setAvailableTechnicians] = useState([]); // Lista de técnicos para filtro
 
     // ========================================
     // FUNCIONES AUXILIARES DE FECHAS
@@ -218,15 +231,11 @@ export default function TableAssignments() {
 
         // Priorizar días sobre horas para mensajes más significativos
         if (days > 0) {
-            return days > 1
-                ? t('assignments.board.sla.overdueDays_plural', { count: days })
-                : t('assignments.board.sla.overdueDays', { count: days });
+            return days > 1 ? `Vencido hace ${days} días` : `Vencido hace ${days} día`;
         } else if (hours > 0) {
-            return hours > 1
-                ? t('assignments.board.sla.overdueHours_plural', { count: hours })
-                : t('assignments.board.sla.overdueHours', { count: hours });
+            return hours > 1 ? `Vencido hace ${hours} horas` : `Vencido hace ${hours} hora`;
         } else {
-            return t('assignments.board.sla.overdueRecently');
+            return 'Vencido recientemente';
         }
     }
 
@@ -244,9 +253,9 @@ export default function TableAssignments() {
         // Intentar extraer el estado desde múltiples posibles campos
         const rawEstado = row.Estado ?? row.Id_Estado ?? row.Estado_Ticket ?? row.estado_ticket ?? row.estado ?? row.status ?? row.state ?? row.EstadoNombre ?? row.NombreEstado;
         return {
-            Id: row.Id ?? row.id ?? row.Id_Ticket ?? row.id_ticket,
+            Id: row.Id ?? row.id ?? row.ID ?? row.Id_Asignacion ?? row.id_asignacion,
             Id_Ticket: row.Id_Ticket ?? row.id_ticket ?? null,
-            Titulo: row.Titulo ?? row.title ?? row.Titulo_Ticket ?? `Ticket #${row.Id ?? row.id ?? row.Id_Ticket ?? ""}`,
+            Titulo: row.Titulo ?? row.title ?? row.Titulo_Ticket ?? `Ticket #${row.Id_Ticket ?? row.id_ticket ?? ""}`,
             Categoria: row.Categoria ?? row.Category ?? row.Categoria_Ticket ?? (row.CategoriaId ? String(row.CategoriaId) : "General"),
             Estado: mapTicketEstadoToColumn(rawEstado) ?? "pending",
             OriginalEstadoRaw: rawEstado ?? null,
@@ -338,19 +347,92 @@ export default function TableAssignments() {
     // ========================================
     /**
      * Hook que se ejecuta al montar el componente
-     * 1. Obtiene todas las asignaciones desde la API
-     * 2. Enriquece cada asignación con datos del ticket asociado
-     * 3. Calcula porcentajes SLA actualizados
+     * 1. Verifica usuario y permisos
+     * 2. Obtiene todas las asignaciones desde la API
+     * 3. Enriquece cada asignación con datos del ticket asociado
+     * 4. Calcula porcentajes SLA actualizados
      */
     useEffect(() => {
         let mounted = true;
 
         const fetchData = async () => {
             try {
+                // Paso 0: Verificar si hay sesión activa
+                const userSession = localStorage.getItem('user');
+                if (!userSession) {
+                    if (mounted) {
+                        setAccessDenied(true);
+                        setLoading(false);
+                        toast.error('Sesión No Iniciada');
+                    }
+                    return;
+                }
+
+                // Obtener ID del usuario desde localStorage
+                let userId;
+                try {
+                    const parsedUser = JSON.parse(userSession);
+                    userId = parsedUser?.Id || parsedUser?.id || parsedUser?.ID;
+                } catch (e) {
+                    console.error('Error al parsear usuario:', e);
+                    userId = 1; // Fallback temporal
+                }
+
+                if (!userId) {
+                    throw new Error('La sesión es inválida o ha expirado');
+                }
+
+                // Verificar usuario y permisos
+                const userData = await UserService.getUserById(userId);
+                
+                if (!userData?.data?.success) {
+                    throw new Error('No se pudo cargar la información del usuario');
+                }
+                
+                const currentUser = userData.data.data;
+                const role = parseInt(currentUser.Rol) || parseInt(currentUser.rol) || currentUser.Rol;
+                
+                if (mounted) {
+                    setUser(currentUser);
+                    setUserRole(role);
+                }
+
+                // Verificar permisos: Solo Admin (rol 1) y Técnico (rol 2) pueden ver asignaciones
+                // Cliente (rol 3) no tiene acceso
+                if (role !== 1 && role !== 2) {
+                    if (mounted) {
+                        setAccessDenied(true);
+                        setLoading(false);
+                        if (role === 3) {
+                            toast.error('Los clientes no tienen acceso al tablero de asignaciones');
+                        } else {
+                            toast.error('Acceso Denegado: Permisos insuficientes');
+                        }
+                    }
+                    return;
+                }
+
                 // Paso 1: Obtener asignaciones base
                 const res = await AssignmentService.getAssignments();
                 const rows = res?.data?.data ?? res?.data ?? [];
-                const base = (Array.isArray(rows) ? rows : []).map(mapAssignment);
+                let base = (Array.isArray(rows) ? rows : []).map(mapAssignment);
+                
+                // Eliminar duplicados - mantener solo la asignación más reciente por ticket
+                const ticketMap = new Map();
+                base.forEach(a => {
+                    const existing = ticketMap.get(a.Id_Ticket);
+                    if (!existing || new Date(a.Fecha_AsignacionRaw) > new Date(existing.Fecha_AsignacionRaw)) {
+                        ticketMap.set(a.Id_Ticket, a);
+                    }
+                });
+                base = Array.from(ticketMap.values());
+                
+                // Filtrar asignaciones según el rol
+                if (role === 2) {
+                    // Técnico: solo ver sus propias asignaciones
+                    base = base.filter(a => a.Id_Tecnico === currentUser.Id);
+                }
+                // Admin (role === 1): ve todas las asignaciones
 
                 // Paso 2: Obtener IDs únicos de tickets para consultas
                 const uniqueTicketIds = Array.from(new Set(base.map(a => a.Id_Ticket).filter(Boolean)));
@@ -394,11 +476,30 @@ export default function TableAssignments() {
 
                 // Actualizar estado solo si el componente sigue montado
                 if (mounted) setAssignments(enriched);
-                if (mounted && (!enriched || !enriched.length)) setError(t('assignments.board.noAssignments'));
+                if (mounted && (!enriched || !enriched.length)) {
+                    setError('No hay asignaciones disponibles');
+                    toast.info('No hay asignaciones disponibles');
+                }
+
+                // Paso 5: Obtener técnicos disponibles para filtros (solo para admin)
+                if (role === 1) {
+                    try {
+                        const techRes = await TechnicianService.getTechnicians();
+                        const techs = techRes?.data?.data ?? [];
+                        if (mounted) setAvailableTechnicians(Array.isArray(techs) ? techs : []);
+                    } catch {
+                        // Si falla, continuar sin filtros
+                        if (mounted) setAvailableTechnicians([]);
+                    }
+                } else {
+                    if (mounted) toast.success('Asignaciones cargadas correctamente');
+                }
             } catch (e) {
                 if (mounted) {
-                    setError(e?.message ?? String(e));
+                    const errorMsg = e?.message ?? String(e);
+                    setError(errorMsg);
                     setAssignments([]);
+                    toast.error('Error al cargar las asignaciones: ' + errorMsg);
                 }
             } finally {
                 if (mounted) setLoading(false);
@@ -454,7 +555,7 @@ export default function TableAssignments() {
 
     // Agrupar asignaciones por día de la semana (Lunes-Domingo)
     function groupByWeekDay(assignmentsArray, weekStartDate) {
-        const days = DAY_KEYS.map(key => t(`assignments.board.days.${key}`));
+        const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
         const grouped = {};
         days.forEach(day => grouped[day] = []);
 
@@ -481,26 +582,101 @@ export default function TableAssignments() {
         return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
     }
 
-    // Función auxiliar para traducir claves de estado
+    // Función auxiliar para obtener nombre de estado en español
     const translateStatus = (statusKey) => {
-        return t(`assignments.board.status.${statusKey}`);
+        const statusMap = {
+            'pending': 'Pendiente',
+            'assigned': 'Asignado',
+            'inProgress': 'En Proceso',
+            'resolved': 'Resuelto',
+            'closed': 'Cerrado'
+        };
+        return statusMap[statusKey] || statusKey;
     };
+
+    // Filtrar asignaciones según el técnico seleccionado
+    const filteredAssignments = selectedTechnician === 'all' 
+        ? assignments 
+        : assignments.filter(a => {
+            const techId = parseInt(a.Id_Tecnico);
+            const selectedId = parseInt(selectedTechnician);
+            return techId === selectedId;
+        });
 
     // Agrupar por estado (para Kanban) - usar claves constantes
     const statusKeys = ['assigned', 'inProgress', 'resolved', 'closed'];
 
     const grouped = {};
     statusKeys.forEach((key) => (grouped[key] = []));
-    assignments.forEach((a) => {
+    filteredAssignments.forEach((a) => {
         const st = a.Estado || 'pending'; // Estado ya está en formato de clave
         if (!grouped[st]) grouped[st] = [];
         grouped[st].push(a);
     });
 
     // Asignaciones filtradas para la semana seleccionada
-    const weekAssignments = assignmentsInWeek(weekStart);
+    const weekAssignments = assignmentsInWeek(weekStart).filter(a => 
+        selectedTechnician === 'all' || a.Id_Tecnico === parseInt(selectedTechnician)
+    );
     const weekGroupedByDay = groupByWeekDay(weekAssignments, weekStart);
 
+
+    // ========================================
+    // RENDERIZADO - CONTROL DE ACCESO
+    // ========================================
+    if (accessDenied) {
+        // Verificar si es por falta de sesión o por permisos
+        const userSession = localStorage.getItem('user');
+        const isNoSession = !userSession;
+
+        return (
+            <div className="container mx-auto py-8 px-4 text-white">
+                <ToastContainer
+                    position="top-right"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                />
+                <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+                    <AlertTriangle className="w-16 h-16 text-red-500" />
+                    <h2 className="text-2xl font-bold text-red-400">
+                        {isNoSession ? 'Sesión No Iniciada' : 'Acceso Denegado'}
+                    </h2>
+                    <p className="text-zinc-400 text-center max-w-md">
+                        {isNoSession 
+                            ? 'Debes iniciar sesión para acceder al tablero de asignaciones. Por favor, inicia sesión con tu cuenta de Andromeda.'
+                            : userRole === 3
+                                ? 'Los clientes no tienen acceso al tablero de asignaciones. Esta sección está disponible solo para administradores y técnicos.'
+                                : 'No tienes permisos para acceder al tablero de asignaciones. Esta sección está disponible solo para administradores y técnicos.'
+                        }
+                    </p>
+                    <div className="flex gap-3">
+                        {isNoSession ? (
+                            <Button 
+                                onClick={() => navigate('/login')}
+                                className="mt-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                            >
+                                Ir a Iniciar Sesión
+                            </Button>
+                        ) : (
+                            <Button 
+                                onClick={() => navigate('/')}
+                                className="mt-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                            >
+                                Volver al Inicio
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     // ========================================
     // RENDERIZADO - ESTADO DE CARGA
@@ -508,7 +684,7 @@ export default function TableAssignments() {
     if (loading) {
         return (
             <div className="container mx-auto py-8 px-4 text-white">
-                <div className="text-sm text-zinc-300">{t('assignments.board.loading')}</div>
+                <div className="text-sm text-zinc-300">Cargando asignaciones...</div>
             </div>
         );
     }
@@ -518,25 +694,88 @@ export default function TableAssignments() {
     // ========================================
     return (
         <div className="container mx-auto py-8 px-4 text-white">
-            {/* CABECERA CON CONTROLES */}
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">{t('assignments.board.title')}</h2>
+            {/* Toast Container para notificaciones */}
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
 
-                {/* Selector de vista y controles semanales */}
+            {/* CABECERA CON CONTROLES */}
+            <div className="flex flex-col gap-6 mb-6">
+                {/* Fila 1: Título y Badge en la misma línea */}
                 <div className="flex items-center gap-3">
-                    <label className="text-sm text-zinc-300">{t('assignments.board.viewLabel')}</label>
+                    <h2 className="text-2xl font-bold">Tablero de Asignaciones</h2>
+                    {/* Badge de rol */}
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        userRole === 1 
+                            ? 'bg-purple-500/20 border border-purple-400/50 text-purple-300'
+                            : 'bg-blue-500/20 border border-blue-400/50 text-blue-300'
+                    }`}>
+                        {userRole === 1 ? 'Administrador' : 'Técnico'}
+                    </span>
+                </div>
+
+                {/* Fila 2: Controles de filtro y vista */}
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                    <div className="flex items-center gap-3">
+                    {/* Filtro por técnico (solo visible para admin) */}
+                    {userRole === 1 && availableTechnicians.length > 0 && (
+                        <>
+                            <label className="text-sm text-zinc-300">Filtrar por:</label>
+                            <Select value={selectedTechnician} onValueChange={(val) => {
+                                setSelectedTechnician(val);
+                                if (val === 'all') {
+                                    toast.info('Mostrando asignaciones de todos los técnicos');
+                                } else {
+                                    const tech = availableTechnicians.find(t => String(t.Id) === val);
+                                    toast.info(`Filtrando asignaciones de ${tech?.Nombre || 'técnico seleccionado'}`);
+                                }
+                            }}>
+                                <SelectTrigger className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-3 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md focus-visible:ring-[#6f3c82]/50 focus-visible:border-[#6f3c82] selection:bg-[#6f3c82] selection:text-[#f7f4f3] w-[220px]">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="bg-[rgba(111,60,130,0.15)] backdrop-blur-md border-[#6f3c82] text-[#f7f4f3] focus-visible:ring-0 selection:bg-[#6f3c82] selection:text-[#f7f4f3]">
+                                    <SelectItem value="all" className="data-[highlighted]:bg-[#6f3c82] data-[highlighted]:text-[#f7f4f3] focus:bg-[#6f3c82] focus:text-[#f7f4f3]">
+                                        Todos los técnicos
+                                    </SelectItem>
+                                    {availableTechnicians.map(tech => (
+                                        <SelectItem 
+                                            key={tech.Id} 
+                                            value={String(tech.Id)}
+                                            className="data-[highlighted]:bg-[#6f3c82] data-[highlighted]:text-[#f7f4f3] focus:bg-[#6f3c82] focus:text-[#f7f4f3]"
+                                        >
+                                            {tech.Nombre}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </>
+                    )}
+
+                    <label className="text-sm text-zinc-300">Vista:</label>
 
                     {/* Select personalizado con estilo glassmorphism */}
-                    <Select value={viewMode} onValueChange={(val) => setViewMode(val)}>
+                    <Select value={viewMode} onValueChange={(val) => {
+                        setViewMode(val);
+                        toast.success(val === 'kanban' ? 'Vista Kanban activada' : 'Vista Semanal activada');
+                    }}>
                         <SelectTrigger className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-3 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md focus-visible:ring-[#6f3c82]/50 focus-visible:border-[#6f3c82] selection:bg-[#6f3c82] selection:text-[#f7f4f3] w-[120px]">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-[rgba(111,60,130,0.15)] backdrop-blur-md border-[#6f3c82] text-[#f7f4f3] focus-visible:ring-0 selection:bg-[#6f3c82] selection:text-[#f7f4f3]">
                             <SelectItem value="kanban" className="data-[highlighted]:bg-[#6f3c82] data-[highlighted]:text-[#f7f4f3] focus:bg-[#6f3c82] focus:text-[#f7f4f3]">
-                                {t('assignments.board.viewKanban')}
+                                Kanban
                             </SelectItem>
                             <SelectItem value="week" className="data-[highlighted]:bg-[#6f3c82] data-[highlighted]:text-[#f7f4f3] focus:bg-[#6f3c82] focus:text-[#f7f4f3]">
-                                {t('assignments.board.viewWeek')}
+                                Semanal
                             </SelectItem>
                         </SelectContent>
                     </Select>
@@ -547,8 +786,11 @@ export default function TableAssignments() {
                             {/* Botón: Semana anterior */}
                             <Button
                                 size="sm"
-                                onClick={() => setWeekStart(prev => startOfWeek(new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() - 7)))}
-                                aria-label={t('assignments.board.previousWeek')}
+                                onClick={() => {
+                                    setWeekStart(prev => startOfWeek(new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() - 7)));
+                                    toast.info('Navegando a la semana anterior');
+                                }}
+                                aria-label="Semana anterior"
                                 className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-2 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md hover:bg-[rgba(111,60,130,0.25)] focus-visible:ring-[#6f3c82]/50"
                             >
                                 <ChevronLeft className="w-4 h-4" />
@@ -560,8 +802,11 @@ export default function TableAssignments() {
                             {/* Botón: Semana siguiente */}
                             <Button
                                 size="sm"
-                                onClick={() => setWeekStart(prev => startOfWeek(new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + 7)))}
-                                aria-label={t('assignments.board.nextWeek')}
+                                onClick={() => {
+                                    setWeekStart(prev => startOfWeek(new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + 7)));
+                                    toast.info('Navegando a la semana siguiente');
+                                }}
+                                aria-label="Semana siguiente"
                                 className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-2 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md hover:bg-[rgba(111,60,130,0.25)] focus-visible:ring-[#6f3c82]/50"
                             >
                                 <ChevronRight className="w-4 h-4" />
@@ -570,13 +815,17 @@ export default function TableAssignments() {
                             {/* Botón: Volver a semana actual */}
                             <Button
                                 size="sm"
-                                onClick={() => setWeekStart(startOfWeek(new Date()))}
+                                onClick={() => {
+                                    setWeekStart(startOfWeek(new Date()));
+                                    toast.success('Mostrando semana actual');
+                                }}
                                 className="rounded-full border-2 border-[#6f3c82] text-[#f7f4f3] px-3 py-1 bg-[rgba(111,60,130,0.15)] backdrop-blur-md hover:bg-[rgba(111,60,130,0.25)] focus-visible:ring-[#6f3c82]/50"
                             >
-                                {t('assignments.board.today')}
+                                Hoy
                             </Button>
                         </div>
                     )}
+                    </div>
                 </div>
             </div>
 
@@ -609,7 +858,7 @@ export default function TableAssignments() {
                             </div>
 
                             <div className="space-y-3">
-                                {grouped[statusKey].length === 0 && <div className="text-xs text-zinc-500">{t('assignments.board.noAssignments')}</div>}
+                                {grouped[statusKey].length === 0 && <div className="text-xs text-zinc-500">No hay asignaciones disponibles</div>}
 
                                 {/* Mapear cada asignación a una tarjeta */}
                                 {grouped[statusKey].map((ticket) => (
@@ -651,11 +900,11 @@ export default function TableAssignments() {
                                             {/* Texto descriptivo del SLA */}
                                             <div className="text-xs mt-1">
                                                 {ticket.Estado === 'resolved' || ticket.Estado === 'closed' ? (
-                                                    <span className="text-emerald-400">✓ {t('assignments.board.sla.completed')}</span>
+                                                    <span className="text-emerald-400">✓ Completado</span>
                                                 ) : ticket.PercentSLA >= 100 && ticket.slaEnd ? (
                                                     <span className="text-red-400 font-medium">⚠️ {getOverdueMessage(ticket.slaEnd)}</span>
                                                 ) : (
-                                                    <span className="text-zinc-400">{ticket.PercentSLA}% {t('assignments.board.sla.consumed')}</span>
+                                                    <span className="text-zinc-400">{ticket.PercentSLA}% consumido</span>
                                                 )}
                                             </div>
                                         </div>
@@ -667,11 +916,14 @@ export default function TableAssignments() {
                                                 <TooltipProvider>
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
-                                                            <Button size="sm" variant="ghost" onClick={() => navigate(`/Assignment/${ticket.Id}`)} aria-label={`${t('assignments.board.tooltip.viewDetail')} ${ticket.Id}`}>
+                                                            <Button size="sm" variant="ghost" onClick={() => {
+                                                                toast.info(`Abriendo detalles del ticket #${ticket.Id_Ticket}`);
+                                                                navigate(`/Assignment/${ticket.Id_Ticket}`);
+                                                            }} aria-label={`Ver detalle ${ticket.Id_Ticket}`}>
                                                                 <Eye className="w-4 h-4" />
                                                             </Button>
                                                         </TooltipTrigger>
-                                                        <TooltipContent>{t('assignments.board.tooltip.viewDetail')}</TooltipContent>
+                                                        <TooltipContent>Ver detalle</TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
 
@@ -690,24 +942,32 @@ export default function TableAssignments() {
                                                 </div>
                                             </div>
 
-                                            {/* Botones adicionales (sin funcionalidad aún) */}
+                                            {/* Botones adicionales */}
                                             <div className="flex items-center gap-2">
-                                                {/* Botón para modificar estado*/}
-                                                {ticket.Estado !== 'closed' && ticket.Estado !== 'resolved' && (
+                                                {/* Botón para modificar estado */}
+                                                {/* Técnico: puede cambiar de Asignado -> En Proceso -> Resuelto */}
+                                                {/* Admin: solo puede cerrar tickets resueltos */}
+                                                {(
+                                                    (userRole === 2 && ticket.Estado !== 'closed' && ticket.Estado !== 'resolved') ||
+                                                    (userRole === 1 && ticket.Estado === 'resolved')
+                                                ) && (
                                                     <Tooltip Tooltip >
                                                         <TooltipTrigger asChild>
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={() => navigate(`/ChangeState/${ticket.Id}`)}
-                                                                aria-label={`Cambiar Estado ${ticket.Id}`}
+                                                                onClick={() => {
+                                                                    toast.info(`Preparando cambio de estado para ticket #${ticket.Id_Ticket}`);
+                                                                    navigate(`/ChangeState/${ticket.Id_Ticket}`);
+                                                                }}
+                                                                aria-label={`Cambiar Estado ${ticket.Id_Ticket}`}
                                                             >
                                                                 <Edit className="h-4 w-4" style={{ color: '#fc52af' }} />
                                                             </Button>
                                                         </TooltipTrigger>
                                                         <TooltipContent>{t('Cambiar Estado')}</TooltipContent>
                                                     </Tooltip>
-                                                )}
+                                                )}  
                                             </div>
                                         </div>
                                     </div>
@@ -722,7 +982,7 @@ export default function TableAssignments() {
                 // ========================================
                 <div className="space-y-6">
                     {/* Mensaje si no hay asignaciones en la semana */}
-                    {weekAssignments.length === 0 && <div className="text-xs text-zinc-500">{t('assignments.board.noAssignmentsWeek')}</div>}
+                    {weekAssignments.length === 0 && <div className="text-xs text-zinc-500">No hay asignaciones en esta semana</div>}
 
                     {/* Iterar por cada día de la semana */}
                     {Object.entries(weekGroupedByDay).map(([dayName, dayAssignments], index) => {
@@ -739,21 +999,27 @@ export default function TableAssignments() {
                                 {/* Tarjetas de asignaciones del día */}
                                 <div className="space-y-2">
                                     {dayAssignments.map((ticket) => (
-                                        <div key={ticket.Id} className={`p-3 rounded border-2 border-[#ff95b5]/50 bg-[rgba(255,255,255,0.02)]`}>
-                                            <div className="flex items-start justify-between">
-                                                {/* Información izquierda: Título, categoría, técnico */}
-                                                <div>
-                                                    <div className="text-sm font-medium text-zinc-100">{ticket.Titulo}</div>
+                                        <div key={ticket.Id} className="p-3 rounded border-2 border-[#ff95b5]/50 bg-[rgba(255,255,255,0.02)]">
+                                            <div className="grid grid-cols-2 gap-4 items-start">
+                                                {/* Columna izquierda: Info principal */}
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex items-center gap-2">
+                                                        {/* Icono relacionado con la categoría */}
+                                                        <span className="p-2 rounded-full bg-purple-500/20 border border-purple-400/50">
+                                                            {categoryIcon(ticket.Categoria)}
+                                                        </span>
+                                                        <span className="text-sm font-medium text-zinc-100">{ticket.Titulo}</span>
+                                                    </div>
                                                     <div className="text-xs text-zinc-400">
-                                                        #{ticket.Id} · {ticket.Categoria} · {ticket.Dia ? ticket.Dia + ' · ' : ''}{ticket.Tecnico ? ticket.Tecnico : ''}
+                                                        <span>#{ticket.Id}</span> · <span>{ticket.Categoria}</span> · {ticket.Dia ? <span>{ticket.Dia} · </span> : null}{ticket.Tecnico ? <span>{ticket.Tecnico}</span> : null}
                                                         {ticket.Puntaje && <span className="ml-1.5 px-2 py-0.5 bg-purple-500/20 border border-purple-400/50 text-purple-300 rounded text-[10px] font-semibold">★ {Math.round(ticket.Puntaje)}</span>}
                                                     </div>
-                                                    <div className="text-xs text-zinc-400 mt-1">{t('assignments.board.date')} {formatDateShort(ticket.slaStart || ticket.Fecha_AsignacionRaw)}</div>
+                                                    <div className="text-xs text-zinc-400 mt-1">Fecha: {formatDateShort(ticket.slaStart || ticket.Fecha_AsignacionRaw)}</div>
                                                 </div>
 
-                                                {/* Información derecha: Estado, SLA, botón ver */}
-                                                <div className="flex flex-col items-end">
-                                                    {/* Badge de Estado Mejorado */}
+                                                {/* Columna derecha: Estado, SLA, tiempo límite, botones */}
+                                                <div className="flex flex-col items-end gap-2">
+                                                    {/* Estado */}
                                                     <div className={`px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm border shadow-sm transition-all duration-200 ${ticket.Estado === 'assigned'
                                                             ? 'bg-blue-500/20 border-blue-400/50 text-blue-300'
                                                             : ticket.Estado === 'inProgress'
@@ -766,39 +1032,56 @@ export default function TableAssignments() {
                                                         }`}>
                                                         {translateStatus(ticket.Estado)}
                                                     </div>
-
-                                                    {/* Barra de progreso SLA compacta */}
-                                                    <div className="w-40 mt-2">
+                                                    {/* SLA barra y porcentaje */}
+                                                    <div className="w-40">
                                                         <div className="w-full h-2 bg-black/20 rounded">
                                                             <div className={`h-2 rounded ${ticket.Estado === 'resolved' || ticket.Estado === 'closed' ? 'bg-emerald-500' : ticket.PercentSLA >= 100 ? 'bg-red-500' : 'bg-gradient-to-r from-emerald-400 to-red-400'}`} style={{ width: `${ticket.PercentSLA}%` }} />
                                                         </div>
-                                                        <div className="text-xs text-zinc-400 mt-1">{ticket.PercentSLA}% {t('assignments.board.sla.consumed')}</div>
+                                                        <div className="text-xs text-zinc-400 mt-1">{ticket.PercentSLA}% consumido</div>
                                                     </div>
-
-                                                    <div className="flex flex-row items-end mt-2 gap-2">
-
-                                                        {/* Botón para modificar estado*/}
-                                                        {ticket.Estado !== 'closed' && ticket.Estado !== 'resolved' && (
-                                                            <Tooltip Tooltip >
-                                                                <TooltipTrigger asChild>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        onClick={() => navigate(`/ChangeState/${ticket.Id}`)}
-                                                                        aria-label={`Cambiar Estado ${ticket.Id}`}
-                                                                    >
-                                                                        <Edit className="h-4 w-4" style={{ color: '#fc52af' }} />
-                                                                    </Button>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent>{t('Cambiar Estado')}</TooltipContent>
-                                                            </Tooltip>
+                                                    {/* Tiempo límite */}
+                                                    <div className="flex items-center gap-2 text-xs text-zinc-400">
+                                                        <span className="inline-flex items-center gap-1">
+                                                            {/* Icono de reloj */}
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6l4 2" /></svg>
+                                                            <span>Tiempo límite:</span>
+                                                        </span>
+                                                        <span className="font-semibold text-pink-300">
+                                                            {ticket.slaEnd && ticket.slaEnd !== 'N/D' ? formatDateShort(ticket.slaEnd) : 'Sin límite'}
+                                                        </span>
+                                                    </div>
+                                                    {/* Botones de acción */}
+                                                    <div className="flex flex-row items-end gap-2">
+                                                        {(
+                                                            (userRole === 2 && ticket.Estado !== 'closed' && ticket.Estado !== 'resolved') ||
+                                                            (userRole === 1 && ticket.Estado === 'resolved')
+                                                        ) && (
+                                                            <TooltipProvider>
+                                                                <Tooltip>
+                                                                    <TooltipTrigger asChild>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="icon"
+                                                                            onClick={() => {
+                                                                                toast.info(`Preparando cambio de estado para ticket #${ticket.Id_Ticket}`);
+                                                                                navigate(`/ChangeState/${ticket.Id_Ticket}`);
+                                                                            }}
+                                                                            aria-label={`Cambiar Estado ${ticket.Id_Ticket}`}
+                                                                        >
+                                                                            <Edit className="h-4 w-4" style={{ color: '#fc52af' }} />
+                                                                        </Button>
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent>Cambiar Estado</TooltipContent>
+                                                                </Tooltip>
+                                                            </TooltipProvider>
                                                         )}
                                                         {/* Botón para ver detalles */}
-                                                        <div className="mt-2">
-                                                            <Button size="sm" variant="ghost" onClick={() => navigate(`/Assignment/${ticket.Id}`)}>
-                                                                <Eye className="w-4 h-4" />
-                                                            </Button>
-                                                        </div>
+                                                        <Button size="sm" variant="ghost" onClick={() => {
+                                                            toast.info(`Abriendo detalles del ticket #${ticket.Id_Ticket}`);
+                                                            navigate(`/Assignment/${ticket.Id_Ticket}`);
+                                                        }}>
+                                                            <Eye className="w-4 h-4" />
+                                                        </Button>
                                                     </div>
                                                 </div>
                                             </div>

@@ -225,6 +225,67 @@
       "noRuleApplied": "No aplicada (asignación manual)",
       "ticketInfo": "Información del Ticket",
       "timeLimit": "Tiempo Límite"
+    },
+    "assignments": {
+      "board": {
+        "title": "Tablero de Asignaciones",
+        "loading": "Cargando asignaciones...",
+        "noAssignments": "No hay asignaciones disponibles",
+        "noAssignmentsWeek": "No hay asignaciones en esta semana",
+        "viewLabel": "Vista",
+        "viewKanban": "Kanban",
+        "viewWeek": "Semanal",
+        "filterLabel": "Filtrar por",
+        "filterAll": "Todos los técnicos",
+        "roleAdmin": "Administrador",
+        "roleTech": "Técnico",
+        "backToHome": "Volver al Inicio",
+        "goToLogin": "Ir a Iniciar Sesión",
+        "previousWeek": "Semana anterior",
+        "nextWeek": "Semana siguiente",
+        "today": "Hoy",
+        "date": "Fecha",
+        "status": {
+          "pending": "Pendiente",
+          "assigned": "Asignado",
+          "inProgress": "En Proceso",
+          "resolved": "Resuelto",
+          "closed": "Cerrado"
+        },
+        "days": {
+          "monday": "Lunes",
+          "tuesday": "Martes",
+          "wednesday": "Miércoles",
+          "thursday": "Jueves",
+          "friday": "Viernes",
+          "saturday": "Sábado",
+          "sunday": "Domingo"
+        },
+        "sla": {
+          "consumed": "consumido",
+          "completed": "Completado",
+          "overdueDays": "Vencido hace {{count}} día",
+          "overdueDays_plural": "Vencido hace {{count}} días",
+          "overdueHours": "Vencido hace {{count}} hora",
+          "overdueHours_plural": "Vencido hace {{count}} horas",
+          "overdueRecently": "Vencido recientemente"
+        },
+        "tooltip": {
+          "viewDetail": "Ver detalle"
+        },
+        "errors": {
+          "userNotFound": "No se pudo cargar la información del usuario",
+          "noSession": "Sesión No Iniciada",
+          "noSessionMessage": "Debes iniciar sesión para acceder al tablero de asignaciones. Por favor, inicia sesión con tu cuenta de Andromeda.",
+          "invalidSession": "La sesión es inválida o ha expirado",
+          "accessDenied": "Acceso Denegado",
+          "accessDeniedMessage": "No tienes permisos para acceder al tablero de asignaciones. Esta sección está disponible solo para administradores y técnicos.",
+          "loadFailed": "Error al cargar las asignaciones"
+        },
+        "messages": {
+          "loadSuccess": "Asignaciones cargadas correctamente"
+        }
+      }
     }
   },
   "technician": {

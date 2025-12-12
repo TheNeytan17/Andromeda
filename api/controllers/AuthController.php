@@ -107,10 +107,14 @@ class Auth
                 'message' => 'Inicio de sesión exitoso',
                 'token' => $token,
                 'user' => [
-                    'id' => $user->Id,
-                    'nombre' => $user->Nombre,
-                    'correo' => $user->Correo,
-                    'rol' => $user->Rol,
+                    'Id' => $user->Id,
+                    'id' => $user->Id,  // Mantener compatibilidad
+                    'Nombre' => $user->Nombre,
+                    'nombre' => $user->Nombre,  // Mantener compatibilidad
+                    'Correo' => $user->Correo,
+                    'correo' => $user->Correo,  // Mantener compatibilidad
+                    'Rol' => $user->Rol,
+                    'rol' => $user->Rol,  // Mantener compatibilidad
                     'rolNombre' => $rolNombre
                 ]
             ]);
